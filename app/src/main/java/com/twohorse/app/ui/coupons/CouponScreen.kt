@@ -96,19 +96,77 @@ fun CouponScreen(
             }
             .onFailure {
                 error =
-                    it.message
-                        ?: "Kupon oluşturulamadı."
+                    couponErrorMessage(it)
             }
 
         loading = false
     }
 
-    LazyColumn(
-        modifier =
-            Modifier.fillMaxSize(),
-        verticalArrangement =
-            Arrangement.spacedBy(12.dp)
-    ) {
+    val scope = rememberCoroutineScope()
+
+    Scaffold(
+        containerColor = Bg,
+        bottomBar = {
+            Surface(
+                color = Bg
+            ) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            generate()
+                        }
+                    },
+                    enabled =
+                        !loading &&
+                        selectedCity.isNotBlank(),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 18.dp,
+                                vertical = 12.dp
+                            )
+                            .height(54.dp),
+                    shape =
+                        RoundedCornerShape(16.dp),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Green
+                        )
+                ) {
+                    if (loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Stars,
+                            contentDescription = null
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(8.dp)
+                        )
+
+                        Text(
+                            text = "Kuponları Oluştur",
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            verticalArrangement =
+                Arrangement.spacedBy(12.dp)
+        ) {
         item {
             CouponHeader(
                 onBack = onBack
@@ -262,6 +320,15 @@ fun CouponScreen(
         }
 
         result?.let { couponResult ->
+            if (couponResult.coupons.isEmpty()) {
+                item {
+                    ErrorCard(
+                        message =
+                            "Bu seçim için uygun kupon üretilemedi. Bütçeyi artırmayı veya diğer altılıyı seçmeyi dene."
+                    )
+                }
+            }
+
             item {
                 Column(
                     modifier =
@@ -291,76 +358,9 @@ fun CouponScreen(
             }
         }
 
-        item {
-            Spacer(
-                modifier =
-                    Modifier.height(30.dp)
-            )
-        }
-    }
-
-    val scope =
-        rememberCoroutineScope()
-
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(
-                    start = 18.dp,
-                    end = 18.dp,
-                    bottom = 18.dp
-                ),
-        contentAlignment =
-            Alignment.BottomCenter
-    ) {
-        Button(
-            onClick = {
-                scope.launch {
-                    generate()
-                }
-            },
-            enabled =
-                !loading &&
-                selectedCity.isNotBlank(),
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-            shape =
-                RoundedCornerShape(16.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = Green
-                )
-        ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier =
-                        Modifier.size(22.dp),
-                    color =
-                        Color.White,
-                    strokeWidth =
-                        2.dp
-                )
-            } else {
-                Icon(
-                    imageVector =
-                        Icons.Default.Stars,
-                    contentDescription =
-                        null
-                )
-
+            item {
                 Spacer(
-                    modifier =
-                        Modifier.width(8.dp)
-                )
-
-                Text(
-                    text =
-                        "Kuponları Oluştur",
-                    fontWeight =
-                        FontWeight.ExtraBold
+                    modifier = Modifier.height(16.dp)
                 )
             }
         }

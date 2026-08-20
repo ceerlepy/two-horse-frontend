@@ -329,8 +329,22 @@ class TwoHorseApi(
                 if (
                     !response.isSuccessful
                 ) {
-                    throw IllegalStateException(
-                        "HTTP ${response.code}: $body"
+                    val errorJson =
+                        runCatching {
+                            JSONObject(body)
+                        }.getOrNull()
+
+                    val apiCode =
+                        errorJson
+                            ?.optString("error")
+                            ?.takeIf {
+                                it.isNotBlank()
+                            }
+
+                    throw ApiException(
+                        statusCode = response.code,
+                        apiCode = apiCode,
+                        message = apiCode ?: "HTTP ${response.code}"
                     )
                 }
 
