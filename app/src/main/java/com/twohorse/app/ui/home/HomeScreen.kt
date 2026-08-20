@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -25,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
@@ -53,12 +57,25 @@ fun HomeScreen(
             TwoHorseRepository()
         }
 
+    val lifecycleOwner =
+        LocalLifecycleOwner.current
+
     var loading by
         remember {
             mutableStateOf(true)
         }
 
     var refreshing by
+        remember {
+            mutableStateOf(false)
+        }
+
+    var requestInFlight by
+        remember {
+            mutableStateOf(false)
+        }
+
+    var showingStaleData by
         remember {
             mutableStateOf(false)
         }
@@ -107,23 +124,78 @@ fun HomeScreen(
         }
     }
 
+    DisposableEffect(
+        lifecycleOwner
+    ) {
+        var firstResume =
+            true
+
+        val observer =
+            LifecycleEventObserver {
+                _,
+                event ->
+
+                if (
+                    event ==
+                    Lifecycle.Event.ON_RESUME
+                ) {
+                    if (
+                        firstResume
+                    ) {
+                        firstResume =
+                            false
+                    } else if (
+                        !requestInFlight
+                    ) {
+                        refreshKey++
+                    }
+                }
+            }
+
+        lifecycleOwner.lifecycle.addObserver(
+            observer
+        )
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(
+                observer
+            )
+        }
+    }
+
     LaunchedEffect(
         refreshKey
     ) {
         if (
-            data == null
+            requestInFlight
         ) {
-            loading = true
-        } else {
-            refreshing = true
+            return@LaunchedEffect
         }
 
-        error = null
+        requestInFlight =
+            true
+
+        if (
+            data == null
+        ) {
+            loading =
+                true
+        } else {
+            refreshing =
+                true
+        }
+
+        error =
+            null
 
         repository
             .today()
             .onSuccess {
-                data = it
+                data =
+                    it
+
+                showingStaleData =
+                    false
 
                 val availableCities =
                     it.meetings
@@ -144,10 +216,19 @@ fun HomeScreen(
                 error =
                     it.message
                         ?: "Veri alınamadı"
+
+                showingStaleData =
+                    data != null
             }
 
-        loading = false
-        refreshing = false
+        loading =
+            false
+
+        refreshing =
+            false
+
+        requestInFlight =
+            false
     }
 
     val allRaces =
@@ -215,10 +296,33 @@ fun HomeScreen(
                 refreshing =
                     refreshing,
                 onRefresh = {
-                    refreshKey++
+                    if (
+                        !requestInFlight
+                    ) {
+                        refreshKey++
+                    }
                 },
                 onHistory = onHistoryClick
             )
+        }
+
+        if (
+            showingStaleData
+        ) {
+            item {
+                Text(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        ),
+                    text =
+                        "Yenileme başarısız. Son başarılı veri gösteriliyor.",
+                    color =
+                        Muted,
+                    fontSize =
+                        12.sp
+                )
+            }
         }
 
         if (
@@ -328,7 +432,11 @@ fun HomeScreen(
 
                     Button(
                         onClick = {
-                            refreshKey++
+                            if (
+                                !requestInFlight
+                            ) {
+                                refreshKey++
+                            }
                         }
                     ) {
                         Text(
