@@ -9,8 +9,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.ui.coupons.CouponScreen
+import com.twohorse.app.ui.history.HistoryDetailScreen
+import com.twohorse.app.ui.history.HistoryScreen
 import com.twohorse.app.ui.home.HomeScreen
 import com.twohorse.app.ui.race.RaceDetailScreen
 import com.twohorse.app.ui.theme.Bg
@@ -27,6 +30,14 @@ private sealed interface AppScreen {
     data class Coupons(
         val cities: List<String>,
         val selectedCity: String?
+    ) :
+        AppScreen
+
+    data object History :
+        AppScreen
+
+    data class HistoryDetail(
+        val race: HistoryRace
     ) :
         AppScreen
 }
@@ -46,7 +57,15 @@ fun TwoHorseApp() {
             AppScreen.Home
     ) {
         screen =
-            AppScreen.Home
+            when (
+                screen
+            ) {
+                is AppScreen.HistoryDetail ->
+                    AppScreen.History
+
+                else ->
+                    AppScreen.Home
+            }
     }
 
     Surface(
@@ -68,6 +87,7 @@ fun TwoHorseApp() {
                                 race
                             )
                     },
+
                     onSixFoldClick = {
                         cities,
                         selectedCity ->
@@ -79,6 +99,11 @@ fun TwoHorseApp() {
                                 selectedCity =
                                     selectedCity
                             )
+                    },
+
+                    onHistoryClick = {
+                        screen =
+                            AppScreen.History
                     }
                 )
             }
@@ -103,6 +128,33 @@ fun TwoHorseApp() {
                     onBack = {
                         screen =
                             AppScreen.Home
+                    }
+                )
+            }
+
+            AppScreen.History -> {
+                HistoryScreen(
+                    onBack = {
+                        screen =
+                            AppScreen.Home
+                    },
+                    onRaceClick = {
+                        race ->
+                        screen =
+                            AppScreen.HistoryDetail(
+                                race
+                            )
+                    }
+                )
+            }
+
+            is AppScreen.HistoryDetail -> {
+                HistoryDetailScreen(
+                    historyRace =
+                        current.race,
+                    onBack = {
+                        screen =
+                            AppScreen.History
                     }
                 )
             }

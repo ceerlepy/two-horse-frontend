@@ -62,3 +62,16 @@ data class CouponResult(
     val budgetTl: Double,
     val coupons: List<Coupon>
 )
+
+data class HistoryRace(
+    val raceDate: String,
+    val city: String,
+    val raceNumber: Int,
+    val startTime: String,
+    val startsAt: String?,
+    val distanceMeters: Int?,
+    val track: String,
+    val runners: List<Horse>,
+    val expertPredictionCount: Int,
+    val finalizedAt: String?
+)

@@ -5,6 +5,7 @@ import com.twohorse.app.domain.model.CouponHorse
 import com.twohorse.app.domain.model.CouponLeg
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.Horse
+import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.Meeting
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
@@ -83,6 +84,117 @@ class TwoHorseApi(
                 date = date,
                 meetings = meetings
             )
+        }
+
+    suspend fun getHistory():
+        List<HistoryRace> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                getJson(
+                    "/api/history"
+                )
+
+            val history =
+                json.optJSONArray(
+                    "history"
+                )
+
+            buildList {
+                if (
+                    history != null
+                ) {
+                    for (
+                        i in 0 until
+                        history.length()
+                    ) {
+                        val item =
+                            history
+                                .getJSONObject(i)
+
+                        val runnersJson =
+                            item.optJSONArray(
+                                "runners"
+                            )
+
+                        val runners =
+                            buildList {
+                                if (
+                                    runnersJson != null
+                                ) {
+                                    for (
+                                        j in 0 until
+                                        runnersJson.length()
+                                    ) {
+                                        add(
+                                            parseHorse(
+                                                runnersJson
+                                                    .getJSONObject(j)
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+
+                        val experts =
+                            item.optJSONArray(
+                                "expertPredictions"
+                            )
+
+                        add(
+                            HistoryRace(
+                                raceDate =
+                                    item.optString(
+                                        "raceDate"
+                                    ),
+
+                                city =
+                                    item.optString(
+                                        "city"
+                                    ),
+
+                                raceNumber =
+                                    item.optInt(
+                                        "raceNumber"
+                                    ),
+
+                                startTime =
+                                    item.optString(
+                                        "startTime"
+                                    ),
+
+                                startsAt =
+                                    item.firstString(
+                                        "startsAt"
+                                    ),
+
+                                distanceMeters =
+                                    item.firstInt(
+                                        "distanceMeters"
+                                    ),
+
+                                track =
+                                    item.optString(
+                                        "track"
+                                    ),
+
+                                runners =
+                                    runners,
+
+                                expertPredictionCount =
+                                    experts?.length()
+                                        ?: 0,
+
+                                finalizedAt =
+                                    item.firstString(
+                                        "finalizedAt"
+                                    )
+                            )
+                        )
+                    }
+                }
+            }
         }
 
     suspend fun getCoupons(

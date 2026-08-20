@@ -2,6 +2,7 @@ package com.twohorse.app.data.repository
 
 import com.twohorse.app.data.api.TwoHorseApi
 import com.twohorse.app.domain.model.CouponResult
+import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.TodayData
 
 class TwoHorseRepository(
@@ -13,6 +14,12 @@ class TwoHorseRepository(
         Result<TodayData> =
         runCatching {
             api.getToday()
+        }
+
+    suspend fun history():
+        Result<List<HistoryRace>> =
+        runCatching {
+            api.getHistory()
         }
 
     suspend fun coupons(
