@@ -852,6 +852,31 @@ private fun ResultSummary(
             fontSize =
                 12.sp
         )
+
+        if (
+            result.unitPriceTl != null
+        ) {
+            Text(
+                text =
+                    "Birim fiyat ${"%.2f".format(result.unitPriceTl)} TL · " +
+                    "Çarpan ${result.multiplier}",
+                color =
+                    Muted,
+                fontSize =
+                    10.sp
+            )
+        }
+
+        result.generatedAt?.let {
+            Text(
+                text =
+                    "Backend üretim zamanı: $it",
+                color =
+                    Muted,
+                fontSize =
+                    9.sp
+            )
+        }
     }
 }
 

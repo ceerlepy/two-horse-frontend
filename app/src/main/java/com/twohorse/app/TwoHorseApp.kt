@@ -3,11 +3,7 @@ package com.twohorse.app
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.Race
@@ -29,7 +25,8 @@ private sealed interface AppScreen {
 
     data class Coupons(
         val cities: List<String>,
-        val selectedCity: String?
+        val selectedCity: String?,
+        val returnRace: Race? = null
     ) :
         AppScreen
 
@@ -51,6 +48,19 @@ fun TwoHorseApp() {
             )
         }
 
+    fun couponBack(
+        coupons: AppScreen.Coupons
+    ) {
+        screen =
+            coupons.returnRace
+                ?.let {
+                    AppScreen.RaceDetail(
+                        it
+                    )
+                }
+                ?: AppScreen.Home
+    }
+
     BackHandler(
         enabled =
             screen !is
@@ -58,10 +68,20 @@ fun TwoHorseApp() {
     ) {
         screen =
             when (
-                screen
+                val current =
+                    screen
             ) {
                 is AppScreen.HistoryDetail ->
                     AppScreen.History
+
+                is AppScreen.Coupons ->
+                    current.returnRace
+                        ?.let {
+                            AppScreen.RaceDetail(
+                                it
+                            )
+                        }
+                        ?: AppScreen.Home
 
                 else ->
                     AppScreen.Home
@@ -97,7 +117,9 @@ fun TwoHorseApp() {
                                 cities =
                                     cities,
                                 selectedCity =
-                                    selectedCity
+                                    selectedCity,
+                                returnRace =
+                                    null
                             )
                     },
 
@@ -112,9 +134,26 @@ fun TwoHorseApp() {
                 RaceDetailScreen(
                     race =
                         current.race,
+
                     onBack = {
                         screen =
                             AppScreen.Home
+                    },
+
+                    onOpenCoupons = {
+                        city ->
+
+                        screen =
+                            AppScreen.Coupons(
+                                cities =
+                                    listOf(
+                                        city
+                                    ),
+                                selectedCity =
+                                    city,
+                                returnRace =
+                                    current.race
+                            )
                     }
                 )
             }
@@ -123,11 +162,14 @@ fun TwoHorseApp() {
                 CouponScreen(
                     cities =
                         current.cities,
+
                     initialCity =
                         current.selectedCity,
+
                     onBack = {
-                        screen =
-                            AppScreen.Home
+                        couponBack(
+                            current
+                        )
                     }
                 )
             }
@@ -138,6 +180,7 @@ fun TwoHorseApp() {
                         screen =
                             AppScreen.Home
                     },
+
                     onRaceClick = {
                         race ->
                         screen =
@@ -152,6 +195,7 @@ fun TwoHorseApp() {
                 HistoryDetailScreen(
                     historyRace =
                         current.race,
+
                     onBack = {
                         screen =
                             AppScreen.History

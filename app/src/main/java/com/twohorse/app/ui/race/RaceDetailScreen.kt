@@ -27,7 +27,8 @@ import kotlin.math.roundToInt
 @Composable
 fun RaceDetailScreen(
     race: Race,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenCoupons: (String) -> Unit
 ) {
     BackHandler(onBack = onBack)
 
@@ -152,6 +153,38 @@ fun RaceDetailScreen(
                     race = currentRace,
                     horses = rankedHorses
                 )
+            }
+        }
+
+        item {
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
+                Button(
+                    onClick = {
+                        onOpenCoupons(
+                            currentRace.city
+                        )
+                    },
+                    modifier =
+                        Modifier.fillMaxWidth(),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor =
+                                Green
+                        ),
+                    shape =
+                        RoundedCornerShape(
+                            14.dp
+                        )
+                ) {
+                    Text(
+                        "Bu şehir için Altılı Kupon"
+                    )
+                }
             }
         }
 

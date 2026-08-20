@@ -255,37 +255,116 @@ class TwoHorseApi(
                     }
                 }
 
+            val responseCity =
+                json.optString(
+                    "city",
+                    city
+                )
+
+            val responseSixfold =
+                json.optInt(
+                    "sixfold",
+                    sixfold
+                )
+
+            val startRace =
+                json.optNullableInt(
+                    "startRace"
+                )
+
+            val endRace =
+                json.optNullableInt(
+                    "endRace"
+                )
+
+            val responseBudget =
+                json.optDouble(
+                    "budgetTl",
+                    budgetTl
+                )
+
+            require(
+                responseCity.isNotBlank()
+            ) {
+                "INVALID_COUPON_RESPONSE_CITY"
+            }
+
+            require(
+                responseSixfold == 1 ||
+                responseSixfold == 2
+            ) {
+                "INVALID_COUPON_RESPONSE_SIXFOLD"
+            }
+
+            require(
+                startRace != null &&
+                endRace != null &&
+                endRace >= startRace &&
+                endRace - startRace == 5
+            ) {
+                "INVALID_COUPON_RESPONSE_WINDOW"
+            }
+
+            require(
+                responseBudget > 0.0
+            ) {
+                "INVALID_COUPON_RESPONSE_BUDGET"
+            }
+
+            coupons.forEach {
+                coupon ->
+
+                require(
+                    coupon.totalTl >= 0.0
+                ) {
+                    "INVALID_COUPON_TOTAL"
+                }
+
+                require(
+                    coupon.legs.size == 6
+                ) {
+                    "INVALID_COUPON_LEG_COUNT"
+                }
+            }
+
             CouponResult(
                 city =
-                    json.optString(
-                        "city",
-                        city
-                    ),
+                    responseCity,
 
                 sixfold =
-                    json.optInt(
-                        "sixfold",
-                        sixfold
-                    ),
+                    responseSixfold,
 
                 startRace =
-                    json.optNullableInt(
-                        "startRace"
-                    ),
+                    startRace,
 
                 endRace =
-                    json.optNullableInt(
-                        "endRace"
-                    ),
+                    endRace,
 
                 budgetTl =
-                    json.optDouble(
-                        "budgetTl",
-                        budgetTl
-                    ),
+                    responseBudget,
 
                 coupons =
-                    coupons
+                    coupons,
+
+                date =
+                    json.firstString(
+                        "date"
+                    ),
+
+                unitPriceTl =
+                    json.firstDouble(
+                        "unitPriceTl"
+                    ),
+
+                multiplier =
+                    json.firstInt(
+                        "multiplier"
+                    ) ?: 1,
+
+                generatedAt =
+                    json.firstString(
+                        "generatedAt"
+                    )
             )
         }
 
