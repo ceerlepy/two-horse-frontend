@@ -1191,3 +1191,58 @@ private fun probabilityText(
     return "%.1f%%"
         .format(percent)
 }
+
+
+private fun visualCouponProfileTitle(
+    profile: String
+): String {
+    val normalized =
+        profile
+            .trim()
+            .lowercase()
+
+    return when {
+        normalized.contains("safe") ||
+        normalized.contains("conservative") ||
+        normalized.contains("guven") ->
+            "Güvenli Kupon"
+
+        normalized.contains("balanced") ||
+        normalized.contains("denge") ->
+            "Dengeli Kupon"
+
+        normalized.contains("aggressive") ||
+        normalized.contains("agres") ->
+            "Agresif Kupon"
+
+        else ->
+            profile
+    }
+}
+
+private fun visualCouponProfileDescription(
+    profile: String
+): String {
+    val normalized =
+        profile
+            .trim()
+            .lowercase()
+
+    return when {
+        normalized.contains("safe") ||
+        normalized.contains("conservative") ||
+        normalized.contains("guven") ->
+            "Daha güçlü adaylara yoğunlaşır; kuponu kontrollü tutmayı hedefler."
+
+        normalized.contains("balanced") ||
+        normalized.contains("denge") ->
+            "Güçlü adaylarla alternatifleri dengeler."
+
+        normalized.contains("aggressive") ||
+        normalized.contains("agres") ->
+            "Daha geniş kapsama ve sürpriz senaryolarına alan açar."
+
+        else ->
+            "Optimizer tarafından oluşturulan kupon profili."
+    }
+}

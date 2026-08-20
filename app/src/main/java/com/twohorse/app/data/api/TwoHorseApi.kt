@@ -930,7 +930,13 @@ class TwoHorseApi(
                 market,
 
             fieldSignal =
-                field
+                field,
+
+            finishPosition =
+                json.firstInt(
+                    "finishPosition",
+                    "finish_position"
+                )
         )
     }
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
@@ -431,13 +432,17 @@ private fun HistoryRaceCard(
             ) {
                 Text(
                     text =
-                        race.city,
+                        "${race.city} · ${race.raceDate}",
                     color =
                         Ink,
                     fontSize =
                         15.sp,
                     fontWeight =
-                        FontWeight.ExtraBold
+                        FontWeight.ExtraBold,
+                    maxLines =
+                        1,
+                    overflow =
+                        TextOverflow.Ellipsis
                 )
 
                 Text(

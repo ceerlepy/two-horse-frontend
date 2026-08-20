@@ -10,8 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.domain.model.HistoryRace
@@ -33,6 +36,7 @@ import com.twohorse.app.ui.theme.Border
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
+import com.twohorse.app.ui.theme.PaleGold
 import com.twohorse.app.ui.theme.PaleGreen
 import com.twohorse.app.ui.theme.Surface
 
@@ -41,299 +45,519 @@ fun HistoryDetailScreen(
     historyRace: HistoryRace,
     onBack: () -> Unit
 ) {
-    BackHandler(
-        onBack = onBack
-    )
+    BackHandler(onBack = onBack)
+
+    val ranked =
+        historyRace.runners
+            .sortedWith(
+                compareByDescending<Horse> {
+                    it.score ?: Double.NEGATIVE_INFINITY
+                }.thenBy {
+                    it.number
+                }
+            )
+
+    val winner =
+        ranked.firstOrNull {
+            it.finishPosition == 1
+        }
+
+    val modelLeader =
+        ranked.firstOrNull()
+
+    val resultAvailable =
+        ranked.any {
+            it.finishPosition != null
+        }
+
+    val top1Hit =
+        winner != null &&
+        modelLeader != null &&
+        winner.number == modelLeader.number
 
     LazyColumn(
-        modifier =
-            Modifier.fillMaxSize(),
-        verticalArrangement =
-            Arrangement.spacedBy(
-                9.dp
-            )
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 8.dp,
-                            vertical = 8.dp
-                        ),
-                verticalAlignment =
-                    Alignment.CenterVertically
+            HistoryHeader(
+                race = historyRace,
+                onBack = onBack
+            )
+        }
+
+        item {
+            Column(
+                modifier = Modifier.padding(horizontal = 18.dp)
             ) {
-                IconButton(
-                    onClick = onBack
-                ) {
-                    Icon(
-                        imageVector =
-                            Icons.Default.ArrowBack,
-                        contentDescription =
-                            "Geri",
-                        tint =
-                            Ink
-                    )
-                }
-
-                Column {
-                    Text(
-                        text =
-                            "${historyRace.city} · ${historyRace.raceNumber}. Koşu",
-                        color =
-                            Ink,
-                        fontSize =
-                            18.sp,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
-
-                    Text(
-                        text =
-                            "${historyRace.raceDate} · ${historyRace.startTime}",
-                        color =
-                            Muted,
-                        fontSize =
-                            11.sp
-                    )
-                }
+                ResultSummaryCard(
+                    race = historyRace,
+                    modelLeader = modelLeader,
+                    winner = winner,
+                    resultAvailable = resultAvailable,
+                    top1Hit = top1Hit
+                )
             }
         }
 
         item {
             Column(
-                modifier =
-                    Modifier.padding(
-                        horizontal = 18.dp
-                    )
-            ) {
-                Card(
-                    modifier =
-                        Modifier.fillMaxWidth(),
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor =
-                                PaleGreen
-                        ),
-                    shape =
-                        RoundedCornerShape(
-                            18.dp
-                        )
-                ) {
-                    Column(
-                        modifier =
-                            Modifier.padding(
-                                16.dp
-                            )
-                    ) {
-                        Text(
-                            text =
-                                "Yarış öncesi dondurulmuş snapshot",
-                            color =
-                                Green,
-                            fontWeight =
-                                FontWeight.ExtraBold
-                        )
-
-                        Text(
-                            text =
-                                "${historyRace.runners.size} at · " +
-                                "${historyRace.expertPredictionCount} uzman kaydı",
-                            color =
-                                Muted,
-                            fontSize =
-                                11.sp
-                        )
-
-                        historyRace.finalizedAt
-                            ?.let {
-                                Spacer(
-                                    modifier =
-                                        Modifier.height(
-                                            6.dp
-                                        )
-                                )
-
-                                Text(
-                                    text =
-                                        "Dondurulma: $it",
-                                    color =
-                                        Muted,
-                                    fontSize =
-                                        9.sp
-                                )
-                            }
-                    }
-                }
-            }
-        }
-
-        item {
-            Text(
-                text =
-                    "Snapshot atları",
                 modifier =
                     Modifier.padding(
                         horizontal = 18.dp,
-                        vertical = 5.dp
-                    ),
-                color =
-                    Ink,
-                fontSize =
-                    17.sp,
-                fontWeight =
-                    FontWeight.ExtraBold
-            )
-        }
-
-        items(
-            items =
-                historyRace.runners,
-            key = {
-                it.number
-            }
-        ) { horse ->
-            Column(
-                modifier =
-                    Modifier.padding(
-                        horizontal = 18.dp
+                        vertical = 6.dp
                     )
             ) {
-                SnapshotHorseCard(
-                    horse = horse
+                Text(
+                    text = "Model sırası ve gerçek sonuç",
+                    color = Ink,
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Text(
+                    text =
+                        "Yarış öncesi model sıralaması gerçek bitiriş derecesiyle karşılaştırılır.",
+                    color = Muted,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        itemsIndexed(
+            items = ranked,
+            key = { _, horse ->
+                horse.number
+            }
+        ) { index, horse ->
+            Column(
+                modifier = Modifier.padding(horizontal = 18.dp)
+            ) {
+                HistoricalHorseCard(
+                    horse = horse,
+                    modelRank = index + 1
                 )
             }
         }
 
         item {
             Spacer(
-                modifier =
-                    Modifier.height(
-                        28.dp
-                    )
+                modifier = Modifier.height(30.dp)
             )
         }
     }
 }
 
 @Composable
-private fun SnapshotHorseCard(
-    horse: Horse
+private fun HistoryHeader(
+    race: HistoryRace,
+    onBack: () -> Unit
 ) {
-    Card(
+    Row(
         modifier =
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 8.dp,
+                    vertical = 8.dp
+                ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onBack
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Geri",
+                tint = Ink
+            )
+        }
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text =
+                    "${race.city} · ${race.raceNumber}. Koşu",
+                color = Ink,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text =
+                    "${race.raceDate} · ${race.startTime}",
+                color = Muted,
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ResultSummaryCard(
+    race: HistoryRace,
+    modelLeader: Horse?,
+    winner: Horse?,
+    resultAvailable: Boolean,
+    top1Hit: Boolean
+) {
+    val background =
+        when {
+            !resultAvailable ->
+                PaleGold
+
+            top1Hit ->
+                PaleGreen
+
+            else ->
+                Surface
+        }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
         colors =
             CardDefaults.cardColors(
-                containerColor =
-                    Surface
+                containerColor = background
             ),
         border =
             BorderStroke(
-                1.dp,
-                Border
-            ),
-        shape =
-            RoundedCornerShape(
-                16.dp
-            )
-    ) {
-        Row(
-            modifier =
-                Modifier.padding(
-                    14.dp
-                ),
-            verticalAlignment =
-                Alignment.CenterVertically
-        ) {
-            Surface(
+                width = 1.dp,
                 color =
-                    PaleGreen,
-                shape =
-                    RoundedCornerShape(
-                        11.dp
-                    )
+                    if (top1Hit)
+                        Green.copy(alpha = 0.35f)
+                    else
+                        Border
+            ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text =
+                    when {
+                        !resultAvailable ->
+                            "Sonuç henüz hazır değil"
+
+                        top1Hit ->
+                            "✓ Model lideri yarışı kazandı"
+
+                        else ->
+                            "Yarış sonucu tamamlandı"
+                    },
+                color =
+                    if (top1Hit)
+                        Green
+                    else
+                        Ink,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            Spacer(
+                modifier = Modifier.height(11.dp)
+            )
+
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text =
-                        horse.number
-                            .toString(),
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 11.dp,
-                            vertical = 8.dp
-                        ),
-                    color =
-                        Green,
-                    fontWeight =
-                        FontWeight.ExtraBold
+                SummaryValue(
+                    modifier = Modifier.weight(1f),
+                    label = "Model lideri",
+                    value =
+                        modelLeader
+                            ?.let {
+                                "#${it.number} ${it.name}"
+                            }
+                            ?: "—"
+                )
+
+                SummaryValue(
+                    modifier = Modifier.weight(1f),
+                    label = "Kazanan",
+                    value =
+                        winner
+                            ?.let {
+                                "#${it.number} ${it.name}"
+                            }
+                            ?: if (resultAvailable)
+                                "—"
+                            else
+                                "Bekleniyor"
                 )
             }
 
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(
-                            start = 11.dp
-                        )
-            ) {
-                Text(
-                    text =
-                        horse.name,
-                    color =
-                        Ink,
-                    fontWeight =
-                        FontWeight.ExtraBold,
-                    fontSize =
-                        14.sp
-                )
+            Spacer(
+                modifier = Modifier.height(9.dp)
+            )
 
-                if (
-                    horse.jockey.isNotBlank()
+            Text(
+                text =
+                    "${race.runners.size} at · " +
+                    "${race.expertPredictionCount} uzman kaydı",
+                color = Muted,
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun SummaryValue(
+    modifier: Modifier,
+    label: String,
+    value: String
+) {
+    Surface(
+        modifier = modifier,
+        color =
+            Color.White.copy(
+                alpha = 0.76f
+            ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = label,
+                color = Muted,
+                fontSize = 8.sp
+            )
+
+            Spacer(
+                modifier = Modifier.height(3.dp)
+            )
+
+            Text(
+                text = value,
+                color = Ink,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun HistoricalHorseCard(
+    horse: Horse,
+    modelRank: Int
+) {
+    val finish =
+        horse.finishPosition
+
+    val exactHit =
+        finish != null &&
+        finish == modelRank
+
+    val won =
+        finish == 1
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color =
+                    when {
+                        won ->
+                            Green.copy(alpha = 0.60f)
+
+                        exactHit ->
+                            Green.copy(alpha = 0.35f)
+
+                        else ->
+                            Border
+                    }
+            ),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp)
+        ) {
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Surface(
+                    color =
+                        if (modelRank == 1)
+                            PaleGreen
+                        else
+                            Color(0xFFF3F5F4),
+                    shape =
+                        RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text =
-                            horse.jockey,
+                            horse.number.toString(),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 11.dp,
+                                vertical = 8.dp
+                            ),
                         color =
-                            Muted,
-                        fontSize =
-                            10.sp
+                            if (modelRank == 1)
+                                Green
+                            else
+                                Ink,
+                        fontWeight =
+                            FontWeight.ExtraBold
                     )
                 }
 
-                Text(
-                    text =
-                        listOfNotNull(
-                            horse.agfPercent
-                                ?.let {
-                                    "AGF %.1f%%"
-                                        .format(it)
-                                },
-                            horse.hp
-                                ?.let {
-                                    "HP $it"
-                                },
-                            horse.weight
-                                ?.let {
-                                    "Kilo %.1f"
-                                        .format(it)
-                                }
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
+                ) {
+                    Text(
+                        text = horse.name,
+                        color = Ink,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    if (
+                        horse.jockey.isNotBlank()
+                    ) {
+                        Text(
+                            text = horse.jockey,
+                            color = Muted,
+                            fontSize = 9.sp,
+                            maxLines = 1,
+                            overflow =
+                                TextOverflow.Ellipsis
                         )
-                            .joinToString(
-                                " · "
-                            )
-                            .ifBlank {
-                                "Snapshot verisi"
-                            },
-                    color =
-                        Muted,
-                    fontSize =
-                        10.sp
+                    }
+                }
+
+                when {
+                    won -> {
+                        ResultBadge(
+                            text = "KAZANDI"
+                        )
+                    }
+
+                    exactHit -> {
+                        ResultBadge(
+                            text = "✓ İSABET"
+                        )
+                    }
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.height(11.dp)
+            )
+
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(7.dp)
+            ) {
+                ResultMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "Model sırası",
+                    value = "$modelRank."
+                )
+
+                ResultMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "Gerçek derece",
+                    value =
+                        finish
+                            ?.let {
+                                "$it."
+                            }
+                            ?: "—"
+                )
+
+                ResultMetric(
+                    modifier = Modifier.weight(1f),
+                    label = "Model puanı",
+                    value =
+                        horse.score
+                            ?.let {
+                                "%.1f".format(it)
+                            }
+                            ?: "—"
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ResultBadge(
+    text: String
+) {
+    Surface(
+        color = PaleGreen,
+        shape =
+            RoundedCornerShape(50)
+    ) {
+        Text(
+            text = text,
+            modifier =
+                Modifier.padding(
+                    horizontal = 8.dp,
+                    vertical = 5.dp
+                ),
+            color = Green,
+            fontSize = 8.sp,
+            fontWeight =
+                FontWeight.ExtraBold
+        )
+    }
+}
+
+@Composable
+private fun ResultMetric(
+    modifier: Modifier,
+    label: String,
+    value: String
+) {
+    Surface(
+        modifier = modifier,
+        color =
+            Color(0xFFF5F7F6),
+        shape =
+            RoundedCornerShape(10.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                text = label,
+                color = Muted,
+                fontSize = 8.sp
+            )
+
+            Spacer(
+                modifier = Modifier.height(2.dp)
+            )
+
+            Text(
+                text = value,
+                color = Ink,
+                fontSize = 12.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
         }
     }
 }

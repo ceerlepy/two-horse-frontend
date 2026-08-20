@@ -73,7 +73,9 @@ data class Horse(
 
     val expertConsensus: ExpertConsensusSummary? = null,
     val marketMovement: MarketMovement? = null,
-    val fieldSignal: FieldSignal? = null
+    val fieldSignal: FieldSignal? = null,
+
+    val finishPosition: Int? = null
 )
 
 data class Race(

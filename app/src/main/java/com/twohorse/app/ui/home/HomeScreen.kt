@@ -1,5 +1,7 @@
 package com.twohorse.app.ui.home
 
+import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -22,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -375,38 +379,7 @@ fun HomeScreen(
             loading
         ) {
             item {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillParentMaxHeight(
-                                0.6f
-                            ),
-                    verticalArrangement =
-                        Arrangement.Center,
-                    horizontalAlignment =
-                        Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(
-                        color =
-                            Green
-                    )
-
-                    Spacer(
-                        modifier =
-                            Modifier.height(
-                                12.dp
-                            )
-                    )
-
-                    Text(
-                        text =
-                            "Bugünün yarışları hazırlanıyor",
-                        color =
-                            Muted,
-                        fontSize =
-                            13.sp
-                    )
-                }
+                HomeLoadingSkeleton()
             }
         } else if (
             error != null &&
@@ -688,4 +661,75 @@ private fun countdownText(
                 secs
             )
     }
+}
+
+
+@Composable
+private fun HomeLoadingSkeleton() {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal =
+                        18.dp
+                ),
+        verticalArrangement =
+            Arrangement.spacedBy(
+                12.dp
+            )
+    ) {
+        SkeletonBlock(
+            height =
+                168.dp
+        )
+
+        SkeletonBlock(
+            height =
+                76.dp
+        )
+
+        SkeletonBlock(
+            height =
+                88.dp
+        )
+
+        SkeletonBlock(
+            height =
+                88.dp
+        )
+
+        Text(
+            text =
+                "Bugünün yarışları hazırlanıyor",
+            color =
+                Muted,
+            fontSize =
+                11.sp
+        )
+    }
+}
+
+@Composable
+private fun SkeletonBlock(
+    height: androidx.compose.ui.unit.Dp
+) {
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(
+                    height
+                )
+                .background(
+                    color =
+                        Color(
+                            0xFFF0F2F1
+                        ),
+                    shape =
+                        RoundedCornerShape(
+                            18.dp
+                        )
+                )
+    )
 }

@@ -1018,6 +1018,36 @@ private fun ComponentRow(
     }
 }
 
+
+@Composable
+private fun VisualScoreBar(
+    value: Double,
+    modifier: Modifier = Modifier
+) {
+    val normalized =
+        (value / 100.0)
+            .coerceIn(
+                0.0,
+                1.0
+            )
+            .toFloat()
+
+    LinearProgressIndicator(
+        progress = {
+            normalized
+        },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(5.dp),
+        color =
+            Green,
+        trackColor =
+            Border
+    )
+}
+
+
 @Composable
 private fun Metric(
     modifier: Modifier,
@@ -1150,4 +1180,22 @@ private fun strategyText(
 
         else ->
             value.reason
+    }
+
+
+private fun marketArrow(
+    movement: Double?
+): String =
+    when {
+        movement == null ->
+            "→"
+
+        movement > 0.01 ->
+            "↑"
+
+        movement < -0.01 ->
+            "↓"
+
+        else ->
+            "→"
     }

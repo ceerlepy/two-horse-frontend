@@ -321,6 +321,20 @@ fun NextRaceHero(
                     )
             )
 
+            RaceInsightBadges(
+                race =
+                    race,
+                dark =
+                    true
+            )
+
+            Spacer(
+                modifier =
+                    Modifier.height(
+                        12.dp
+                    )
+            )
+
             Row(
                 modifier =
                     Modifier.fillMaxWidth(),
@@ -515,6 +529,20 @@ fun UpcomingRaceCard(
                         Muted,
                     fontSize =
                         11.sp
+                )
+
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            6.dp
+                        )
+                )
+
+                RaceInsightBadges(
+                    race =
+                        race,
+                    dark =
+                        false
                 )
             }
 
@@ -716,3 +744,195 @@ private fun raceMeta(
             "Koşu bilgisi"
         }
 }
+
+
+@Composable
+private fun RaceInsightBadges(
+    race: Race,
+    dark: Boolean
+) {
+    val uncertainty =
+        race.uncertainty
+
+    val strategy =
+        race.couponStrategy
+
+    if (
+        uncertainty == null &&
+        strategy == null
+    ) {
+        return
+    }
+
+    Column(
+        verticalArrangement =
+            Arrangement.spacedBy(
+                5.dp
+            )
+    ) {
+        uncertainty?.let {
+            CompactRaceBadge(
+                text =
+                    "Belirsizlik: ${
+                        uncertaintyLabel(
+                            it.level
+                        )
+                    }",
+                background =
+                    if (dark)
+                        Color.White.copy(
+                            alpha = 0.14f
+                        )
+                    else
+                        uncertaintyBackground(
+                            it.level
+                        ),
+                foreground =
+                    if (dark)
+                        Color.White
+                    else
+                        uncertaintyForeground(
+                            it.level
+                        )
+            )
+        }
+
+        strategy?.let {
+            CompactRaceBadge(
+                text =
+                    strategyLabel(
+                        it.mode
+                    ),
+                background =
+                    if (dark)
+                        Color.White.copy(
+                            alpha = 0.14f
+                        )
+                    else
+                        PaleGreen,
+                foreground =
+                    if (dark)
+                        Color.White
+                    else
+                        Green
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactRaceBadge(
+    text: String,
+    background: Color,
+    foreground: Color
+) {
+    Surface(
+        color =
+            background,
+        shape =
+            RoundedCornerShape(
+                50
+            )
+    ) {
+        Text(
+            text =
+                text,
+            modifier =
+                Modifier.padding(
+                    horizontal =
+                        8.dp,
+                    vertical =
+                        4.dp
+                ),
+            color =
+                foreground,
+            fontSize =
+                9.sp,
+            fontWeight =
+                FontWeight.ExtraBold,
+            maxLines =
+                1,
+            overflow =
+                TextOverflow.Ellipsis
+        )
+    }
+}
+
+private fun uncertaintyLabel(
+    level: String
+): String =
+    when(level) {
+        "low" ->
+            "Düşük"
+
+        "medium" ->
+            "Orta"
+
+        "high" ->
+            "Yüksek"
+
+        "very-high" ->
+            "Çok yüksek"
+
+        else ->
+            level
+    }
+
+private fun strategyLabel(
+    mode: String
+): String =
+    when(mode) {
+        "single" ->
+            "Tek adayı güçlü"
+
+        "compact" ->
+            "Dar kupon"
+
+        "spread" ->
+            "Geniş kupon"
+
+        else ->
+            mode
+    }
+
+private fun uncertaintyBackground(
+    level: String
+): Color =
+    when(level) {
+        "low" ->
+            PaleGreen
+
+        "medium" ->
+            PaleGold
+
+        "high",
+        "very-high" ->
+            Color(
+                0xFFFFECEC
+            )
+
+        else ->
+            Color(
+                0xFFF2F4F3
+            )
+    }
+
+private fun uncertaintyForeground(
+    level: String
+): Color =
+    when(level) {
+        "low" ->
+            Green
+
+        "medium" ->
+            Gold
+
+        "high",
+        "very-high" ->
+            Color(
+                0xFFB42318
+            )
+
+        else ->
+            Muted
+    }
