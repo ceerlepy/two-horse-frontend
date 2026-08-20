@@ -75,31 +75,194 @@ fun CouponScreen(
             mutableStateOf<String?>(null)
         }
 
+    var requestVersion by
+        remember {
+            mutableLongStateOf(0L)
+        }
+
+    var lastGeneratedCity by
+        remember {
+            mutableStateOf<String?>(null)
+        }
+
+    var lastGeneratedSixfold by
+        remember {
+            mutableStateOf<Int?>(null)
+        }
+
+    var lastGeneratedBudget by
+        remember {
+            mutableStateOf<Double?>(null)
+        }
+
+    fun invalidateGeneration() {
+        requestVersion++
+
+        loading =
+            false
+
+        result =
+            null
+
+        error =
+            null
+
+        lastGeneratedCity =
+            null
+
+        lastGeneratedSixfold =
+            null
+
+        lastGeneratedBudget =
+            null
+    }
+
     suspend fun generate() {
-        if (selectedCity.isBlank()) {
-            error = "Şehir seçilemedi."
+        if (
+            loading
+        ) {
             return
         }
 
-        loading = true
-        error = null
+        val requestCity =
+            selectedCity
 
-        repository
-            .coupons(
-                city = selectedCity,
-                budgetTl = budget,
-                sixfold = sixfold,
-                multiplier = 1
+        val requestSixfold =
+            sixfold
+
+        val requestBudget =
+            budget
+
+        if (
+            requestCity.isBlank()
+        ) {
+            error =
+                "Şehir seçilemedi."
+
+            return
+        }
+
+        requestVersion++
+
+        val myRequestVersion =
+            requestVersion
+
+        loading =
+            true
+
+        error =
+            null
+
+        val response =
+            repository.coupons(
+                city =
+                    requestCity,
+                budgetTl =
+                    requestBudget,
+                sixfold =
+                    requestSixfold,
+                multiplier =
+                    1
             )
+
+        if (
+            requestVersion !=
+            myRequestVersion
+        ) {
+            return
+        }
+
+        response
             .onSuccess {
-                result = it
+                couponResult ->
+
+                val cityMatches =
+                    couponResult.city.equals(
+                        requestCity,
+                        ignoreCase =
+                            true
+                    )
+
+                val sixfoldMatches =
+                    couponResult.sixfold ==
+                        requestSixfold
+
+                val budgetMatches =
+                    couponResult.budgetTl <=
+                        requestBudget +
+                        0.01
+
+                val couponsWithinBudget =
+                    couponResult.coupons.all {
+                        coupon ->
+                        coupon.totalTl >=
+                            0.0 &&
+                        coupon.totalTl <=
+                            requestBudget +
+                            0.01
+                    }
+
+                when {
+                    !cityMatches ||
+                    !sixfoldMatches -> {
+                        result =
+                            null
+
+                        error =
+                            "Backend beklenmeyen kupon penceresi döndürdü."
+                    }
+
+                    !budgetMatches ||
+                    !couponsWithinBudget -> {
+                        result =
+                            null
+
+                        error =
+                            "Backend bütçe sınırını aşan kupon döndürdü."
+                    }
+
+                    else -> {
+                        result =
+                            couponResult
+
+                        error =
+                            null
+
+                        lastGeneratedCity =
+                            requestCity
+
+                        lastGeneratedSixfold =
+                            requestSixfold
+
+                        lastGeneratedBudget =
+                            requestBudget
+                    }
+                }
             }
             .onFailure {
-                error =
-                    couponErrorMessage(it)
+                throwable ->
+
+                if (
+                    requestVersion ==
+                    myRequestVersion
+                ) {
+                    result =
+                        null
+
+                    error =
+                        couponErrorMessage(
+                            throwable
+                        )
+                }
             }
 
-        loading = false
+        if (
+            requestVersion ==
+            myRequestVersion
+        ) {
+            loading =
+                false
+        }
     }
 
     val scope = rememberCoroutineScope()
@@ -213,8 +376,15 @@ fun CouponScreen(
                         selected =
                             selectedCity == city,
                         onClick = {
-                            selectedCity = city
-                            result = null
+                            if (
+                                selectedCity !=
+                                city
+                            ) {
+                                invalidateGeneration()
+
+                                selectedCity =
+                                    city
+                            }
                         }
                     )
                 }
@@ -247,8 +417,14 @@ fun CouponScreen(
                         selected =
                             sixfold == 1,
                         onClick = {
-                            sixfold = 1
-                            result = null
+                            if (
+                                sixfold != 1
+                            ) {
+                                invalidateGeneration()
+
+                                sixfold =
+                                    1
+                            }
                         }
                     )
 
@@ -257,8 +433,14 @@ fun CouponScreen(
                         selected =
                             sixfold == 2,
                         onClick = {
-                            sixfold = 2
-                            result = null
+                            if (
+                                sixfold != 2
+                            ) {
+                                invalidateGeneration()
+
+                                sixfold =
+                                    2
+                            }
                         }
                     )
                 }
@@ -302,8 +484,15 @@ fun CouponScreen(
                             selected =
                                 budget == value,
                             onClick = {
-                                budget = value
-                                result = null
+                                if (
+                                    budget !=
+                                    value
+                                ) {
+                                    invalidateGeneration()
+
+                                    budget =
+                                        value
+                                }
                             }
                         )
                     }
@@ -316,6 +505,49 @@ fun CouponScreen(
                 ErrorCard(
                     message = message
                 )
+            }
+        }
+
+        if (
+            result != null &&
+            lastGeneratedCity != null &&
+            lastGeneratedSixfold != null &&
+            lastGeneratedBudget != null
+        ) {
+            item {
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal =
+                                    18.dp
+                            ),
+                    color =
+                        PaleGreen,
+                    shape =
+                        RoundedCornerShape(
+                            14.dp
+                        )
+                ) {
+                    Text(
+                        text =
+                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. Altılı · ${lastGeneratedBudget?.toInt()} TL bütçe",
+                        modifier =
+                            Modifier.padding(
+                                horizontal =
+                                    12.dp,
+                                vertical =
+                                    10.dp
+                            ),
+                        color =
+                            Green,
+                        fontSize =
+                            11.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
             }
         }
 
@@ -344,6 +576,14 @@ fun CouponScreen(
 
             items(
                 couponResult.coupons
+                    .filter {
+                        coupon ->
+                        coupon.totalTl >=
+                            0.0 &&
+                        coupon.totalTl <=
+                            couponResult.budgetTl +
+                            0.01
+                    }
             ) { coupon ->
                 Column(
                     modifier =
