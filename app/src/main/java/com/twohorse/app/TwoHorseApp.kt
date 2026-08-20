@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.ui.coupons.CouponScreen
 import com.twohorse.app.ui.home.HomeScreen
 import com.twohorse.app.ui.race.RaceDetailScreen
 import com.twohorse.app.ui.theme.Bg
@@ -20,6 +21,12 @@ private sealed interface AppScreen {
 
     data class RaceDetail(
         val race: Race
+    ) :
+        AppScreen
+
+    data class Coupons(
+        val cities: List<String>,
+        val selectedCity: String?
     ) :
         AppScreen
 }
@@ -60,6 +67,18 @@ fun TwoHorseApp() {
                             AppScreen.RaceDetail(
                                 race
                             )
+                    },
+                    onSixFoldClick = {
+                        cities,
+                        selectedCity ->
+
+                        screen =
+                            AppScreen.Coupons(
+                                cities =
+                                    cities,
+                                selectedCity =
+                                    selectedCity
+                            )
                     }
                 )
             }
@@ -68,6 +87,19 @@ fun TwoHorseApp() {
                 RaceDetailScreen(
                     race =
                         current.race,
+                    onBack = {
+                        screen =
+                            AppScreen.Home
+                    }
+                )
+            }
+
+            is AppScreen.Coupons -> {
+                CouponScreen(
+                    cities =
+                        current.cities,
+                    initialCity =
+                        current.selectedCity,
                     onBack = {
                         screen =
                             AppScreen.Home

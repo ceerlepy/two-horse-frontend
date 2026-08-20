@@ -43,7 +43,7 @@ import kotlin.math.max
 @Composable
 fun HomeScreen(
     onRaceClick: (Race) -> Unit,
-    onSixFoldClick: () -> Unit = {},
+    onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
     onHistoryClick: () -> Unit = {}
 ) {
     val repository =
@@ -359,8 +359,12 @@ fun HomeScreen(
                         )
                 ) {
                     SixFoldEntryCard(
-                        onClick =
-                            onSixFoldClick
+                        onClick = {
+                            onSixFoldClick(
+                                cities,
+                                selectedCity
+                            )
+                        }
                     )
                 }
             }
