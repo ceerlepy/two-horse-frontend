@@ -41,7 +41,11 @@ import java.time.OffsetDateTime
 import kotlin.math.max
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onRaceClick: (Race) -> Unit,
+    onSixFoldClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {}
+) {
     val repository =
         remember {
             TwoHorseRepository()
@@ -211,9 +215,7 @@ fun HomeScreen() {
                 onRefresh = {
                     refreshKey++
                 },
-                onHistory = {
-                    // History screen sonraki committe.
-                }
+                onHistory = onHistoryClick
             )
         }
 
@@ -340,7 +342,9 @@ fun HomeScreen() {
                                     nowMillis
                                 ),
                             onClick = {
-                                // Race detail sonraki committe.
+                                onRaceClick(
+                                    nextRace
+                                )
                             }
                         )
                     }
@@ -355,9 +359,8 @@ fun HomeScreen() {
                         )
                 ) {
                     SixFoldEntryCard(
-                        onClick = {
-                            // Kupon ekranı sonraki committe.
-                        }
+                        onClick =
+                            onSixFoldClick
                     )
                 }
             }
@@ -424,7 +427,9 @@ fun HomeScreen() {
                                 race
                             ),
                         onClick = {
-                            // Race detail sonraki committe.
+                            onRaceClick(
+                                race
+                            )
                         }
                     )
                 }
