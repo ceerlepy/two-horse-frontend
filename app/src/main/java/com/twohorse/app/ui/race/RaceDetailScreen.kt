@@ -15,15 +15,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.ui.theme.Border
 import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Green
@@ -52,20 +60,114 @@ fun RaceDetailScreen(
         onBack = onBack
     )
 
-    val rankedHorses =
-        race.horses.sortedWith(
-            compareByDescending<Horse> {
-                it.score
-                    ?: Double.NEGATIVE_INFINITY
+    val repository =
+        remember {
+            TwoHorseRepository()
+        }
+
+    var currentRace by
+        remember(
+            race.city,
+            race.number
+        ) {
+            mutableStateOf(
+                race
+            )
+        }
+
+    var refreshing by
+        remember {
+            mutableStateOf(
+                false
+            )
+        }
+
+    var refreshError by
+        remember {
+            mutableStateOf<String?>(
+                null
+            )
+        }
+
+    var refreshKey by
+        remember {
+            mutableStateOf(
+                0
+            )
+        }
+
+    LaunchedEffect(
+        refreshKey,
+        race.city,
+        race.number
+    ) {
+        if (
+            refreshing
+        ) {
+            return@LaunchedEffect
+        }
+
+        refreshing =
+            true
+
+        refreshError =
+            null
+
+        repository
+            .today()
+            .onSuccess {
+                today ->
+
+                val freshRace =
+                    today.meetings
+                        .asSequence()
+                        .flatMap {
+                            meeting ->
+                            meeting.races
+                                .asSequence()
+                        }
+                        .firstOrNull {
+                            candidate ->
+                            candidate.city ==
+                                race.city &&
+                            candidate.number ==
+                                race.number
+                        }
+
+                if (
+                    freshRace != null
+                ) {
+                    currentRace =
+                        freshRace
+                } else {
+                    refreshError =
+                        "Yarış güncel programda bulunamadı. Son bilinen veri gösteriliyor."
+                }
             }
-                .thenByDescending {
-                    it.agfPercent
+            .onFailure {
+                refreshError =
+                    "Yarış yenilenemedi. Son bilinen veri gösteriliyor."
+            }
+
+        refreshing =
+            false
+    }
+
+    val rankedHorses =
+        currentRace.horses
+            .sortedWith(
+                compareByDescending<Horse> {
+                    it.score
                         ?: Double.NEGATIVE_INFINITY
                 }
-                .thenBy {
-                    it.number
-                }
-        )
+                    .thenByDescending {
+                        it.agfPercent
+                            ?: Double.NEGATIVE_INFINITY
+                    }
+                    .thenBy {
+                        it.number
+                    }
+            )
 
     LazyColumn(
         modifier =
@@ -77,9 +179,57 @@ fun RaceDetailScreen(
     ) {
         item {
             RaceDetailHeader(
-                race = race,
-                onBack = onBack
+                race =
+                    currentRace,
+                refreshing =
+                    refreshing,
+                onRefresh = {
+                    if (
+                        !refreshing
+                    ) {
+                        refreshKey++
+                    }
+                },
+                onBack =
+                    onBack
             )
+        }
+
+        if (
+            refreshError != null
+        ) {
+            item {
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 18.dp
+                            ),
+                    color =
+                        PaleGold,
+                    shape =
+                        RoundedCornerShape(
+                            14.dp
+                        )
+                ) {
+                    Text(
+                        text =
+                            refreshError
+                                ?: "",
+                        modifier =
+                            Modifier.padding(
+                                12.dp
+                            ),
+                        color =
+                            Muted,
+                        fontSize =
+                            11.sp,
+                        fontWeight =
+                            FontWeight.SemiBold
+                    )
+                }
+            }
         }
 
         item {
@@ -90,64 +240,121 @@ fun RaceDetailScreen(
                     )
             ) {
                 RaceSummaryCard(
-                    race = race,
+                    race =
+                        currentRace,
                     rankedHorses =
                         rankedHorses
                 )
             }
         }
 
-        item {
-            Column(
-                modifier =
-                    Modifier.padding(
-                        start = 18.dp,
-                        end = 18.dp,
-                        top = 8.dp
-                    )
-            ) {
-                Text(
-                    text =
-                        "Tüm atlar",
+        if (
+            rankedHorses.isEmpty()
+        ) {
+            item {
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 18.dp
+                            ),
                     color =
-                        Ink,
-                    fontSize =
-                        19.sp,
-                    fontWeight =
-                        FontWeight.ExtraBold
-                )
+                        Surface,
+                    shape =
+                        RoundedCornerShape(
+                            18.dp
+                        ),
+                    border =
+                        BorderStroke(
+                            1.dp,
+                            Border
+                        )
+                ) {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                20.dp
+                            ),
+                        horizontalAlignment =
+                            Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text =
+                                "At verisi bulunamadı",
+                            color =
+                                Ink,
+                            fontWeight =
+                                FontWeight.ExtraBold
+                        )
 
-                Text(
-                    text =
-                        "Model puanı, güven ve temel yarış verileri",
-                    color =
-                        Muted,
-                    fontSize =
-                        12.sp
-                )
+                        Text(
+                            text =
+                                "Backend bu yarış için runner verisi döndürmedi.",
+                            color =
+                                Muted,
+                            fontSize =
+                                11.sp
+                        )
+                    }
+                }
             }
-        }
-
-        items(
-            items =
-                rankedHorses,
-            key = {
-                it.number
-            }
-        ) { horse ->
-            Column(
-                modifier =
-                    Modifier.padding(
-                        horizontal = 18.dp
+        } else {
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            start = 18.dp,
+                            end = 18.dp,
+                            top = 8.dp
+                        )
+                ) {
+                    Text(
+                        text =
+                            "Tüm atlar",
+                        color =
+                            Ink,
+                        fontSize =
+                            19.sp,
+                        fontWeight =
+                            FontWeight.ExtraBold
                     )
-            ) {
-                HorseAnalysisCard(
-                    horse = horse,
-                    rank =
-                        rankedHorses
-                            .indexOf(horse) +
-                        1
-                )
+
+                    Text(
+                        text =
+                            "Model puanı, güven ve temel yarış verileri",
+                        color =
+                            Muted,
+                        fontSize =
+                            12.sp
+                    )
+                }
+            }
+
+            items(
+                items =
+                    rankedHorses,
+                key = {
+                    it.number
+                }
+            ) { horse ->
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    HorseAnalysisCard(
+                        horse =
+                            horse,
+                        rank =
+                            rankedHorses
+                                .indexOf(
+                                    horse
+                                ) +
+                            1
+                    )
+                }
             }
         }
 
@@ -165,6 +372,8 @@ fun RaceDetailScreen(
 @Composable
 private fun RaceDetailHeader(
     race: Race,
+    refreshing: Boolean,
+    onRefresh: () -> Unit,
     onBack: () -> Unit
 ) {
     Row(
@@ -179,7 +388,8 @@ private fun RaceDetailHeader(
             Alignment.CenterVertically
     ) {
         IconButton(
-            onClick = onBack
+            onClick =
+                onBack
         ) {
             Icon(
                 imageVector =
@@ -193,7 +403,9 @@ private fun RaceDetailHeader(
 
         Column(
             modifier =
-                Modifier.weight(1f)
+                Modifier.weight(
+                    1f
+                )
         ) {
             Text(
                 text =
@@ -216,6 +428,37 @@ private fun RaceDetailHeader(
                 fontSize =
                     12.sp
             )
+        }
+
+        IconButton(
+            onClick =
+                onRefresh,
+            enabled =
+                !refreshing
+        ) {
+            if (
+                refreshing
+            ) {
+                CircularProgressIndicator(
+                    modifier =
+                        Modifier.padding(
+                            9.dp
+                        ),
+                    color =
+                        Green,
+                    strokeWidth =
+                        2.dp
+                )
+            } else {
+                Icon(
+                    imageVector =
+                        Icons.Default.Refresh,
+                    contentDescription =
+                        "Yarışı yenile",
+                    tint =
+                        Green
+                )
+            }
         }
     }
 }
