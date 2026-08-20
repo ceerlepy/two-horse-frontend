@@ -1,14 +1,6 @@
 package com.twohorse.app.data.api
 
-import com.twohorse.app.domain.model.Coupon
-import com.twohorse.app.domain.model.CouponHorse
-import com.twohorse.app.domain.model.CouponLeg
-import com.twohorse.app.domain.model.CouponResult
-import com.twohorse.app.domain.model.Horse
-import com.twohorse.app.domain.model.HistoryRace
-import com.twohorse.app.domain.model.Meeting
-import com.twohorse.app.domain.model.Race
-import com.twohorse.app.domain.model.TodayData
+import com.twohorse.app.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -404,30 +396,108 @@ class TwoHorseApi(
         fallbackCity: String
     ): Race {
         val horsesJson =
-            json.optJSONArray(
-                "runners"
-            )
-                ?: json.optJSONArray(
-                    "horses"
-                )
+            json.optJSONArray("runners")
+                ?: json.optJSONArray("horses")
 
         val horses =
             buildList {
-                if (
-                    horsesJson != null
-                ) {
-                    for (
-                        i in 0 until
-                        horsesJson.length()
-                    ) {
+                if (horsesJson != null) {
+                    for (i in 0 until horsesJson.length()) {
                         add(
                             parseHorse(
-                                horsesJson
-                                    .getJSONObject(i)
+                                horsesJson.getJSONObject(i)
                             )
                         )
                     }
                 }
+            }
+
+        val uncertaintyJson =
+            json.optJSONObject("uncertainty")
+
+        val uncertainty =
+            uncertaintyJson?.let {
+                RaceUncertainty(
+                    level =
+                        it.optString(
+                            "level",
+                            "unknown"
+                        ),
+                    score =
+                        it.optDouble(
+                            "score",
+                            0.0
+                        ),
+                    topMargin =
+                        it.optDouble(
+                            "topMargin",
+                            0.0
+                        ),
+                    leaderScore =
+                        it.optDouble(
+                            "leaderScore",
+                            0.0
+                        ),
+                    secondScore =
+                        it.optNullableDouble(
+                            "secondScore"
+                        ),
+                    expansionPressure =
+                        it.optDouble(
+                            "expansionPressure",
+                            0.0
+                        )
+                )
+            }
+
+        val strategyJson =
+            json.optJSONObject(
+                "couponStrategy"
+            )
+
+        val strategy =
+            strategyJson?.let {
+                val horseNumbers =
+                    buildList {
+                        val array =
+                            it.optJSONArray(
+                                "horseNumbers"
+                            )
+
+                        if (array != null) {
+                            for (
+                                i in 0 until
+                                array.length()
+                            ) {
+                                add(
+                                    array.optInt(i)
+                                )
+                            }
+                        }
+                    }
+
+                RaceCouponStrategy(
+                    mode =
+                        it.optString(
+                            "mode"
+                        ),
+                    horseNumbers =
+                        horseNumbers,
+                    confidence =
+                        it.optDouble(
+                            "confidence",
+                            0.0
+                        ),
+                    expansionPressure =
+                        it.optDouble(
+                            "expansionPressure",
+                            0.0
+                        ),
+                    reason =
+                        it.optString(
+                            "reason"
+                        )
+                )
             }
 
         return Race(
@@ -436,8 +506,7 @@ class TwoHorseApi(
                     "race_number",
                     "raceNumber",
                     "number"
-                )
-                    ?: 0,
+                ) ?: 0,
 
             city =
                 json.optString(
@@ -456,8 +525,7 @@ class TwoHorseApi(
                     "title",
                     "race_name",
                     "raceName"
-                )
-                    .orEmpty(),
+                ).orEmpty(),
 
             distance =
                 json.firstInt(
@@ -469,49 +537,255 @@ class TwoHorseApi(
                     }
                     ?: json.firstString(
                         "distance"
-                    )
-                        .orEmpty(),
+                    ).orEmpty(),
 
             surface =
                 json.firstString(
                     "track",
                     "surface"
-                )
-                    .orEmpty(),
+                ).orEmpty(),
 
             horses =
-                horses
+                horses,
+
+            uncertainty =
+                uncertainty,
+
+            couponStrategy =
+                strategy
         )
     }
 
     private fun parseHorse(
         json: JSONObject
-    ): Horse =
-        Horse(
+    ): Horse {
+        val modelScore =
+            json.optJSONObject(
+                "modelScore"
+            )
+
+        val components =
+            buildList {
+                val array =
+                    modelScore
+                        ?.optJSONArray(
+                            "components"
+                        )
+
+                if (array != null) {
+                    for (
+                        i in 0 until
+                        array.length()
+                    ) {
+                        val item =
+                            array.getJSONObject(i)
+
+                        add(
+                            ScoreComponent(
+                                key =
+                                    item.optString(
+                                        "key"
+                                    ),
+                                score =
+                                    item.optNullableDouble(
+                                        "score"
+                                    ),
+                                configuredWeight =
+                                    item.optDouble(
+                                        "configuredWeight",
+                                        0.0
+                                    ),
+                                effectiveWeight =
+                                    item.optDouble(
+                                        "effectiveWeight",
+                                        0.0
+                                    )
+                            )
+                        )
+                    }
+                }
+            }
+
+        val consensusJson =
+            json.optJSONObject(
+                "expertConsensus"
+            )
+
+        val consensus =
+            consensusJson?.let {
+                val labels =
+                    buildList {
+                        val array =
+                            it.optJSONArray(
+                                "labels"
+                            )
+
+                        if (array != null) {
+                            for (
+                                i in 0 until
+                                array.length()
+                            ) {
+                                val value =
+                                    array.optString(i)
+
+                                if (
+                                    value.isNotBlank()
+                                ) {
+                                    add(value)
+                                }
+                            }
+                        }
+                    }
+
+                ExpertConsensusSummary(
+                    sourceCount =
+                        it.optInt(
+                            "sourceCount",
+                            0
+                        ),
+                    bankoCount =
+                        it.optInt(
+                            "bankoCount",
+                            0
+                        ),
+                    favoriteCount =
+                        it.optInt(
+                            "favoriteCount",
+                            0
+                        ),
+                    strongCount =
+                        it.optInt(
+                            "strongCount",
+                            0
+                        ),
+                    starCount =
+                        it.optInt(
+                            "starCount",
+                            0
+                        ),
+                    rivalCount =
+                        it.optInt(
+                            "rivalCount",
+                            0
+                        ),
+                    surpriseCount =
+                        it.optInt(
+                            "surpriseCount",
+                            0
+                        ),
+                    avoidCount =
+                        it.optInt(
+                            "avoidCount",
+                            0
+                        ),
+                    expertScore =
+                        it.optNullableDouble(
+                            "expertScore"
+                        ),
+                    supportConfidence =
+                        it.optNullableDouble(
+                            "supportConfidence"
+                        ),
+                    labels =
+                        labels
+                )
+            }
+
+        val marketJson =
+            json.optJSONObject(
+                "marketMovement"
+            )
+
+        val market =
+            marketJson?.let {
+                MarketMovement(
+                    score =
+                        it.optNullableDouble(
+                            "score"
+                        ),
+                    sampleSize =
+                        it.optInt(
+                            "sampleSize",
+                            0
+                        ),
+                    firstAgf =
+                        it.optNullableDouble(
+                            "firstAgf"
+                        ),
+                    latestAgf =
+                        it.optNullableDouble(
+                            "latestAgf"
+                        ),
+                    absoluteDelta =
+                        it.optNullableDouble(
+                            "absoluteDelta"
+                        ),
+                    relativeDelta =
+                        it.optNullableDouble(
+                            "relativeDelta"
+                        ),
+                    spanMinutes =
+                        it.optNullableDouble(
+                            "spanMinutes"
+                        ),
+                    direction =
+                        it.optString(
+                            "direction",
+                            "unknown"
+                        )
+                )
+            }
+
+        val fieldJson =
+            json.optJSONObject(
+                "fieldSignal"
+            )
+
+        val field =
+            fieldJson?.let {
+                FieldSignal(
+                    score =
+                        it.optNullableDouble(
+                            "score"
+                        ),
+                    tjkScore =
+                        it.optNullableDouble(
+                            "tjkScore"
+                        ),
+                    expertScore =
+                        it.optNullableDouble(
+                            "expertScore"
+                        ),
+                    tjkSampleSize =
+                        it.optInt(
+                            "tjkSampleSize",
+                            0
+                        )
+                )
+            }
+
+        return Horse(
             number =
                 json.firstInt(
                     "horse_number",
                     "horseNumber",
                     "number",
                     "no"
-                )
-                    ?: 0,
+                ) ?: 0,
 
             name =
                 json.firstString(
                     "horse_name",
                     "horseName",
                     "name"
-                )
-                    .orEmpty(),
+                ).orEmpty(),
 
             jockey =
                 json.firstString(
                     "jockey",
                     "jockey_name",
                     "jockeyName"
-                )
-                    .orEmpty(),
+                ).orEmpty(),
 
             weight =
                 json.firstDouble(
@@ -535,13 +809,10 @@ class TwoHorseApi(
                     "recent_form_raw",
                     "recentForm",
                     "last6"
-                )
-                    .orEmpty(),
+                ).orEmpty(),
 
             score =
-                json.optJSONObject(
-                    "modelScore"
-                )
+                modelScore
                     ?.firstDouble(
                         "score"
                     )
@@ -550,16 +821,39 @@ class TwoHorseApi(
                     ),
 
             confidence =
-                json.optJSONObject(
-                    "modelScore"
-                )
+                modelScore
                     ?.firstDouble(
                         "confidence"
                     )
                     ?: json.firstDouble(
                         "confidence"
-                    )
+                    ),
+
+            baseScore =
+                modelScore
+                    ?.firstDouble(
+                        "baseScore"
+                    ),
+
+            learningAdjustment =
+                modelScore
+                    ?.firstDouble(
+                        "learningAdjustment"
+                    ),
+
+            scoreComponents =
+                components,
+
+            expertConsensus =
+                consensus,
+
+            marketMovement =
+                market,
+
+            fieldSignal =
+                field
         )
+    }
 
     private fun parseCoupon(
         json: JSONObject
