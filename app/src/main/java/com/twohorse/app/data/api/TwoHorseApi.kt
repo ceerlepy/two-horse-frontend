@@ -446,15 +446,22 @@ class TwoHorseApi(
                     .orEmpty(),
 
             distance =
-                json.firstString(
-                    "distance"
+                json.firstInt(
+                    "distance_meters",
+                    "distanceMeters"
                 )
-                    .orEmpty(),
+                    ?.let {
+                        "$it m"
+                    }
+                    ?: json.firstString(
+                        "distance"
+                    )
+                        .orEmpty(),
 
             surface =
                 json.firstString(
-                    "surface",
-                    "track"
+                    "track",
+                    "surface"
                 )
                     .orEmpty(),
 
@@ -518,14 +525,26 @@ class TwoHorseApi(
                     .orEmpty(),
 
             score =
-                json.firstDouble(
-                    "score"
-                ),
+                json.optJSONObject(
+                    "modelScore"
+                )
+                    ?.firstDouble(
+                        "score"
+                    )
+                    ?: json.firstDouble(
+                        "score"
+                    ),
 
             confidence =
-                json.firstDouble(
-                    "confidence"
+                json.optJSONObject(
+                    "modelScore"
                 )
+                    ?.firstDouble(
+                        "confidence"
+                    )
+                    ?: json.firstDouble(
+                        "confidence"
+                    )
         )
 
     private fun parseCoupon(

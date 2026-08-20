@@ -23,6 +23,9 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Check frontend API contract
+        run: bash scripts/check-api-contract.sh
+
       - name: Build debug APK
         run: gradle :app:assembleDebug
 

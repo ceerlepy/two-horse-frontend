@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -307,11 +308,34 @@ fun HomeScreen(
             data == null
         ) {
             item {
-                EmptyRaceState(
-                    message =
-                        error
-                            ?: "Veri alınamadı"
-                )
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 18.dp,
+                                vertical = 36.dp
+                            ),
+                    horizontalAlignment =
+                        Alignment.CenterHorizontally
+                ) {
+                    EmptyRaceState(
+                        message =
+                            error
+                                ?: "Veri alınamadı"
+                    )
+
+                    Button(
+                        onClick = {
+                            refreshKey++
+                        }
+                    ) {
+                        Text(
+                            text =
+                                "Tekrar Dene"
+                        )
+                    }
+                }
             }
         } else if (
             filteredRaces.isEmpty()
