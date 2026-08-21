@@ -2,14 +2,17 @@ package com.twohorse.app.ui.race
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.*
+import com.twohorse.app.ui.components.*
 import com.twohorse.app.ui.theme.*
 import kotlin.math.roundToInt
 
@@ -50,7 +54,7 @@ fun RaceDetailScreen(
             mutableStateOf(false)
         }
 
-    var refreshError by
+    var error by
         remember {
             mutableStateOf<String?>(null)
         }
@@ -58,6 +62,11 @@ fun RaceDetailScreen(
     var refreshKey by
         remember {
             mutableIntStateOf(0)
+        }
+
+    var deepExpanded by
+        remember {
+            mutableStateOf(false)
         }
 
     LaunchedEffect(
@@ -70,38 +79,40 @@ fun RaceDetailScreen(
         }
 
         refreshing = true
-        refreshError = null
+        error = null
 
         repository
             .today()
             .onSuccess { today ->
-                val freshRace =
+                val fresh =
                     today.meetings
                         .asSequence()
                         .flatMap {
                             it.races.asSequence()
                         }
                         .firstOrNull {
-                            it.city == race.city &&
-                                it.number == race.number
+                            it.city ==
+                                race.city &&
+                            it.number ==
+                                race.number
                         }
 
-                if (freshRace != null) {
-                    currentRace = freshRace
+                if (fresh != null) {
+                    currentRace = fresh
                 } else {
-                    refreshError =
+                    error =
                         "Yarış güncel programda bulunamadı. Son bilinen veri gösteriliyor."
                 }
             }
             .onFailure {
-                refreshError =
+                error =
                     "Yarış yenilenemedi. Son bilinen veri gösteriliyor."
             }
 
         refreshing = false
     }
 
-    val rankedHorses =
+    val horses =
         currentRace.horses
             .sortedWith(
                 compareByDescending<Horse> {
@@ -117,14 +128,27 @@ fun RaceDetailScreen(
                     }
             )
 
+    val favorite =
+        horses.firstOrNull()
+
+    val rival =
+        horses.getOrNull(1)
+
+    val surprise =
+        horses.getOrNull(2)
+
     LazyColumn(
         modifier =
             Modifier.fillMaxSize(),
+        contentPadding =
+            PaddingValues(
+                bottom = 34.dp
+            ),
         verticalArrangement =
-            Arrangement.spacedBy(10.dp)
+            Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Header(
+            RaceHeader(
                 race = currentRace,
                 refreshing = refreshing,
                 onRefresh = {
@@ -136,9 +160,28 @@ fun RaceDetailScreen(
             )
         }
 
-        refreshError?.let { message ->
+        error?.let {
             item {
-                NoticeCard(message)
+                Notice(
+                    text = it
+                )
+            }
+        }
+
+        favorite?.let {
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    ResultHero(
+                        favorite = it,
+                        rival = rival,
+                        surprise = surprise
+                    )
+                }
             }
         }
 
@@ -149,9 +192,8 @@ fun RaceDetailScreen(
                         horizontal = 18.dp
                     )
             ) {
-                RaceOverview(
-                    race = currentRace,
-                    horses = rankedHorses
+                RaceRiskCard(
+                    race = currentRace
                 )
             }
         }
@@ -170,25 +212,32 @@ fun RaceDetailScreen(
                         )
                     },
                     modifier =
-                        Modifier.fillMaxWidth(),
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(
+                                min = 50.dp
+                            ),
                     colors =
                         ButtonDefaults.buttonColors(
                             containerColor =
                                 Green
                         ),
                     shape =
-                        RoundedCornerShape(
-                            14.dp
-                        )
+                        RoundedCornerShape(15.dp)
                 ) {
                     Text(
-                        "Bu şehir için Altılı Kupon"
+                        text =
+                            "Bu şehir için Altılı Kupon",
+                        fontWeight =
+                            FontWeight.Black
                     )
                 }
             }
         }
 
-        currentRace.uncertainty?.let {
+        if (
+            horses.isNotEmpty()
+        ) {
             item {
                 Column(
                     modifier =
@@ -196,53 +245,26 @@ fun RaceDetailScreen(
                             horizontal = 18.dp
                         )
                 ) {
-                    UncertaintyCard(
-                        uncertainty = it,
-                        strategy =
-                            currentRace
-                                .couponStrategy
-                    )
-                }
-            }
-        }
-
-        if (rankedHorses.isEmpty()) {
-            item {
-                NoticeCard(
-                    "Bu yarış için at verisi bulunamadı."
-                )
-            }
-        } else {
-            item {
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 18.dp,
-                            vertical = 4.dp
-                        )
-                ) {
-                    Text(
-                        "Detaylı model analizi",
-                        color = Ink,
-                        fontSize = 19.sp,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
-
-                    Text(
-                        "Skorun hangi sinyallerden oluştuğunu aşağıda görebilirsin.",
-                        color = Muted,
-                        fontSize = 11.sp
+                    SectionHeader(
+                        title =
+                            "Olası sıralama · tüm atlar",
+                        subtitle =
+                            "${horses.size} at"
                     )
                 }
             }
 
-            items(
-                items = rankedHorses,
+            itemsIndexed(
+                items = horses,
                 key = {
-                    it.number
+                    _,
+                    horse ->
+                    horse.number
                 }
-            ) { horse ->
+            ) {
+                index,
+                horse ->
+
                 Column(
                     modifier =
                         Modifier.padding(
@@ -251,41 +273,78 @@ fun RaceDetailScreen(
                 ) {
                     HorseCard(
                         horse = horse,
-                        rank =
-                            rankedHorses
-                                .indexOf(horse) + 1
+                        rank = index + 1
                     )
                 }
             }
         }
 
         item {
-            Spacer(
-                Modifier.height(28.dp)
-            )
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
+                ExpandableAnalysisHeader(
+                    expanded =
+                        deepExpanded,
+                    onClick = {
+                        deepExpanded =
+                            !deepExpanded
+                    }
+                )
+            }
+        }
+
+        if (
+            deepExpanded
+        ) {
+            favorite?.let {
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        DeepAnalysisCard(
+                            horse = it
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun Header(
+private fun RaceHeader(
     race: Race,
     refreshing: Boolean,
     onRefresh: () -> Unit,
     onBack: () -> Unit
 ) {
+    val compact =
+        isCompactScreen()
+
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .padding(
                     horizontal = 8.dp,
-                    vertical = 8.dp
+                    vertical = 5.dp
                 ),
         verticalAlignment =
             Alignment.CenterVertically
     ) {
-        IconButton(onClick = onBack) {
+        IconButton(
+            onClick = onBack,
+            modifier =
+                Modifier.size(48.dp)
+        ) {
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "Geri",
@@ -294,40 +353,50 @@ private fun Header(
         }
 
         Column(
-            Modifier.weight(1f)
+            modifier =
+                Modifier.weight(1f)
         ) {
             Text(
-                "${race.city} · ${race.number}. Koşu",
+                text =
+                    "${race.city} · ${race.number}. Koşu",
                 color = Ink,
-                fontSize = 18.sp,
+                fontSize =
+                    if (compact)
+                        18.sp
+                    else
+                        21.sp,
                 fontWeight =
-                    FontWeight.ExtraBold
+                    FontWeight.Black,
+                maxLines = 2
             )
 
             Text(
-                raceMeta(race),
+                text =
+                    raceMeta(race),
                 color = Muted,
-                fontSize = 11.sp
+                fontSize = 12.sp
             )
         }
 
         IconButton(
             onClick = onRefresh,
-            enabled = !refreshing
+            enabled = !refreshing,
+            modifier =
+                Modifier.size(48.dp)
         ) {
             if (refreshing) {
                 CircularProgressIndicator(
                     modifier =
-                        Modifier.size(22.dp),
-                    color = Green,
-                    strokeWidth = 2.dp
+                        Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Green
                 )
             } else {
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription =
-                        "Yenile",
-                    tint = Green
+                        "Yarışı yenile",
+                    tint = Ink
                 )
             }
         }
@@ -335,675 +404,236 @@ private fun Header(
 }
 
 @Composable
-private fun RaceOverview(
-    race: Race,
-    horses: List<Horse>
-) {
-    val leader =
-        horses.firstOrNull()
-
-    Card(
-        modifier =
-            Modifier.fillMaxWidth(),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = Green
-            ),
-        shape =
-            RoundedCornerShape(20.dp)
-    ) {
-        Column(
-            Modifier.padding(18.dp)
-        ) {
-            Row(
-                verticalAlignment =
-                    Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.Stars,
-                    contentDescription = null,
-                    tint = Gold
-                )
-
-                Spacer(
-                    Modifier.width(7.dp)
-                )
-
-                Text(
-                    "MODEL ANALİZİ",
-                    color = Color.White,
-                    fontSize = 11.sp,
-                    fontWeight =
-                        FontWeight.ExtraBold
-                )
-
-                Spacer(
-                    Modifier.weight(1f)
-                )
-
-                Text(
-                    "${race.horses.size} at",
-                    color =
-                        Color.White.copy(
-                            alpha = 0.85f
-                        ),
-                    fontWeight =
-                        FontWeight.Bold
-                )
-            }
-
-            Spacer(
-                Modifier.height(14.dp)
-            )
-
-            if (leader != null) {
-                Text(
-                    "Model lideri",
-                    color =
-                        Color.White.copy(
-                            alpha = 0.7f
-                        ),
-                    fontSize = 10.sp
-                )
-
-                Text(
-                    "#${leader.number} ${leader.name}",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight =
-                        FontWeight.ExtraBold
-                )
-
-                leader.score?.let {
-                    Text(
-                        "Final puan ${one(it)}",
-                        color = Color.White,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun UncertaintyCard(
-    uncertainty: RaceUncertainty,
-    strategy: RaceCouponStrategy?
+private fun ResultHero(
+    favorite: Horse,
+    rival: Horse?,
+    surprise: Horse?
 ) {
     Card(
-        modifier =
-            Modifier.fillMaxWidth(),
         colors =
             CardDefaults.cardColors(
-                containerColor = Surface
-            ),
-        border =
-            BorderStroke(
-                1.dp,
-                Border
+                containerColor = Ink
             ),
         shape =
-            RoundedCornerShape(18.dp)
+            RoundedCornerShape(26.dp)
     ) {
         Column(
-            Modifier.padding(15.dp)
+            modifier =
+                Modifier.padding(20.dp)
         ) {
             Text(
-                "Yarış belirsizliği",
-                color = Ink,
+                text =
+                    "OLASI KAZANAN",
+                color = Gold,
                 fontWeight =
-                    FontWeight.ExtraBold
+                    FontWeight.ExtraBold,
+                fontSize = 10.sp
             )
 
             Spacer(
-                Modifier.height(7.dp)
+                Modifier.height(6.dp)
             )
 
-            Row(
-                horizontalArrangement =
-                    Arrangement.spacedBy(7.dp)
-            ) {
-                Metric(
-                    Modifier.weight(1f),
-                    "Seviye",
-                    uncertaintyLabel(
-                        uncertainty.level
-                    )
-                )
-
-                Metric(
-                    Modifier.weight(1f),
-                    "Belirsizlik",
-                    "${one(uncertainty.score)}%"
-                )
-
-                Metric(
-                    Modifier.weight(1f),
-                    "Lider farkı",
-                    one(
-                        uncertainty.topMargin
-                    )
-                )
-            }
-
-            strategy?.let {
-                Spacer(
-                    Modifier.height(11.dp)
-                )
-
-                Text(
-                    "Backend kupon stratejisi",
-                    color = Muted,
-                    fontSize = 10.sp
-                )
-
-                Text(
-                    strategyText(it),
-                    color = Ink,
-                    fontSize = 13.sp,
-                    fontWeight =
-                        FontWeight.Bold
-                )
-
-                if (
-                    it.horseNumbers
-                        .isNotEmpty()
-                ) {
-                    Text(
-                        "Önerilen atlar: ${
-                            it.horseNumbers
-                                .joinToString(", ")
-                        }",
-                        color = Green,
-                        fontSize = 11.sp,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HorseCard(
-    horse: Horse,
-    rank: Int
-) {
-    Card(
-        modifier =
-            Modifier.fillMaxWidth(),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = Surface
-            ),
-        border =
-            BorderStroke(
-                1.dp,
-                Border
-            ),
-        shape =
-            RoundedCornerShape(18.dp)
-    ) {
-        Column(
-            Modifier.padding(15.dp)
-        ) {
             Row(
                 verticalAlignment =
                     Alignment.CenterVertically
             ) {
-                Surface(
-                    color =
-                        if (rank == 1)
-                            PaleGreen
-                        else
-                            PaleGold,
-                    shape =
-                        RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        horse.number.toString(),
-                        modifier =
-                            Modifier.padding(
-                                horizontal = 12.dp,
-                                vertical = 9.dp
-                            ),
-                        color =
-                            if (rank == 1)
-                                Green
-                            else
-                                Gold,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
-                }
-
                 Column(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .padding(
-                                start = 11.dp
-                            )
+                    Modifier.weight(1f)
                 ) {
                     Text(
-                        horse.name,
-                        color = Ink,
-                        fontSize = 16.sp,
+                        text =
+                            "#${favorite.number} ${favorite.name}",
+                        color = Color.White,
                         fontWeight =
-                            FontWeight.ExtraBold,
-                        maxLines = 1,
+                            FontWeight.Black,
+                        fontSize = 24.sp,
+                        maxLines = 2,
                         overflow =
                             TextOverflow.Ellipsis
                     )
 
-                    if (
-                        horse.jockey
-                            .isNotBlank()
-                    ) {
-                        Text(
-                            horse.jockey,
-                            color = Muted,
-                            fontSize = 10.sp
-                        )
-                    }
+                    Text(
+                        text =
+                            "Güven Puanı ${
+                                favorite.score
+                                    ?.let {
+                                        "%.1f".format(it)
+                                    }
+                                    ?: "—"
+                            }/100",
+                        color =
+                            Color.White.copy(
+                                alpha = 0.72f
+                            ),
+                        fontSize = 13.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
                 }
 
-                horse.score?.let {
+                Surface(
+                    color =
+                        Color.White.copy(
+                            alpha = 0.10f
+                        ),
+                    shape = CircleShape
+                ) {
                     Text(
-                        one(it),
-                        color = Green,
-                        fontSize = 17.sp,
+                        text =
+                            favorite.score
+                                ?.roundToInt()
+                                ?.toString()
+                                ?: "—",
+                        modifier =
+                            Modifier.padding(18.dp),
+                        color = Gold,
                         fontWeight =
-                            FontWeight.ExtraBold
+                            FontWeight.Black,
+                        fontSize = 20.sp
                     )
                 }
             }
 
             Spacer(
-                Modifier.height(12.dp)
+                Modifier.height(16.dp)
             )
 
-            Row(
-                horizontalArrangement =
-                    Arrangement.spacedBy(6.dp)
-            ) {
-                Metric(
-                    Modifier.weight(1f),
-                    "Güven",
-                    horse.confidence
-                        ?.let {
-                            "${(it * 100).roundToInt()}%"
-                        }
-                        ?: "—"
-                )
-
-                Metric(
-                    Modifier.weight(1f),
-                    "AGF",
-                    horse.agfPercent
-                        ?.let {
-                            "${one(it)}%"
-                        }
-                        ?: "—"
-                )
-
-                Metric(
-                    Modifier.weight(1f),
-                    "HP",
-                    horse.hp
-                        ?.toString()
-                        ?: "—"
-                )
-
-                Metric(
-                    Modifier.weight(1f),
-                    "Kilo",
-                    horse.weight
-                        ?.let(::one)
-                        ?: "—"
-                )
-            }
-
-            LearningSection(horse)
-
-            ExpertSection(
-                horse.expertConsensus
+            DarkMetric(
+                "AGF",
+                favorite.agfPercent
+                    ?.let {
+                        "%${"%.1f".format(it)}"
+                    }
+                    ?: "Veri yok"
             )
 
-            MarketSection(
-                horse.marketMovement
+            DarkMetric(
+                "HP",
+                favorite.hp
+                    ?.let {
+                        "$it puan"
+                    }
+                    ?: "Veri yok"
             )
 
-            FieldSection(
-                horse.fieldSignal
+            DarkMetric(
+                "Uzman desteği",
+                expertSummary(
+                    favorite
+                )
             )
+
+            DarkMetric(
+                "Saha",
+                fieldSummary(
+                    favorite
+                )
+            )
+
+            DarkMetric(
+                "Piyasa",
+                marketSummary(
+                    favorite
+                )
+            )
+
+            DarkMetric(
+                "Form",
+                favorite.recentForm
+                    .ifBlank {
+                        "Veri yok"
+                    }
+            )
+
+            favorite.learningAdjustment
+                ?.let {
+                    DarkMetric(
+                        "Learning",
+                        "${
+                            if (it >= 0)
+                                "+"
+                            else
+                                ""
+                        }${"%.1f".format(it)} puan"
+                    )
+                }
 
             if (
-                horse.scoreComponents
-                    .isNotEmpty()
+                rival != null ||
+                surprise != null
             ) {
                 Spacer(
                     Modifier.height(13.dp)
                 )
 
-                Text(
-                    "Puan bileşenleri",
-                    color = Ink,
-                    fontSize = 12.sp,
-                    fontWeight =
-                        FontWeight.ExtraBold
+                HorizontalDivider(
+                    color =
+                        Color.White.copy(
+                            alpha = 0.12f
+                        )
                 )
 
                 Spacer(
-                    Modifier.height(6.dp)
+                    Modifier.height(11.dp)
                 )
 
-                horse.scoreComponents
-                    .forEach {
-                        ComponentRow(it)
-                    }
+                rival?.let {
+                    Text(
+                        text =
+                            "En ciddi rakip: #${it.number} ${it.name} · ${
+                                it.score?.roundToInt()
+                                    ?: 0
+                            }/100",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
+
+                surprise?.let {
+                    Spacer(
+                        Modifier.height(6.dp)
+                    )
+
+                    Text(
+                        text =
+                            "💣 Sürpriz: #${it.number} ${it.name} · ${
+                                it.score?.roundToInt()
+                                    ?: 0
+                            }/100",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun LearningSection(
-    horse: Horse
-) {
-    val base =
-        horse.baseScore
-
-    val adjustment =
-        horse.learningAdjustment
-
-    if (
-        base == null &&
-        adjustment == null
-    ) {
-        return
-    }
-
-    Spacer(
-        Modifier.height(12.dp)
-    )
-
-    Surface(
-        color = PaleGreen,
-        shape =
-            RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            Modifier.padding(10.dp)
-        ) {
-            Text(
-                "Learning etkisi",
-                color = Green,
-                fontSize = 10.sp,
-                fontWeight =
-                    FontWeight.ExtraBold
-            )
-
-            val final =
-                horse.score
-
-            Text(
-                buildString {
-                    if (base != null) {
-                        append(
-                            "Base ${one(base)}"
-                        )
-                    }
-
-                    if (final != null) {
-                        if (isNotEmpty()) {
-                            append(" → ")
-                        }
-
-                        append(
-                            "Final ${one(final)}"
-                        )
-                    }
-
-                    if (adjustment != null) {
-                        append(
-                            " (${
-                                if (adjustment >= 0)
-                                    "+"
-                                else
-                                    ""
-                            }${one(adjustment)})"
-                        )
-                    }
-                },
-                color = Ink,
-                fontSize = 12.sp,
-                fontWeight =
-                    FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-private fun ExpertSection(
-    value: ExpertConsensusSummary?
-) {
-    if (
-        value == null ||
-        value.sourceCount <= 0
-    ) {
-        return
-    }
-
-    Spacer(
-        Modifier.height(12.dp)
-    )
-
-    Text(
-        "Uzman konsensüsü",
-        color = Ink,
-        fontSize = 12.sp,
-        fontWeight =
-            FontWeight.ExtraBold
-    )
-
-    Text(
-        buildString {
-            append(
-                "${value.sourceCount} kaynak"
-            )
-
-            if (value.bankoCount > 0) {
-                append(
-                    " · ${value.bankoCount} banko"
-                )
-            }
-
-            if (
-                value.favoriteCount > 0
-            ) {
-                append(
-                    " · ${value.favoriteCount} favori"
-                )
-            }
-
-            if (
-                value.strongCount > 0
-            ) {
-                append(
-                    " · ${value.strongCount} güçlü"
-                )
-            }
-
-            if (
-                value.surpriseCount > 0
-            ) {
-                append(
-                    " · ${value.surpriseCount} sürpriz"
-                )
-            }
-        },
-        color = Muted,
-        fontSize = 11.sp
-    )
-
-    if (
-        value.labels
-            .isNotEmpty()
-    ) {
-        Text(
-            value.labels
-                .joinToString(" · "),
-            color = Green,
-            fontSize = 10.sp,
-            fontWeight =
-                FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun MarketSection(
-    value: MarketMovement?
-) {
-    if (value == null) {
-        return
-    }
-
-    Spacer(
-        Modifier.height(12.dp)
-    )
-
-    Text(
-        "Piyasa hareketi",
-        color = Ink,
-        fontSize = 12.sp,
-        fontWeight =
-            FontWeight.ExtraBold
-    )
-
-    Text(
-        buildString {
-            append(
-                marketLabel(
-                    value.direction
-                )
-            )
-
-            value.score?.let {
-                append(
-                    " · skor ${one(it)}"
-                )
-            }
-
-            value.absoluteDelta?.let {
-                append(
-                    " · AGF ${
-                        if (it >= 0)
-                            "+"
-                        else
-                            ""
-                    }${one(it)}"
-                )
-            }
-
-            append(
-                " · ${value.sampleSize} ölçüm"
-            )
-        },
-        color = Muted,
-        fontSize = 11.sp
-    )
-}
-
-@Composable
-private fun FieldSection(
-    value: FieldSignal?
-) {
-    if (
-        value == null ||
-        value.score == null
-    ) {
-        return
-    }
-
-    Spacer(
-        Modifier.height(12.dp)
-    )
-
-    Text(
-        "Saha sinyali",
-        color = Ink,
-        fontSize = 12.sp,
-        fontWeight =
-            FontWeight.ExtraBold
-    )
-
-    Text(
-        buildString {
-            append(
-                "Birleşik ${one(value.score)}"
-            )
-
-            value.tjkScore?.let {
-                append(
-                    " · TJK ${one(it)}"
-                )
-            }
-
-            value.expertScore?.let {
-                append(
-                    " · Uzman ${one(it)}"
-                )
-            }
-
-            if (
-                value.tjkSampleSize > 0
-            ) {
-                append(
-                    " · ${value.tjkSampleSize} örnek"
-                )
-            }
-        },
-        color = Muted,
-        fontSize = 11.sp
-    )
-}
-
-@Composable
-private fun ComponentRow(
-    item: ScoreComponent
+private fun DarkMetric(
+    label: String,
+    value: String
 ) {
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(
-                    vertical = 3.dp
-                ),
-        verticalAlignment =
-            Alignment.CenterVertically
+                .padding(vertical = 3.dp)
     ) {
         Text(
-            componentName(item.key),
+            text = label,
             modifier =
                 Modifier.weight(1f),
-            color = Muted,
-            fontSize = 10.sp
-        )
-
-        Text(
-            item.score
-                ?.let(::one)
-                ?: "veri yok",
-            color = Ink,
-            fontSize = 11.sp,
-            fontWeight =
-                FontWeight.Bold
+            color =
+                Color.White.copy(
+                    alpha = 0.58f
+                ),
+            fontSize = 11.sp
         )
 
         Spacer(
@@ -1011,81 +641,180 @@ private fun ComponentRow(
         )
 
         Text(
-            "ağırlık ${one(item.effectiveWeight)}",
-            color = Muted,
-            fontSize = 9.sp
+            text = value,
+            color = Color.White,
+            fontSize = 11.sp,
+            fontWeight =
+                FontWeight.SemiBold
         )
     }
 }
 
-
 @Composable
-private fun VisualScoreBar(
-    value: Double,
-    modifier: Modifier = Modifier
+private fun RaceRiskCard(
+    race: Race
 ) {
-    val normalized =
-        (value / 100.0)
-            .coerceIn(
-                0.0,
-                1.0
-            )
-            .toFloat()
-
-    LinearProgressIndicator(
-        progress = {
-            normalized
-        },
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(5.dp),
-        color =
-            Green,
-        trackColor =
-            Border
-    )
-}
-
-
-@Composable
-private fun Metric(
-    modifier: Modifier,
-    title: String,
-    value: String
-) {
-    Surface(
-        modifier = modifier,
-        color =
-            Color(
-                0xFFF6F8F7
+    Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            BorderStroke(
+                1.dp,
+                Border
             ),
         shape =
-            RoundedCornerShape(10.dp)
+            RoundedCornerShape(18.dp)
     ) {
         Column(
-            Modifier.padding(8.dp)
+            Modifier.padding(15.dp)
         ) {
             Text(
-                title,
-                color = Muted,
-                fontSize = 8.sp
+                text =
+                    "Yarış risk haritası",
+                color = Ink,
+                fontSize = 14.sp,
+                fontWeight =
+                    FontWeight.Black
             )
 
-            Text(
-                value,
-                color = Ink,
-                fontSize = 11.sp,
-                fontWeight =
-                    FontWeight.ExtraBold
+            RaceInsightSummary(
+                race = race
+            )
+
+            race.uncertainty?.let {
+                Spacer(
+                    Modifier.height(9.dp)
+                )
+
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(7.dp)
+                ) {
+                    MiniMetric(
+                        Modifier.weight(1f),
+                        "Belirsizlik",
+                        uncertaintyText(
+                            it.level
+                        )
+                    )
+
+                    MiniMetric(
+                        Modifier.weight(1f),
+                        "Lider farkı",
+                        "%.1f".format(
+                            it.topMargin
+                        )
+                    )
+
+                    MiniMetric(
+                        Modifier.weight(1f),
+                        "Genişleme",
+                        "%.1f".format(
+                            it.expansionPressure
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    subtitle: String
+) {
+    Row(
+        modifier =
+            Modifier.fillMaxWidth(),
+        verticalAlignment =
+            Alignment.Bottom
+    ) {
+        Text(
+            text = title,
+            modifier =
+                Modifier.weight(1f),
+            color = Ink,
+            fontSize = 19.sp,
+            fontWeight =
+                FontWeight.Black
+        )
+
+        Text(
+            text = subtitle,
+            color = Muted,
+            fontSize = 10.sp
+        )
+    }
+}
+
+@Composable
+private fun ExpandableAnalysisHeader(
+    expanded: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    onClick = onClick
+                ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Row(
+            modifier =
+                Modifier.padding(15.dp),
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+            Column(
+                Modifier.weight(1f)
+            ) {
+                Text(
+                    text =
+                        "Detaylı model analizi",
+                    color = Ink,
+                    fontWeight =
+                        FontWeight.Black
+                )
+
+                Text(
+                    text =
+                        "Ağırlıklar, learning ve sinyal bileşenleri",
+                    color = Muted,
+                    fontSize = 10.sp
+                )
+            }
+
+            Icon(
+                if (expanded)
+                    Icons.Default.KeyboardArrowUp
+                else
+                    Icons.Default.KeyboardArrowDown,
+                contentDescription =
+                    if (expanded)
+                        "Detaylı analizi kapat"
+                    else
+                        "Detaylı analizi aç"
             )
         }
     }
 }
 
 @Composable
-private fun NoticeCard(
-    message: String
+private fun Notice(
+    text: String
 ) {
     Surface(
         modifier =
@@ -1099,7 +828,7 @@ private fun NoticeCard(
             RoundedCornerShape(14.dp)
     ) {
         Text(
-            message,
+            text = text,
             modifier =
                 Modifier.padding(12.dp),
             color = Muted,
@@ -1123,79 +852,71 @@ private fun raceMeta(
             "Koşu bilgisi"
         }
 
-private fun one(
-    value: Double
-): String =
-    "%.1f".format(value)
+private fun expertSummary(
+    horse: Horse
+): String {
+    val e =
+        horse.expertConsensus
+            ?: return "Kaynak bekleniyor / bulunamadı"
 
-private fun componentName(
-    key: String
-): String =
-    when (key) {
-        "agf" -> "AGF"
-        "expert" -> "Uzman"
-        "form" -> "Form"
-        "hp" -> "HP"
-        "market" -> "Piyasa"
-        "weight" -> "Kilo"
-        "field" -> "Saha"
-        else -> key
+    return buildString {
+        append(
+            "${e.sourceCount} kaynak"
+        )
+
+        if (e.favoriteCount > 0) {
+            append(
+                " · ${e.favoriteCount} favori"
+            )
+        }
+
+        if (e.bankoCount > 0) {
+            append(
+                " · ⭐ ${e.bankoCount} banko"
+            )
+        }
+
+        if (e.strongCount > 0) {
+            append(
+                " · ${e.strongCount} güçlü"
+            )
+        }
     }
+}
 
-private fun uncertaintyLabel(
-    value: String
-): String =
-    when (value) {
-        "low" -> "Düşük"
-        "medium" -> "Orta"
-        "high" -> "Yüksek"
-        "very-high" -> "Çok yüksek"
-        else -> value
+private fun marketSummary(
+    horse: Horse
+): String {
+    val m =
+        horse.marketMovement
+            ?: return "Veri yok"
+
+    return buildString {
+        append(
+            "${marketArrow(m.direction)} ${
+                marketText(m.direction)
+            }"
+        )
+
+        m.absoluteDelta?.let {
+            append(
+                " · AGF ${
+                    if (it >= 0)
+                        "+"
+                    else
+                        ""
+                }${"%.1f".format(it)}"
+            )
+        }
     }
+}
 
-private fun marketLabel(
-    value: String
+private fun fieldSummary(
+    horse: Horse
 ): String =
-    when (value) {
-        "strong-up" -> "Güçlü yükseliş"
-        "up" -> "Yükseliş"
-        "flat" -> "Yatay"
-        "down" -> "Düşüş"
-        "strong-down" -> "Güçlü düşüş"
-        else -> "Yetersiz piyasa verisi"
-    }
-
-private fun strategyText(
-    value: RaceCouponStrategy
-): String =
-    when (value.mode) {
-        "single" ->
-            "Tek adayı güçlü"
-
-        "compact" ->
-            "Dar kupon uygun"
-
-        "spread" ->
-            "Bu ayakta genişleme öneriliyor"
-
-        else ->
-            value.reason
-    }
-
-
-private fun marketArrow(
-    movement: Double?
-): String =
-    when {
-        movement == null ->
-            "→"
-
-        movement > 0.01 ->
-            "↑"
-
-        movement < -0.01 ->
-            "↓"
-
-        else ->
-            "→"
-    }
+    horse.fieldSignal
+        ?.score
+        ?.let {
+            "Birleşik ${"%.1f".format(it)}"
+        }
+        ?: "Veri yok"
