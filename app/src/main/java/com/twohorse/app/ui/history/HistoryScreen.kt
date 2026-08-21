@@ -239,6 +239,21 @@ fun HistoryScreen(
                     Column(
                         modifier =
                             Modifier.padding(
+                                horizontal =
+                                    18.dp
+                            )
+                    ) {
+                        HistoryStats(
+                            history =
+                                history
+                        )
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
                                 horizontal = 18.dp
                             )
                     ) {
@@ -487,6 +502,347 @@ private fun HistoryRaceCard(
                     null,
                 tint =
                     Muted
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun HistoryStats(
+    history: List<HistoryRace>
+) {
+    val completed =
+        history.filter {
+            race ->
+            race.runners.any {
+                it.finishPosition != null
+            }
+        }
+
+    val top1Hits =
+        completed.count {
+            race ->
+            val ranked =
+                race.runners
+                    .sortedByDescending {
+                        it.score
+                            ?: Double.NEGATIVE_INFINITY
+                    }
+
+            val winner =
+                race.runners
+                    .firstOrNull {
+                        it.finishPosition == 1
+                    }
+
+            winner != null &&
+            ranked.firstOrNull()
+                ?.number ==
+                winner.number
+        }
+
+    val top3Hits =
+        completed.count {
+            race ->
+            val top3 =
+                race.runners
+                    .sortedByDescending {
+                        it.score
+                            ?: Double.NEGATIVE_INFINITY
+                    }
+                    .take(3)
+                    .map {
+                        it.number
+                    }
+
+            val winner =
+                race.runners
+                    .firstOrNull {
+                        it.finishPosition == 1
+                    }
+
+            winner != null &&
+            winner.number in
+                top3
+        }
+
+    val top1Percent =
+        if (completed.isEmpty())
+            0
+        else
+            (
+                top1Hits * 100.0 /
+                completed.size
+            ).toInt()
+
+    val top3Percent =
+        if (completed.isEmpty())
+            0
+        else
+            (
+                top3Hits * 100.0 /
+                completed.size
+            ).toInt()
+
+    val cityStats =
+        completed
+            .groupBy {
+                it.city
+            }
+            .map {
+                entry ->
+
+                val hits =
+                    entry.value.count {
+                        race ->
+
+                        val model =
+                            race.runners
+                                .maxByOrNull {
+                                    it.score
+                                        ?: Double.NEGATIVE_INFINITY
+                                }
+
+                        val winner =
+                            race.runners
+                                .firstOrNull {
+                                    it.finishPosition ==
+                                        1
+                                }
+
+                        model != null &&
+                        winner != null &&
+                        model.number ==
+                            winner.number
+                    }
+
+                Triple(
+                    entry.key,
+                    hits,
+                    entry.value.size
+                )
+            }
+            .sortedByDescending {
+                if (it.third == 0)
+                    0.0
+                else
+                    it.second.toDouble() /
+                    it.third
+            }
+
+    Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    Surface
+            ),
+        border =
+            BorderStroke(
+                1.dp,
+                Border
+            ),
+        shape =
+            RoundedCornerShape(
+                20.dp
+            )
+    ) {
+        Column(
+            modifier =
+                Modifier.padding(
+                    15.dp
+                )
+        ) {
+            Text(
+                text =
+                    "Model performansı",
+                color =
+                    Ink,
+                fontSize =
+                    15.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
+
+            Text(
+                text =
+                    "${completed.size} sonuçlanmış yarış üzerinden",
+                color =
+                    Muted,
+                fontSize =
+                    9.sp
+            )
+
+            Spacer(
+                Modifier.height(
+                    10.dp
+                )
+            )
+
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        7.dp
+                    )
+            ) {
+                PerformanceMetric(
+                    modifier =
+                        Modifier.weight(
+                            1f
+                        ),
+                    label =
+                        "Top-1 isabet",
+                    value =
+                        "%$top1Percent"
+                )
+
+                PerformanceMetric(
+                    modifier =
+                        Modifier.weight(
+                            1f
+                        ),
+                    label =
+                        "Top-3 kapsama",
+                    value =
+                        "%$top3Percent"
+                )
+
+                PerformanceMetric(
+                    modifier =
+                        Modifier.weight(
+                            1f
+                        ),
+                    label =
+                        "Yarış",
+                    value =
+                        completed.size
+                            .toString()
+                )
+            }
+
+            if (
+                cityStats.isNotEmpty()
+            ) {
+                Spacer(
+                    Modifier.height(
+                        13.dp
+                    )
+                )
+
+                Text(
+                    text =
+                        "Şehir bazlı Top-1",
+                    color =
+                        Ink,
+                    fontSize =
+                        11.sp,
+                    fontWeight =
+                        FontWeight.ExtraBold
+                )
+
+                Spacer(
+                    Modifier.height(
+                        6.dp
+                    )
+                )
+
+                cityStats
+                    .take(5)
+                    .forEach {
+                        item ->
+
+                        val percent =
+                            if (
+                                item.third == 0
+                            )
+                                0
+                            else
+                                (
+                                    item.second *
+                                    100.0 /
+                                    item.third
+                                )
+                                    .toInt()
+
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        vertical =
+                                            3.dp
+                                    )
+                        ) {
+                            Text(
+                                text =
+                                    item.first,
+                                modifier =
+                                    Modifier.weight(
+                                        1f
+                                    ),
+                                color =
+                                    Muted,
+                                fontSize =
+                                    9.sp
+                            )
+
+                            Text(
+                                text =
+                                    "${item.second}/${item.third} · %$percent",
+                                color =
+                                    Green,
+                                fontSize =
+                                    9.sp,
+                                fontWeight =
+                                    FontWeight.Bold
+                            )
+                        }
+                    }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PerformanceMetric(
+    modifier: Modifier,
+    label: String,
+    value: String
+) {
+    Surface(
+        modifier =
+            modifier,
+        color =
+            PaleGreen,
+        shape =
+            RoundedCornerShape(
+                12.dp
+            )
+    ) {
+        Column(
+            modifier =
+                Modifier.padding(
+                    9.dp
+                )
+        ) {
+            Text(
+                text =
+                    label,
+                color =
+                    Muted,
+                fontSize =
+                    8.sp
+            )
+
+            Text(
+                text =
+                    value,
+                color =
+                    Green,
+                fontSize =
+                    16.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
             )
         }
     }
