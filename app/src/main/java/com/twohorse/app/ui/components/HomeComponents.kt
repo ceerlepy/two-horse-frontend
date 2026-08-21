@@ -1,50 +1,35 @@
 package com.twohorse.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stars
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.R
+import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
-import com.twohorse.app.ui.theme.Border
-import com.twohorse.app.ui.theme.Gold
-import com.twohorse.app.ui.theme.Green
-import com.twohorse.app.ui.theme.Ink
-import com.twohorse.app.ui.theme.Muted
-import com.twohorse.app.ui.theme.PaleGold
-import com.twohorse.app.ui.theme.PaleGreen
-import com.twohorse.app.ui.theme.Surface
+import com.twohorse.app.ui.theme.*
 
 @Composable
 fun TwoHorseHeader(
@@ -52,78 +37,113 @@ fun TwoHorseHeader(
     onRefresh: () -> Unit,
     onHistory: () -> Unit
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 18.dp,
-                    vertical = 12.dp
-                ),
-        verticalAlignment =
-            Alignment.CenterVertically
-    ) {
-        Image(
-            painter =
-                painterResource(
-                    R.drawable.two_horse_logo
-                ),
-            contentDescription =
-                "Two Horse",
-            modifier =
-                Modifier.size(44.dp)
-        )
+    val compact =
+        isCompactScreen()
 
-        Column(
+    Surface(
+        color = Bg
+    ) {
+        Row(
             modifier =
                 Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
+                    .statusBarsPadding()
                     .padding(
-                        start = 10.dp
-                    )
+                        start = 18.dp,
+                        end = 8.dp,
+                        top = 8.dp,
+                        bottom = 10.dp
+                    ),
+            verticalAlignment =
+                Alignment.CenterVertically
         ) {
-            Text(
-                text = "Two Horse",
-                color = Ink,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold
+            Image(
+                painter =
+                    painterResource(
+                        R.drawable.two_horse_logo
+                    ),
+                contentDescription =
+                    "Two Horse logosu",
+                contentScale =
+                    ContentScale.Fit,
+                modifier =
+                    Modifier
+                        .size(
+                            if (compact)
+                                48.dp
+                            else
+                                54.dp
+                        )
+                        .clip(
+                            RoundedCornerShape(
+                                16.dp
+                            )
+                        )
             )
 
-            Text(
-                text = "Akıllı yarış analizi",
-                color = Muted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+            Spacer(
+                Modifier.width(12.dp)
             )
-        }
 
-        IconButton(
-            onClick = onHistory
-        ) {
-            Icon(
-                imageVector =
+            Column(
+                modifier =
+                    Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Two Horse",
+                    color = Ink,
+                    fontSize =
+                        if (compact)
+                            23.sp
+                        else
+                            27.sp,
+                    fontWeight =
+                        FontWeight.Black,
+                    maxLines = 1
+                )
+
+                Text(
+                    text =
+                        if (refreshing)
+                            "Canlı veri güncelleniyor…"
+                        else
+                            "Türkiye yarış analizi",
+                    color = Muted,
+                    fontSize = 12.sp,
+                    maxLines = 1
+                )
+            }
+
+            IconButton(
+                onClick = onHistory,
+                modifier =
+                    Modifier.size(48.dp)
+            ) {
+                Icon(
                     Icons.Default.History,
-                contentDescription =
-                    "Geçmiş",
-                tint = Ink
-            )
-        }
+                    contentDescription =
+                        "Geçmiş yarışları aç",
+                    tint = Ink
+                )
+            }
 
-        IconButton(
-            onClick = onRefresh,
-            enabled = !refreshing
-        ) {
-            Icon(
-                imageVector =
+            IconButton(
+                onClick = onRefresh,
+                enabled = !refreshing,
+                modifier =
+                    Modifier.size(48.dp)
+            ) {
+                Icon(
                     Icons.Default.Refresh,
-                contentDescription =
-                    "Yenile",
-                tint =
-                    if (refreshing)
-                        Muted
-                    else
-                        Green
-            )
+                    contentDescription =
+                        "Yarış verisini yenile",
+                    tint =
+                        if (refreshing)
+                            Muted
+                        else
+                            Ink
+                )
+            }
         }
     }
 }
@@ -138,53 +158,42 @@ fun CityChip(
         modifier =
             Modifier
                 .clip(
-                    RoundedCornerShape(
-                        50
-                    )
+                    RoundedCornerShape(50)
                 )
                 .clickable(
                     onClick = onClick
                 ),
-        shape =
-            RoundedCornerShape(
-                50
-            ),
         color =
             if (selected)
-                Green
+                Ink
             else
                 Surface,
-        tonalElevation =
-            if (selected)
-                1.dp
-            else
-                0.dp,
-        shadowElevation =
-            0.dp,
         border =
-            androidx.compose.foundation.BorderStroke(
+            BorderStroke(
                 1.dp,
                 if (selected)
-                    Green
+                    Ink
                 else
                     Border
-            )
+            ),
+        shape =
+            RoundedCornerShape(50)
     ) {
         Text(
             text = city,
             modifier =
                 Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 9.dp
+                    horizontal = 14.dp,
+                    vertical = 8.dp
                 ),
             color =
                 if (selected)
                     Color.White
                 else
                     Ink,
+            fontSize = 11.sp,
             fontWeight =
-                FontWeight.SemiBold,
-            fontSize = 13.sp
+                FontWeight.Bold
         )
     }
 }
@@ -195,209 +204,232 @@ fun NextRaceHero(
     countdown: String,
     onClick: () -> Unit
 ) {
+    val compact =
+        isCompactScreen()
+
     Card(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = onClick
-                ),
-        shape =
-            RoundedCornerShape(
-                22.dp
-            ),
+            Modifier.fillMaxWidth(),
         colors =
             CardDefaults.cardColors(
-                containerColor =
-                    Green
+                containerColor = Ink
             ),
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation =
-                    2.dp
-            )
+        shape =
+            RoundedCornerShape(28.dp)
     ) {
         Column(
             modifier =
                 Modifier.padding(
-                    18.dp
+                    if (compact)
+                        18.dp
+                    else
+                        22.dp
                 )
         ) {
             Row(
-                modifier =
-                    Modifier.fillMaxWidth(),
                 verticalAlignment =
                     Alignment.CenterVertically
             ) {
                 Surface(
-                    color =
-                        PaleGold,
+                    color = Gold,
                     shape =
-                        RoundedCornerShape(
-                            50
-                        )
+                        RoundedCornerShape(50)
                 ) {
                     Text(
                         text =
-                            "EN YAKIN YARIŞ",
+                            "$countdown KALDI",
                         modifier =
                             Modifier.padding(
-                                horizontal = 10.dp,
-                                vertical = 5.dp
+                                horizontal = 11.dp,
+                                vertical = 6.dp
                             ),
-                        color =
-                            Gold,
-                        fontSize =
-                            10.sp,
+                        color = Ink,
+                        fontSize = 10.sp,
                         fontWeight =
-                            FontWeight.ExtraBold
+                            FontWeight.Black
                     )
                 }
 
                 Spacer(
-                    modifier =
-                        Modifier.weight(1f)
+                    Modifier.weight(1f)
                 )
 
                 Text(
                     text =
-                        countdown,
-                    color =
-                        Color.White,
-                    fontSize =
-                        18.sp,
+                        raceTime(
+                            race
+                        ),
+                    color = Color.White,
+                    fontSize = 20.sp,
                     fontWeight =
-                        FontWeight.ExtraBold
+                        FontWeight.Black
                 )
             }
 
             Spacer(
-                modifier =
-                    Modifier.height(
-                        16.dp
-                    )
+                Modifier.height(18.dp)
+            )
+
+            Text(
+                text = "Sıradaki yarış",
+                color =
+                    Color.White.copy(
+                        alpha = 0.58f
+                    ),
+                fontSize = 12.sp,
+                fontWeight =
+                    FontWeight.Bold
             )
 
             Text(
                 text =
                     "${race.city} · ${race.number}. Koşu",
-                color =
-                    Color.White,
+                color = Color.White,
                 fontSize =
-                    21.sp,
+                    if (compact)
+                        23.sp
+                    else
+                        27.sp,
                 fontWeight =
-                    FontWeight.ExtraBold
+                    FontWeight.Black,
+                maxLines = 2,
+                overflow =
+                    TextOverflow.Ellipsis
             )
 
-            Spacer(
-                modifier =
-                    Modifier.height(
-                        4.dp
-                    )
+            Text(
+                text =
+                    raceMeta(race),
+                color =
+                    Color.White.copy(
+                        alpha = 0.68f
+                    ),
+                fontSize = 13.sp
             )
 
             if (
                 race.title.isNotBlank()
             ) {
+                Spacer(
+                    Modifier.height(5.dp)
+                )
+
                 Text(
-                    text =
-                        race.title,
+                    text = race.title,
                     color =
                         Color.White.copy(
-                            alpha = 0.88f
+                            alpha = 0.72f
                         ),
-                    fontSize =
-                        13.sp,
-                    maxLines = 1,
+                    fontSize = 11.sp,
+                    maxLines = 2,
                     overflow =
                         TextOverflow.Ellipsis
                 )
             }
 
-            Spacer(
-                modifier =
-                    Modifier.height(
-                        14.dp
-                    )
+            RaceInsightSummary(
+                race = race,
+                dark = true
             )
 
-            RaceInsightBadges(
-                race =
-                    race,
-                dark =
-                    true
-            )
+            val leader =
+                rankedHorses(race)
+                    .firstOrNull()
 
-            Spacer(
-                modifier =
-                    Modifier.height(
-                        12.dp
-                    )
-            )
+            leader?.let {
+                Spacer(
+                    Modifier.height(13.dp)
+                )
 
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth(),
-                verticalAlignment =
-                    Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier =
-                        Modifier.weight(1f)
+                HorizontalDivider(
+                    color =
+                        Color.White.copy(
+                            alpha = 0.12f
+                        )
+                )
+
+                Spacer(
+                    Modifier.height(11.dp)
+                )
+
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
-                    Text(
-                        text =
-                            raceMeta(
-                                race
-                            ),
-                        color =
-                            Color.White.copy(
-                                alpha = 0.82f
-                            ),
-                        fontSize =
-                            12.sp
-                    )
+                    Column(
+                        modifier =
+                            Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text =
+                                "MODEL FAVORİSİ",
+                            color =
+                                Color.White.copy(
+                                    alpha = 0.56f
+                                ),
+                            fontSize = 9.sp,
+                            fontWeight =
+                                FontWeight.Bold
+                        )
 
-                    Text(
-                        text =
-                            "${race.horses.size} at",
-                        color =
-                            Color.White,
-                        fontWeight =
-                            FontWeight.Bold,
-                        fontSize =
-                            13.sp
-                    )
-                }
+                        Text(
+                            text =
+                                "#${it.number} ${it.name}",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight =
+                                FontWeight.Black,
+                            maxLines = 1,
+                            overflow =
+                                TextOverflow.Ellipsis
+                        )
+                    }
 
-                Box(
-                    modifier =
-                        Modifier
-                            .size(
-                                38.dp
-                            )
-                            .background(
-                                color =
-                                    Color.White.copy(
-                                        alpha = 0.14f
+                    it.score?.let { score ->
+                        Surface(
+                            color =
+                                Color.White.copy(
+                                    alpha = 0.10f
+                                ),
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                text =
+                                    score.toInt()
+                                        .toString(),
+                                modifier =
+                                    Modifier.padding(
+                                        13.dp
                                     ),
-                                shape =
-                                    RoundedCornerShape(
-                                        12.dp
-                                    )
-                            ),
-                    contentAlignment =
-                        Alignment.Center
-                ) {
-                    Icon(
-                        imageVector =
-                            Icons.Default.KeyboardArrowRight,
-                        contentDescription =
-                            null,
-                        tint =
-                            Color.White
-                    )
+                                color = Gold,
+                                fontWeight =
+                                    FontWeight.Black
+                            )
+                        }
+                    }
                 }
+            }
+
+            Spacer(
+                Modifier.height(16.dp)
+            )
+
+            Button(
+                onClick = onClick,
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                            Color.White,
+                        contentColor = Ink
+                    ),
+                shape =
+                    RoundedCornerShape(15.dp)
+            ) {
+                Text(
+                    text = "Analizi aç",
+                    fontWeight =
+                        FontWeight.Black
+                )
             }
         }
     }
@@ -409,6 +441,13 @@ fun UpcomingRaceCard(
     time: String,
     onClick: () -> Unit
 ) {
+    val compact =
+        isCompactScreen()
+
+    val favorite =
+        rankedHorses(race)
+            .firstOrNull()
+
     Card(
         modifier =
             Modifier
@@ -416,172 +455,372 @@ fun UpcomingRaceCard(
                 .clickable(
                     onClick = onClick
                 ),
-        shape =
-            RoundedCornerShape(
-                18.dp
-            ),
         colors =
             CardDefaults.cardColors(
-                containerColor =
-                    Surface
+                containerColor = Surface
             ),
         border =
-            androidx.compose.foundation.BorderStroke(
-                1.dp,
-                Border
-            ),
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation =
-                    0.dp
-            )
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier =
-                Modifier.padding(
-                    15.dp
-                ),
+                Modifier.padding(15.dp),
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
-            Surface(
-                shape =
-                    RoundedCornerShape(
-                        14.dp
-                    ),
-                color =
-                    PaleGreen
-            ) {
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 13.dp,
-                            vertical = 10.dp
-                        ),
-                    horizontalAlignment =
-                        Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text =
-                            time,
-                        color =
-                            Green,
-                        fontSize =
-                            15.sp,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
-
-                    Text(
-                        text =
-                            "${race.number}. K",
-                        color =
-                            Green,
-                        fontSize =
-                            10.sp,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
-                }
-            }
-
             Column(
                 modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(
-                            start = 13.dp
-                        )
+                    Modifier.width(
+                        if (compact)
+                            62.dp
+                        else
+                            70.dp
+                    )
             ) {
                 Text(
-                    text =
-                        race.city,
-                    color =
-                        Ink,
+                    text = time,
+                    color = Ink,
                     fontSize =
-                        15.sp,
+                        if (compact)
+                            16.sp
+                        else
+                            18.sp,
+                    fontWeight =
+                        FontWeight.Black
+                )
+
+                Text(
+                    text =
+                        "${race.number}. Koşu",
+                    color = Green,
+                    fontSize = 10.sp,
                     fontWeight =
                         FontWeight.Bold
                 )
+            }
 
-                if (
-                    race.title.isNotBlank()
-                ) {
+            Box(
+                Modifier
+                    .width(1.dp)
+                    .height(44.dp)
+                    .background(Border)
+            )
+
+            Spacer(
+                Modifier.width(13.dp)
+            )
+
+            Column(
+                modifier =
+                    Modifier.weight(1f)
+            ) {
+                Text(
+                    text =
+                        "${race.city} · ${race.number}. Koşu",
+                    color = Ink,
+                    fontSize = 14.sp,
+                    fontWeight =
+                        FontWeight.Black,
+                    maxLines = 1,
+                    overflow =
+                        TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = raceMeta(race),
+                    color = Muted,
+                    fontSize = 11.sp
+                )
+
+                favorite?.let {
                     Text(
                         text =
-                            race.title,
-                        color =
-                            Muted,
-                        fontSize =
-                            12.sp,
+                            "Favori: #${it.number} ${it.name}",
+                        color = Green,
+                        fontSize = 11.sp,
+                        fontWeight =
+                            FontWeight.Bold,
                         maxLines = 1,
                         overflow =
                             TextOverflow.Ellipsis
                     )
                 }
+            }
+
+            Icon(
+                Icons.Default.KeyboardArrowRight,
+                contentDescription =
+                    "Yarış analizini aç",
+                tint = Muted
+            )
+        }
+    }
+}
+
+@Composable
+fun RaceCard(
+    race: Race,
+    countdown: String,
+    time: String,
+    onClick: () -> Unit
+) {
+    val ranked =
+        rankedHorses(race)
+
+    val favorite =
+        ranked.firstOrNull()
+
+    val surprise =
+        ranked
+            .drop(2)
+            .firstOrNull()
+
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    onClick = onClick
+                ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier =
+                Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = PaleGreen,
+                    shape =
+                        RoundedCornerShape(9.dp)
+                ) {
+                    Text(
+                        text =
+                            "${race.city} · ${race.number}. KOŞU",
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 9.dp,
+                                vertical = 6.dp
+                            ),
+                        color = Green,
+                        fontSize = 10.sp,
+                        fontWeight =
+                            FontWeight.ExtraBold
+                    )
+                }
+
+                Spacer(
+                    Modifier.width(9.dp)
+                )
 
                 Text(
-                    text =
-                        raceMeta(
-                            race
-                        ),
-                    color =
-                        Muted,
-                    fontSize =
-                        11.sp
+                    text = time,
+                    color = Ink,
+                    fontSize = 15.sp,
+                    fontWeight =
+                        FontWeight.Black
                 )
 
                 Spacer(
-                    modifier =
-                        Modifier.height(
-                            6.dp
-                        )
+                    Modifier.width(7.dp)
                 )
 
-                RaceInsightBadges(
-                    race =
-                        race,
-                    dark =
-                        false
+                Text(
+                    text = countdown,
+                    color = Green,
+                    fontSize = 10.sp,
+                    fontWeight =
+                        FontWeight.Bold
                 )
             }
 
+            Spacer(
+                Modifier.height(8.dp)
+            )
+
+            Text(
+                text = raceMeta(race),
+                color = Muted,
+                fontSize = 11.sp
+            )
+
+            if (
+                race.title.isNotBlank()
+            ) {
+                Spacer(
+                    Modifier.height(7.dp)
+                )
+
+                Text(
+                    text = race.title,
+                    color = Ink,
+                    fontSize = 13.sp,
+                    fontWeight =
+                        FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow =
+                        TextOverflow.Ellipsis
+                )
+            }
+
+            RaceInsightSummary(
+                race = race
+            )
+
+            favorite?.let {
+                Spacer(
+                    Modifier.height(13.dp)
+                )
+
+                HorizontalDivider(
+                    color = Border
+                )
+
+                Spacer(
+                    Modifier.height(11.dp)
+                )
+
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text =
+                                "MODEL FAVORİSİ",
+                            color = Muted,
+                            fontSize = 10.sp,
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+
+                        Text(
+                            text =
+                                "#${it.number} ${it.name}",
+                            color = Ink,
+                            fontSize = 16.sp,
+                            fontWeight =
+                                FontWeight.Black,
+                            maxLines = 1,
+                            overflow =
+                                TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            text =
+                                favoriteSummary(it),
+                            color = Muted,
+                            fontSize = 10.sp,
+                            maxLines = 2,
+                            overflow =
+                                TextOverflow.Ellipsis
+                        )
+                    }
+
+                    ScoreBadge(it)
+                }
+
+                surprise?.let { horse ->
+                    Spacer(
+                        Modifier.height(8.dp)
+                    )
+
+                    Text(
+                        text =
+                            "💣 Sürpriz  #${horse.number} ${horse.name}",
+                        color = Red,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Bold,
+                        maxLines = 1,
+                        overflow =
+                            TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RemainingRacesToggle(
+    count: Int,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    onClick = onToggle
+                ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Row(
+            modifier =
+                Modifier.padding(
+                    horizontal = 16.dp,
+                    vertical = 14.dp
+                ),
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
             Column(
-                horizontalAlignment =
-                    Alignment.End
+                Modifier.weight(1f)
             ) {
                 Text(
                     text =
-                        "${race.horses.size}",
-                    color =
-                        Ink,
-                    fontSize =
-                        15.sp,
+                        "Diğer kalan koşular",
+                    color = Ink,
+                    fontSize = 14.sp,
                     fontWeight =
-                        FontWeight.ExtraBold
+                        FontWeight.Black
                 )
 
                 Text(
                     text =
-                        "at",
-                    color =
-                        Muted,
-                    fontSize =
-                        10.sp
+                        "$count yaklaşan koşu",
+                    color = Muted,
+                    fontSize = 11.sp
                 )
             }
 
             Icon(
-                imageVector =
-                    Icons.Default.KeyboardArrowRight,
+                if (expanded)
+                    Icons.Default.KeyboardArrowUp
+                else
+                    Icons.Default.KeyboardArrowDown,
                 contentDescription =
-                    null,
-                tint =
-                    Muted,
-                modifier =
-                    Modifier.padding(
-                        start = 8.dp
-                    )
+                    if (expanded)
+                        "Diğer yarışları kapat"
+                    else
+                        "Diğer yarışları aç",
+                tint = Ink
             )
         }
     }
@@ -598,48 +837,31 @@ fun SixFoldEntryCard(
                 .clickable(
                     onClick = onClick
                 ),
-        shape =
-            RoundedCornerShape(
-                18.dp
-            ),
         colors =
             CardDefaults.cardColors(
                 containerColor =
                     PaleGold
             ),
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation =
-                    0.dp
-            )
+        shape =
+            RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier =
-                Modifier.padding(
-                    16.dp
-                ),
+                Modifier.padding(16.dp),
             verticalAlignment =
                 Alignment.CenterVertically
         ) {
             Surface(
-                color =
-                    Gold,
+                color = Gold,
                 shape =
-                    RoundedCornerShape(
-                        14.dp
-                    )
+                    RoundedCornerShape(14.dp)
             ) {
                 Icon(
-                    imageVector =
-                        Icons.Default.Stars,
-                    contentDescription =
-                        null,
-                    tint =
-                        Color.White,
+                    Icons.Default.Stars,
+                    contentDescription = null,
+                    tint = Color.White,
                     modifier =
-                        Modifier.padding(
-                            11.dp
-                        )
+                        Modifier.padding(11.dp)
                 )
             }
 
@@ -647,38 +869,29 @@ fun SixFoldEntryCard(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .padding(
-                            start = 13.dp
-                        )
+                        .padding(start = 13.dp)
             ) {
                 Text(
-                    text =
-                        "Altılı Kupon",
-                    color =
-                        Ink,
-                    fontSize =
-                        16.sp,
+                    text = "Altılı Kupon",
+                    color = Ink,
+                    fontSize = 16.sp,
                     fontWeight =
-                        FontWeight.ExtraBold
+                        FontWeight.Black
                 )
 
                 Text(
                     text =
                         "Bütçene göre optimize edilmiş kupon",
-                    color =
-                        Muted,
-                    fontSize =
-                        12.sp
+                    color = Muted,
+                    fontSize = 12.sp
                 )
             }
 
             Icon(
-                imageVector =
-                    Icons.Default.KeyboardArrowRight,
+                Icons.Default.KeyboardArrowRight,
                 contentDescription =
-                    null,
-                tint =
-                    Gold
+                    "Altılı kupon ekranını aç",
+                tint = Gold
             )
         }
     }
@@ -692,247 +905,128 @@ fun EmptyRaceState(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(
-                    vertical = 48.dp
-                ),
+                .padding(vertical = 48.dp),
         horizontalAlignment =
-            Alignment.CenterHorizontally,
-        verticalArrangement =
-            Arrangement.Center
+            Alignment.CenterHorizontally
     ) {
         Text(
             text = "Two Horse",
             style =
-                MaterialTheme.typography.titleMedium,
+                MaterialTheme.typography
+                    .titleMedium,
             color = Ink,
             fontWeight =
-                FontWeight.Bold
+                FontWeight.Black
         )
 
         Spacer(
-            modifier =
-                Modifier.height(
-                    6.dp
-                )
+            Modifier.height(6.dp)
         )
 
         Text(
-            text =
-                message,
-            color =
-                Muted,
-            fontSize =
-                13.sp
+            text = message,
+            color = Muted,
+            fontSize = 13.sp
         )
     }
 }
+
+@Composable
+private fun ScoreBadge(
+    horse: Horse
+) {
+    Surface(
+        color = PaleGreen,
+        shape = CircleShape
+    ) {
+        Text(
+            text =
+                horse.score
+                    ?.toInt()
+                    ?.toString()
+                    ?: "—",
+            modifier =
+                Modifier.padding(14.dp),
+            color = Green,
+            fontSize = 15.sp,
+            fontWeight =
+                FontWeight.Black
+        )
+    }
+}
+
+private fun rankedHorses(
+    race: Race
+): List<Horse> =
+    race.horses
+        .sortedWith(
+            compareByDescending<Horse> {
+                it.score
+                    ?: Double.NEGATIVE_INFINITY
+            }
+                .thenByDescending {
+                    it.agfPercent
+                        ?: Double.NEGATIVE_INFINITY
+                }
+                .thenBy {
+                    it.number
+                }
+        )
+
+private fun favoriteSummary(
+    horse: Horse
+): String =
+    buildList {
+        horse.agfPercent?.let {
+            add("AGF %${"%.1f".format(it)}")
+        }
+
+        horse.expertConsensus
+            ?.sourceCount
+            ?.takeIf {
+                it > 0
+            }
+            ?.let {
+                add("Uzman $it kaynak")
+            }
+
+        horse.hp?.let {
+            add("HP $it")
+        }
+    }
+        .joinToString(" · ")
+        .ifBlank {
+            "Model lideri"
+        }
 
 private fun raceMeta(
     race: Race
-): String {
-    return listOf(
-        race.distance,
+): String =
+    listOf(
+        race.distance
+            .takeIf {
+                it.isNotBlank()
+            },
         race.surface
+            .takeIf {
+                it.isNotBlank()
+            }
     )
-        .filter {
-            it.isNotBlank()
-        }
-        .joinToString(
-            " · "
-        )
+        .filterNotNull()
+        .joinToString(" · ")
         .ifBlank {
             "Koşu bilgisi"
         }
-}
 
-
-@Composable
-private fun RaceInsightBadges(
-    race: Race,
-    dark: Boolean
-) {
-    val uncertainty =
-        race.uncertainty
-
-    val strategy =
-        race.couponStrategy
-
-    if (
-        uncertainty == null &&
-        strategy == null
-    ) {
-        return
-    }
-
-    Column(
-        verticalArrangement =
-            Arrangement.spacedBy(
-                5.dp
-            )
-    ) {
-        uncertainty?.let {
-            CompactRaceBadge(
-                text =
-                    "Belirsizlik: ${
-                        uncertaintyLabel(
-                            it.level
-                        )
-                    }",
-                background =
-                    if (dark)
-                        Color.White.copy(
-                            alpha = 0.14f
-                        )
-                    else
-                        uncertaintyBackground(
-                            it.level
-                        ),
-                foreground =
-                    if (dark)
-                        Color.White
-                    else
-                        uncertaintyForeground(
-                            it.level
-                        )
-            )
-        }
-
-        strategy?.let {
-            CompactRaceBadge(
-                text =
-                    strategyLabel(
-                        it.mode
-                    ),
-                background =
-                    if (dark)
-                        Color.White.copy(
-                            alpha = 0.14f
-                        )
-                    else
-                        PaleGreen,
-                foreground =
-                    if (dark)
-                        Color.White
-                    else
-                        Green
-            )
-        }
-    }
-}
-
-@Composable
-private fun CompactRaceBadge(
-    text: String,
-    background: Color,
-    foreground: Color
-) {
-    Surface(
-        color =
-            background,
-        shape =
-            RoundedCornerShape(
-                50
-            )
-    ) {
-        Text(
-            text =
-                text,
-            modifier =
-                Modifier.padding(
-                    horizontal =
-                        8.dp,
-                    vertical =
-                        4.dp
-                ),
-            color =
-                foreground,
-            fontSize =
-                9.sp,
-            fontWeight =
-                FontWeight.ExtraBold,
-            maxLines =
-                1,
-            overflow =
-                TextOverflow.Ellipsis
-        )
-    }
-}
-
-private fun uncertaintyLabel(
-    level: String
+private fun raceTime(
+    race: Race
 ): String =
-    when(level) {
-        "low" ->
-            "Düşük"
-
-        "medium" ->
-            "Orta"
-
-        "high" ->
-            "Yüksek"
-
-        "very-high" ->
-            "Çok yüksek"
-
-        else ->
-            level
-    }
-
-private fun strategyLabel(
-    mode: String
-): String =
-    when(mode) {
-        "single" ->
-            "Tek adayı güçlü"
-
-        "compact" ->
-            "Dar kupon"
-
-        "spread" ->
-            "Geniş kupon"
-
-        else ->
-            mode
-    }
-
-private fun uncertaintyBackground(
-    level: String
-): Color =
-    when(level) {
-        "low" ->
-            PaleGreen
-
-        "medium" ->
-            PaleGold
-
-        "high",
-        "very-high" ->
-            Color(
-                0xFFFFECEC
+    race.startsAt
+        ?.let {
+            Regex(
+                """\b\d{2}:\d{2}\b"""
             )
-
-        else ->
-            Color(
-                0xFFF2F4F3
-            )
-    }
-
-private fun uncertaintyForeground(
-    level: String
-): Color =
-    when(level) {
-        "low" ->
-            Green
-
-        "medium" ->
-            Gold
-
-        "high",
-        "very-high" ->
-            Color(
-                0xFFB42318
-            )
-
-        else ->
-            Muted
-    }
+                .find(it)
+                ?.value
+        }
+        ?: "--:--"
