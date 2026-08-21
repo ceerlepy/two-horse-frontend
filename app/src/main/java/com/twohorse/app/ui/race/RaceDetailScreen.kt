@@ -920,3 +920,738 @@ private fun fieldSummary(
             "Birleşik ${"%.1f".format(it)}"
         }
         ?: "Veri yok"
+
+@Composable
+private fun HorseCard(
+    horse: Horse,
+    rank: Int
+) {
+    var expanded by
+        remember(
+            horse.number
+        ) {
+            mutableStateOf(
+                rank == 1
+            )
+        }
+
+    Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            BorderStroke(
+                1.dp,
+                if (rank == 1)
+                    Green.copy(
+                        alpha = 0.35f
+                    )
+                else
+                    Border
+            ),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier =
+                Modifier.padding(15.dp)
+        ) {
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Surface(
+                    color =
+                        if (rank == 1)
+                            PaleGreen
+                        else
+                            Color(0xFFF3F5F4),
+                    shape =
+                        RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text =
+                            horse.number
+                                .toString(),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 12.dp,
+                                vertical = 9.dp
+                            ),
+                        color =
+                            if (rank == 1)
+                                Green
+                            else
+                                Ink,
+                        fontWeight =
+                            FontWeight.Black
+                    )
+                }
+
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
+                ) {
+                    Text(
+                        text = horse.name,
+                        color = Ink,
+                        fontSize = 16.sp,
+                        fontWeight =
+                            FontWeight.Black,
+                        maxLines = 1,
+                        overflow =
+                            TextOverflow.Ellipsis
+                    )
+
+                    if (
+                        horse.jockey
+                            .isNotBlank()
+                    ) {
+                        Text(
+                            text =
+                                "${horse.jockey}${
+                                    horse.weight?.let {
+                                        " · ${"%.1f".format(it)} kg"
+                                    }.orEmpty()
+                                }",
+                            color = Muted,
+                            fontSize = 10.sp,
+                            maxLines = 1,
+                            overflow =
+                                TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Column(
+                    horizontalAlignment =
+                        Alignment.End
+                ) {
+                    Text(
+                        text =
+                            horse.score
+                                ?.let {
+                                    "%.1f".format(it)
+                                }
+                                ?: "—",
+                        color = Green,
+                        fontSize = 18.sp,
+                        fontWeight =
+                            FontWeight.Black
+                    )
+
+                    Text(
+                        text =
+                            "#$rank model",
+                        color = Muted,
+                        fontSize = 8.sp
+                    )
+                }
+            }
+
+            Spacer(
+                Modifier.height(11.dp)
+            )
+
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(6.dp)
+            ) {
+                MiniMetric(
+                    Modifier.weight(1f),
+                    "Güven",
+                    horse.confidence
+                        ?.let {
+                            "${(it * 100).roundToInt()}%"
+                        }
+                        ?: "—",
+                    accent =
+                        rank == 1
+                )
+
+                MiniMetric(
+                    Modifier.weight(1f),
+                    "AGF",
+                    horse.agfPercent
+                        ?.let {
+                            "%${"%.1f".format(it)}"
+                        }
+                        ?: "—"
+                )
+
+                MiniMetric(
+                    Modifier.weight(1f),
+                    "HP",
+                    horse.hp
+                        ?.toString()
+                        ?: "—"
+                )
+            }
+
+            ExpertConsensusSection(
+                horse.expertConsensus
+            )
+
+            MarketSection(
+                horse.marketMovement
+            )
+
+            FieldSection(
+                horse.fieldSignal
+            )
+
+            if (
+                horse.recentForm
+                    .isNotBlank()
+            ) {
+                Spacer(
+                    Modifier.height(11.dp)
+                )
+
+                Text(
+                    text = "Form",
+                    color = Ink,
+                    fontSize = 11.sp,
+                    fontWeight =
+                        FontWeight.Black
+                )
+
+                Text(
+                    text =
+                        horse.recentForm,
+                    color = Muted,
+                    fontSize = 10.sp
+                )
+            }
+
+            Spacer(
+                Modifier.height(10.dp)
+            )
+
+            TextButton(
+                onClick = {
+                    expanded =
+                        !expanded
+                },
+                contentPadding =
+                    PaddingValues(0.dp)
+            ) {
+                Text(
+                    text =
+                        if (expanded)
+                            "Model detayını kapat"
+                        else
+                            "Model detayını aç",
+                    color = Green,
+                    fontSize = 10.sp,
+                    fontWeight =
+                        FontWeight.Bold
+                )
+            }
+
+            if (expanded) {
+                LearningSection(
+                    horse
+                )
+
+                if (
+                    horse.scoreComponents
+                        .isNotEmpty()
+                ) {
+                    Spacer(
+                        Modifier.height(12.dp)
+                    )
+
+                    Text(
+                        text =
+                            "Skor bileşenleri",
+                        color = Ink,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Black
+                    )
+
+                    Spacer(
+                        Modifier.height(7.dp)
+                    )
+
+                    horse.scoreComponents
+                        .forEach {
+                            ScoreProgress(
+                                title =
+                                    componentTitle(
+                                        it.key
+                                    ),
+                                score =
+                                    it.score,
+                                subtitle =
+                                    "Etkin ağırlık ${
+                                        "%.1f".format(
+                                            it.effectiveWeight
+                                        )
+                                    } · yapılandırılmış ${
+                                        "%.1f".format(
+                                            it.configuredWeight
+                                        )
+                                    }"
+                            )
+
+                            Spacer(
+                                Modifier.height(8.dp)
+                            )
+                        }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpertConsensusSection(
+    value: ExpertConsensusSummary?
+) {
+    if (
+        value == null ||
+        value.sourceCount <= 0
+    ) {
+        return
+    }
+
+    Spacer(
+        Modifier.height(12.dp)
+    )
+
+    Text(
+        text =
+            "👥 Uzman konsensüsü",
+        color = Ink,
+        fontSize = 11.sp,
+        fontWeight =
+            FontWeight.Black
+    )
+
+    Spacer(
+        Modifier.height(6.dp)
+    )
+
+    Column(
+        verticalArrangement =
+            Arrangement.spacedBy(5.dp)
+    ) {
+        Row(
+            horizontalArrangement =
+                Arrangement.spacedBy(5.dp)
+        ) {
+            AnalyticsChip(
+                "${value.sourceCount} kaynak"
+            )
+
+            if (
+                value.favoriteCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.favoriteCount} favori",
+                    strong = true
+                )
+            }
+
+            if (
+                value.bankoCount > 0
+            ) {
+                AnalyticsChip(
+                    "⭐ ${value.bankoCount} banko",
+                    strong = true
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement =
+                Arrangement.spacedBy(5.dp)
+        ) {
+            if (
+                value.strongCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.strongCount} güçlü"
+                )
+            }
+
+            if (
+                value.rivalCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.rivalCount} rakip"
+                )
+            }
+
+            if (
+                value.surpriseCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.surpriseCount} sürpriz"
+                )
+            }
+
+            if (
+                value.avoidCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.avoidCount} olumsuz",
+                    danger = true
+                )
+            }
+        }
+    }
+
+    value.expertScore?.let {
+        Spacer(
+            Modifier.height(6.dp)
+        )
+
+        ScoreProgress(
+            title = "Uzman skoru",
+            score = it,
+            subtitle =
+                value.supportConfidence
+                    ?.let { confidence ->
+                        "Destek güveni ${
+                            "%.1f".format(
+                                confidence * 100
+                            )
+                        }%"
+                    }
+        )
+    }
+}
+
+@Composable
+private fun MarketSection(
+    value: MarketMovement?
+) {
+    if (value == null) {
+        return
+    }
+
+    Spacer(
+        Modifier.height(12.dp)
+    )
+
+    Row(
+        verticalAlignment =
+            Alignment.CenterVertically
+    ) {
+        Surface(
+            color =
+                when (
+                    value.direction
+                ) {
+                    "strong-up",
+                    "up" ->
+                        PaleGreen
+
+                    "strong-down",
+                    "down" ->
+                        PaleRed
+
+                    else ->
+                        Color(0xFFF2F4F3)
+                },
+            shape =
+                RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text =
+                    marketArrow(
+                        value.direction
+                    ),
+                modifier =
+                    Modifier.padding(
+                        horizontal = 10.dp,
+                        vertical = 6.dp
+                    ),
+                color =
+                    when (
+                        value.direction
+                    ) {
+                        "strong-up",
+                        "up" ->
+                            Green
+
+                        "strong-down",
+                        "down" ->
+                            Red
+
+                        else ->
+                            Muted
+                    },
+                fontSize = 16.sp,
+                fontWeight =
+                    FontWeight.Black
+            )
+        }
+
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(start = 9.dp)
+        ) {
+            Text(
+                text =
+                    "📈 Piyasa hareketi",
+                color = Ink,
+                fontSize = 11.sp,
+                fontWeight =
+                    FontWeight.Black
+            )
+
+            Text(
+                text =
+                    buildString {
+                        append(
+                            marketText(
+                                value.direction
+                            )
+                        )
+
+                        value.firstAgf?.let {
+                            append(
+                                " · ilk %${"%.1f".format(it)}"
+                            )
+                        }
+
+                        value.latestAgf?.let {
+                            append(
+                                " → %${"%.1f".format(it)}"
+                            )
+                        }
+
+                        if (
+                            value.sampleSize > 0
+                        ) {
+                            append(
+                                " · ${value.sampleSize} ölçüm"
+                            )
+                        }
+                    },
+                color = Muted,
+                fontSize = 9.sp,
+                maxLines = 2
+            )
+        }
+    }
+
+    value.score?.let {
+        Spacer(
+            Modifier.height(5.dp)
+        )
+
+        ScoreProgress(
+            title =
+                "Piyasa skoru",
+            score = it
+        )
+    }
+}
+
+@Composable
+private fun FieldSection(
+    value: FieldSignal?
+) {
+    if (value == null) {
+        return
+    }
+
+    Spacer(
+        Modifier.height(12.dp)
+    )
+
+    Text(
+        text = "🏇 Saha sinyali",
+        color = Ink,
+        fontSize = 11.sp,
+        fontWeight =
+            FontWeight.Black
+    )
+
+    value.score?.let {
+        Spacer(
+            Modifier.height(5.dp)
+        )
+
+        ScoreProgress(
+            title =
+                "Birleşik saha",
+            score = it,
+            subtitle =
+                buildString {
+                    value.tjkScore?.let {
+                        append(
+                            "TJK ${"%.1f".format(it)}"
+                        )
+                    }
+
+                    value.expertScore?.let {
+                        if (isNotEmpty()) {
+                            append(" · ")
+                        }
+
+                        append(
+                            "Uzman ${"%.1f".format(it)}"
+                        )
+                    }
+
+                    if (
+                        value.tjkSampleSize > 0
+                    ) {
+                        append(
+                            " · ${value.tjkSampleSize} örnek"
+                        )
+                    }
+                }
+        )
+    }
+}
+
+@Composable
+private fun LearningSection(
+    horse: Horse
+) {
+    val base =
+        horse.baseScore
+
+    val adjustment =
+        horse.learningAdjustment
+
+    if (
+        base == null &&
+        adjustment == null
+    ) {
+        return
+    }
+
+    Spacer(
+        Modifier.height(8.dp)
+    )
+
+    Surface(
+        color = PaleGreen,
+        shape =
+            RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = "🧠 Learning etkisi",
+                color = Green,
+                fontSize = 10.sp,
+                fontWeight =
+                    FontWeight.Black
+            )
+
+            Text(
+                text =
+                    buildString {
+                        base?.let {
+                            append(
+                                "Base ${"%.1f".format(it)}"
+                            )
+                        }
+
+                        horse.score?.let {
+                            if (isNotEmpty()) {
+                                append(" → ")
+                            }
+
+                            append(
+                                "Final ${"%.1f".format(it)}"
+                            )
+                        }
+
+                        adjustment?.let {
+                            append(
+                                " (${
+                                    if (it >= 0)
+                                        "+"
+                                    else
+                                        ""
+                                }${"%.1f".format(it)})"
+                            )
+                        }
+                    },
+                color = Ink,
+                fontSize = 11.sp,
+                fontWeight =
+                    FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeepAnalysisCard(
+    horse: Horse
+) {
+    Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            Modifier.padding(15.dp)
+        ) {
+            Text(
+                text =
+                    "Modelin derin görünümü",
+                color = Ink,
+                fontSize = 14.sp,
+                fontWeight =
+                    FontWeight.Black
+            )
+
+            Text(
+                text =
+                    "#${horse.number} ${horse.name}",
+                color = Muted,
+                fontSize = 10.sp
+            )
+
+            Spacer(
+                Modifier.height(11.dp)
+            )
+
+            horse.scoreComponents
+                .forEach {
+                    ScoreProgress(
+                        title =
+                            componentTitle(
+                                it.key
+                            ),
+                        score =
+                            it.score,
+                        subtitle =
+                            "Etkin ağırlık ${
+                                "%.1f".format(
+                                    it.effectiveWeight
+                                )
+                            }"
+                    )
+
+                    Spacer(
+                        Modifier.height(8.dp)
+                    )
+                }
+        }
+    }
+}
