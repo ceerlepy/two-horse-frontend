@@ -39,7 +39,10 @@ import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
 import com.twohorse.app.ui.components.NextRaceHero
+import com.twohorse.app.ui.components.RaceCard
+import com.twohorse.app.ui.components.RemainingRacesToggle
 import com.twohorse.app.ui.components.SixFoldEntryCard
+import com.twohorse.app.ui.components.ShimmerBlock
 import com.twohorse.app.ui.components.TwoHorseHeader
 import com.twohorse.app.ui.components.UpcomingRaceCard
 import com.twohorse.app.ui.theme.Green
@@ -104,6 +107,12 @@ fun HomeScreen(
                 null
             )
         }
+
+    var remainingExpanded by
+        remember {
+            mutableStateOf(false)
+        }
+
 
     var refreshKey by
         remember {
@@ -440,8 +449,7 @@ fun HomeScreen(
                             )
                     ) {
                         NextRaceHero(
-                            race =
-                                nextRace,
+                            race = nextRace,
                             countdown =
                                 countdownText(
                                     nextRace,
@@ -475,73 +483,134 @@ fun HomeScreen(
                 }
             }
 
-            item {
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            start = 18.dp,
-                            end = 18.dp,
-                            top = 4.dp
-                        )
-                ) {
-                    Text(
-                        text =
-                            "Kalan diğer yarışlar",
-                        color =
-                            Ink,
-                        fontSize =
-                            18.sp,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
+            val remaining =
+                futureRaces
+                    .filter {
+                        it !== nextRace
+                    }
 
-                    Text(
-                        text =
-                            if (
-                                selectedCity == null
-                            ) {
-                                "Bugünün programı"
-                            } else {
-                                "$selectedCity programı"
-                            },
-                        color =
-                            Muted,
-                        fontSize =
-                            12.sp
-                    )
+            val previews =
+                remaining.take(2)
+
+            if (
+                previews.isNotEmpty()
+            ) {
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp,
+                                vertical = 3.dp
+                            )
+                    ) {
+                        Text(
+                            text =
+                                "Yaklaşan koşular",
+                            color = Ink,
+                            fontSize = 19.sp,
+                            fontWeight =
+                                FontWeight.ExtraBold
+                        )
+
+                        Text(
+                            text =
+                                "Sıradaki program özeti",
+                            color = Muted,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
+                items(
+                    items = previews,
+                    key = {
+                        "preview-${it.city}-${it.number}"
+                    }
+                ) { race ->
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        UpcomingRaceCard(
+                            race = race,
+                            time =
+                                displayRaceTime(
+                                    race
+                                ),
+                            onClick = {
+                                onRaceClick(
+                                    race
+                                )
+                            }
+                        )
+                    }
                 }
             }
 
-            items(
-                items =
-                    futureRaces
-                        .filter {
-                            it !==
-                                nextRace
-                        },
-                key = {
-                    "${it.city}-${it.number}"
-                }
-            ) { race ->
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 18.dp
+            val richRaces =
+                remaining.drop(
+                    previews.size
+                )
+
+            if (
+                richRaces.isNotEmpty()
+            ) {
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        RemainingRacesToggle(
+                            count =
+                                richRaces.size,
+                            expanded =
+                                remainingExpanded,
+                            onToggle = {
+                                remainingExpanded =
+                                    !remainingExpanded
+                            }
                         )
+                    }
+                }
+
+                if (
+                    remainingExpanded
                 ) {
-                    UpcomingRaceCard(
-                        race =
-                            race,
-                        time =
-                            displayRaceTime(
-                                race
-                            ),
-                        onClick = {
-                            onRaceClick(
-                                race
+                    items(
+                        items = richRaces,
+                        key = {
+                            "rich-${it.city}-${it.number}"
+                        }
+                    ) { race ->
+                        Column(
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = 18.dp
+                                )
+                        ) {
+                            RaceCard(
+                                race = race,
+                                countdown =
+                                    countdownText(
+                                        race,
+                                        nowMillis
+                                    ),
+                                time =
+                                    displayRaceTime(
+                                        race
+                                    ),
+                                onClick = {
+                                    onRaceClick(
+                                        race
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
             }
         }
@@ -671,65 +740,32 @@ private fun HomeLoadingSkeleton() {
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal =
-                        18.dp
+                    horizontal = 18.dp
                 ),
         verticalArrangement =
-            Arrangement.spacedBy(
-                12.dp
-            )
+            Arrangement.spacedBy(12.dp)
     ) {
-        SkeletonBlock(
-            height =
-                168.dp
+        ShimmerBlock(
+            height = 210.dp
         )
 
-        SkeletonBlock(
-            height =
-                76.dp
+        ShimmerBlock(
+            height = 80.dp
         )
 
-        SkeletonBlock(
-            height =
-                88.dp
+        ShimmerBlock(
+            height = 84.dp
         )
 
-        SkeletonBlock(
-            height =
-                88.dp
+        ShimmerBlock(
+            height = 84.dp
         )
 
         Text(
             text =
                 "Bugünün yarışları hazırlanıyor",
-            color =
-                Muted,
-            fontSize =
-                11.sp
+            color = Muted,
+            fontSize = 11.sp
         )
     }
-}
-
-@Composable
-private fun SkeletonBlock(
-    height: androidx.compose.ui.unit.Dp
-) {
-    Spacer(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(
-                    height
-                )
-                .background(
-                    color =
-                        Color(
-                            0xFFF0F2F1
-                        ),
-                    shape =
-                        RoundedCornerShape(
-                            18.dp
-                        )
-                )
-    )
 }
