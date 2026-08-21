@@ -344,6 +344,13 @@ fun CouponScreen(
                     )
             ) {
                 CouponIntro()
+
+                Spacer(
+                    modifier =
+                        Modifier.height(12.dp)
+                )
+
+                CouponProfileLegend()
             }
         }
 
@@ -1244,5 +1251,167 @@ private fun visualCouponProfileDescription(
 
         else ->
             "Optimizer tarafından oluşturulan kupon profili."
+    }
+}
+
+
+@Composable
+private fun CouponProfileLegend() {
+    Card(
+        modifier =
+            Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    Surface
+            ),
+        border =
+            BorderStroke(
+                1.dp,
+                Border
+            ),
+        shape =
+            RoundedCornerShape(
+                18.dp
+            )
+    ) {
+        Column(
+            modifier =
+                Modifier.padding(
+                    14.dp
+                ),
+            verticalArrangement =
+                Arrangement.spacedBy(
+                    9.dp
+                )
+        ) {
+            Text(
+                text =
+                    "Kupon profilleri",
+                color =
+                    Ink,
+                fontSize =
+                    13.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
+
+            ProfileLegendRow(
+                symbol =
+                    "✓",
+                title =
+                    "Güvenli",
+                description =
+                    "Güçlü adaylara yoğunlaşır · daha kontrollü kapsam",
+                foreground =
+                    Green,
+                background =
+                    PaleGreen
+            )
+
+            ProfileLegendRow(
+                symbol =
+                    "●",
+                title =
+                    "Dengeli",
+                description =
+                    "Risk, maliyet ve kapsama arasında orta yol",
+                foreground =
+                    Gold,
+                background =
+                    PaleGold
+            )
+
+            ProfileLegendRow(
+                symbol =
+                    "⚡",
+                title =
+                    "Agresif",
+                description =
+                    "Sürpriz senaryolara daha fazla alan açar",
+                foreground =
+                    Red,
+                background =
+                    PaleRed
+            )
+
+            Text(
+                text =
+                    "Her profil backend optimizer tarafından bütçe sınırı içinde hesaplanır.",
+                color =
+                    Muted,
+                fontSize =
+                    9.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileLegendRow(
+    symbol: String,
+    title: String,
+    description: String,
+    foreground: Color,
+    background: Color
+) {
+    Row(
+        verticalAlignment =
+            Alignment.CenterVertically
+    ) {
+        Surface(
+            color =
+                background,
+            shape =
+                RoundedCornerShape(
+                    11.dp
+                )
+        ) {
+            Text(
+                text =
+                    symbol,
+                modifier =
+                    Modifier.padding(
+                        horizontal =
+                            10.dp,
+                        vertical =
+                            7.dp
+                    ),
+                color =
+                    foreground,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
+        }
+
+        Column(
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(
+                        start =
+                            9.dp
+                    )
+        ) {
+            Text(
+                text =
+                    title,
+                color =
+                    Ink,
+                fontSize =
+                    11.sp,
+                fontWeight =
+                    FontWeight.ExtraBold
+            )
+
+            Text(
+                text =
+                    description,
+                color =
+                    Muted,
+                fontSize =
+                    9.sp
+            )
+        }
     }
 }
