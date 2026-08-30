@@ -18,7 +18,8 @@ data class ExpertConsensusSummary(
     val avoidCount: Int = 0,
     val expertScore: Double? = null,
     val supportConfidence: Double? = null,
-    val labels: List<String> = emptyList()
+    val labels: List<String> = emptyList(),
+    val summary: String = ""
 )
 
 data class MarketMovement(
