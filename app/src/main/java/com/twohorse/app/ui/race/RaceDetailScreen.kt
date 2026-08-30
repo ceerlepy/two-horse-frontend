@@ -1281,6 +1281,14 @@ private fun ExpertConsensusSection(
             }
 
             if (
+                value.starCount > 0
+            ) {
+                AnalyticsChip(
+                    "${value.starCount} yıldız"
+                )
+            }
+
+            if (
                 value.rivalCount > 0
             ) {
                 AnalyticsChip(
@@ -1305,6 +1313,20 @@ private fun ExpertConsensusSection(
                 )
             }
         }
+    }
+
+    if (
+        value.summary.isNotBlank()
+    ) {
+        Spacer(
+            Modifier.height(6.dp)
+        )
+
+        Text(
+            text = value.summary,
+            color = Muted,
+            fontSize = 11.sp
+        )
     }
 
     value.expertScore?.let {

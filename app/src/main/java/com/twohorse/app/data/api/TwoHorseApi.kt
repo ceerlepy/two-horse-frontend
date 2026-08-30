@@ -766,7 +766,12 @@ class TwoHorseApi(
                             "supportConfidence"
                         ),
                     labels =
-                        labels
+                        labels,
+                    summary =
+                        it.optString(
+                            "summary",
+                            ""
+                        )
                 )
             }
 
