@@ -1253,7 +1253,7 @@ private fun ExpertConsensusSection(
                 value.favoriteCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.favoriteCount} favori",
+                    "${value.favoriteCount} favori (%${value.favoriteScore.roundToInt()})",
                     strong = true
                 )
             }
@@ -1262,7 +1262,7 @@ private fun ExpertConsensusSection(
                 value.bankoCount > 0
             ) {
                 AnalyticsChip(
-                    "⭐ ${value.bankoCount} banko",
+                    "⭐ ${value.bankoCount} banko (%${value.bankoScore.roundToInt()})",
                     strong = true
                 )
             }
@@ -1276,7 +1276,7 @@ private fun ExpertConsensusSection(
                 value.strongCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.strongCount} güçlü"
+                    "${value.strongCount} güçlü (%${value.strongScore.roundToInt()})"
                 )
             }
 
@@ -1284,7 +1284,7 @@ private fun ExpertConsensusSection(
                 value.starCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.starCount} yıldız"
+                    "${value.starCount} yıldız (%${value.starScore.roundToInt()})"
                 )
             }
 
@@ -1292,7 +1292,7 @@ private fun ExpertConsensusSection(
                 value.rivalCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.rivalCount} rakip"
+                    "${value.rivalCount} rakip (%${value.rivalScore.roundToInt()})"
                 )
             }
 
@@ -1300,7 +1300,7 @@ private fun ExpertConsensusSection(
                 value.surpriseCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.surpriseCount} sürpriz"
+                    "${value.surpriseCount} sürpriz (%${value.surpriseScore.roundToInt()})"
                 )
             }
 
@@ -1308,7 +1308,7 @@ private fun ExpertConsensusSection(
                 value.avoidCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.avoidCount} olumsuz",
+                    "${value.avoidCount} olumsuz (%${value.avoidScore.roundToInt()})",
                     danger = true
                 )
             }

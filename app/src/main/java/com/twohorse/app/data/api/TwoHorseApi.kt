@@ -757,6 +757,41 @@ class TwoHorseApi(
                             "avoidCount",
                             0
                         ),
+                    bankoScore =
+                        it.optDouble(
+                            "bankoScore",
+                            0.0
+                        ),
+                    favoriteScore =
+                        it.optDouble(
+                            "favoriteScore",
+                            0.0
+                        ),
+                    strongScore =
+                        it.optDouble(
+                            "strongScore",
+                            0.0
+                        ),
+                    starScore =
+                        it.optDouble(
+                            "starScore",
+                            0.0
+                        ),
+                    rivalScore =
+                        it.optDouble(
+                            "rivalScore",
+                            0.0
+                        ),
+                    surpriseScore =
+                        it.optDouble(
+                            "surpriseScore",
+                            0.0
+                        ),
+                    avoidScore =
+                        it.optDouble(
+                            "avoidScore",
+                            0.0
+                        ),
                     expertScore =
                         it.optNullableDouble(
                             "expertScore"
