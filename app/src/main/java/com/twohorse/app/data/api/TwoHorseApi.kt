@@ -175,8 +175,11 @@ class TwoHorseApi(
                                     runners,
 
                                 expertPredictionCount =
-                                    experts?.length()
-                                        ?: 0,
+                                    item.optInt(
+                                        "expertPredictionCount",
+                                        experts?.length()
+                                            ?: 0
+                                    ),
 
                                 finalizedAt =
                                     item.firstString(
