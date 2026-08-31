@@ -12,43 +12,43 @@ import androidx.compose.runtime.Composable
 interface Strings {
 
     // ---- Common ----
-    @Composable
+    @get:Composable
     val noData: String
-    @Composable
+    @get:Composable
     val startingSoon: String
-    @Composable
+    @get:Composable
     val back: String
 
     // ---- Login screen ----
-    @Composable
+    @get:Composable
     val loginSubtitle: String
-    @Composable
+    @get:Composable
     val loginGoogleButton: String
-    @Composable
+    @get:Composable
     val loginOr: String
-    @Composable
+    @get:Composable
     val loginEmailLabel: String
-    @Composable
+    @get:Composable
     val loginPasswordLabel: String
-    @Composable
+    @get:Composable
     val loginSubmitButton: String
-    @Composable
+    @get:Composable
     val loginErrorInvalidCredentials: String
-    @Composable
+    @get:Composable
     val loginErrorEmailPasswordRequired: String
-    @Composable
+    @get:Composable
     val loginErrorEmailNotVerified: String
-    @Composable
+    @get:Composable
     val loginErrorNotConfigured: String
-    @Composable
+    @get:Composable
     val loginErrorGeneric: String
-    @Composable
+    @get:Composable
     val loginErrorGoogleIncomplete: String
     @Composable
     fun loginErrorGoogleFailed(code: Int): String
 
     // ---- Account screen ----
-    @Composable
+    @get:Composable
     val accountTitle: String
     @Composable
     fun accountTierTitle(tier: String): String
@@ -56,85 +56,85 @@ interface Strings {
     fun accountTrialEndsAt(date: String): String
     @Composable
     fun accountSubscriptionRenewsAt(date: String): String
-    @Composable
+    @get:Composable
     val accountUnlimited: String
-    @Composable
+    @get:Composable
     val accountGoldDescription: String
-    @Composable
+    @get:Composable
     val accountPremiumDescription: String
     @Composable
     fun accountUpgradeTo(tierTitle: String): String
-    @Composable
+    @get:Composable
     val accountLoadingEllipsis: String
-    @Composable
+    @get:Composable
     val accountAlreadyPremium: String
-    @Composable
+    @get:Composable
     val accountLogout: String
     @Composable
     fun accountPurchaseActivated(tierTitle: String): String
-    @Composable
+    @get:Composable
     val accountPurchaseVerifyFailed: String
 
     // ---- Coupon errors ----
-    @Composable
+    @get:Composable
     val couponErrorCityRequired: String
-    @Composable
+    @get:Composable
     val couponErrorValidBudgetRequired: String
-    @Composable
+    @get:Composable
     val couponErrorSixfoldNotFound: String
-    @Composable
+    @get:Composable
     val couponErrorNotEnoughRaces: String
-    @Composable
+    @get:Composable
     val couponErrorNoRunners: String
-    @Composable
+    @get:Composable
     val couponErrorTierUpgradeRequired: String
-    @Composable
+    @get:Composable
     val couponErrorBudgetCapExceeded: String
-    @Composable
+    @get:Composable
     val couponErrorAuthRequired: String
-    @Composable
+    @get:Composable
     val couponErrorNotFound: String
-    @Composable
+    @get:Composable
     val couponErrorBadRequest: String
-    @Composable
+    @get:Composable
     val couponErrorServerUnavailable: String
-    @Composable
+    @get:Composable
     val couponErrorNoInternet: String
-    @Composable
+    @get:Composable
     val couponErrorTimeout: String
-    @Composable
+    @get:Composable
     val couponErrorGeneric: String
 
     // ---- Coupon screen ----
-    @Composable
+    @get:Composable
     val couponHeaderTitle: String
-    @Composable
+    @get:Composable
     val poolLabelSixfold: String
-    @Composable
+    @get:Composable
     val poolLabelFivefold: String
-    @Composable
+    @get:Composable
     val couponCitySelectFailed: String
-    @Composable
+    @get:Composable
     val couponUnexpectedWindow: String
-    @Composable
+    @get:Composable
     val couponBudgetExceeded: String
-    @Composable
+    @get:Composable
     val couponGenerateButton: String
-    @Composable
+    @get:Composable
     val couponUpgradeButton: String
-    @Composable
+    @get:Composable
     val couponCityTitle: String
-    @Composable
+    @get:Composable
     val couponCitySubtitle: String
-    @Composable
+    @get:Composable
     val couponTypeTitle: String
-    @Composable
+    @get:Composable
     val couponTypeSubtitle: String
     @Composable
     fun couponWindowSubtitle(poolLabelLower: String): String
-    @Composable
+    @get:Composable
     val couponBudgetTitle: String
-    @Composable
+    @get:Composable
     val couponBudgetSubtitle: String
     @Composable
     fun couponGeneratedSummary(
@@ -145,11 +145,11 @@ interface Strings {
     ): String
     @Composable
     fun couponWindowStarted(poolLabel: String): String
-    @Composable
+    @get:Composable
     val couponNoneGenerated: String
-    @Composable
+    @get:Composable
     val couponIntroTitle: String
-    @Composable
+    @get:Composable
     val couponIntroSubtitle: String
     @Composable
     fun couponRaceRange(startRace: String, endRace: String): String
@@ -159,29 +159,29 @@ interface Strings {
     fun couponUnitPriceAndMultiplier(unitPriceTl: String, multiplier: Int): String
     @Composable
     fun couponGeneratedAt(time: String): String
-    @Composable
+    @get:Composable
     val couponLadderTitle: String
-    @Composable
+    @get:Composable
     val couponLadderFixed1Title: String
-    @Composable
+    @get:Composable
     val couponLadderFixed1Desc: String
-    @Composable
+    @get:Composable
     val couponLadderFixed2Title: String
-    @Composable
+    @get:Composable
     val couponLadderFixed2Desc: String
-    @Composable
+    @get:Composable
     val couponLadderVariableTitle: String
-    @Composable
+    @get:Composable
     val couponLadderVariableDesc: String
-    @Composable
+    @get:Composable
     val couponLadderFooter: String
     @Composable
     fun couponTierLabel(index: Int, total: Int): String
     @Composable
     fun couponAmountLabel(amount: Int): String
-    @Composable
+    @get:Composable
     val couponMetricCombinations: String
-    @Composable
+    @get:Composable
     val couponMetricCoverage: String
     @Composable
     fun couponLegCoverage(pct: String): String
@@ -189,39 +189,39 @@ interface Strings {
     fun couponWindowOrdinal(number: Int, poolLabel: String): String
 
     // ---- Race detail screen ----
-    @Composable
+    @get:Composable
     val raceNotFoundInProgram: String
-    @Composable
+    @get:Composable
     val raceRefreshFailed: String
-    @Composable
+    @get:Composable
     val raceCouponButton: String
-    @Composable
+    @get:Composable
     val raceAllHorsesTitle: String
     @Composable
     fun raceHorseCount(n: Int): String
-    @Composable
+    @get:Composable
     val raceRefresh: String
     @Composable
     fun raceCityAndNumber(city: String, number: Int): String
-    @Composable
+    @get:Composable
     val raceLikelyWinner: String
     @Composable
     fun raceConfidenceScore(score: String): String
-    @Composable
+    @get:Composable
     val raceAgf: String
-    @Composable
+    @get:Composable
     val raceHp: String
     @Composable
     fun raceHpPoints(n: Int): String
-    @Composable
+    @get:Composable
     val raceExpertSupport: String
-    @Composable
+    @get:Composable
     val raceField: String
-    @Composable
+    @get:Composable
     val raceMarket: String
-    @Composable
+    @get:Composable
     val raceForm: String
-    @Composable
+    @get:Composable
     val raceLearning: String
     @Composable
     fun raceLearningDelta(signedValue: String): String
@@ -229,25 +229,25 @@ interface Strings {
     fun raceTopRival(number: Int, name: String, score: Int): String
     @Composable
     fun raceSurprise(number: Int, name: String, score: Int): String
-    @Composable
+    @get:Composable
     val raceRiskMapTitle: String
-    @Composable
+    @get:Composable
     val raceUncertaintyMetric: String
-    @Composable
+    @get:Composable
     val raceLeaderMarginMetric: String
-    @Composable
+    @get:Composable
     val raceExpansionMetric: String
-    @Composable
+    @get:Composable
     val raceDeepAnalysisTitle: String
-    @Composable
+    @get:Composable
     val raceDeepAnalysisSubtitle: String
-    @Composable
+    @get:Composable
     val raceCloseDeepAnalysis: String
-    @Composable
+    @get:Composable
     val raceOpenDeepAnalysis: String
-    @Composable
+    @get:Composable
     val raceInfoFallback: String
-    @Composable
+    @get:Composable
     val raceExpertSourceMissing: String
     @Composable
     fun raceExpertSourcesCount(n: Int): String
@@ -259,29 +259,29 @@ interface Strings {
     fun raceExpertStrongCount(n: Int): String
     @Composable
     fun raceFieldCombined(value: String): String
-    @Composable
+    @get:Composable
     val raceGuven: String
-    @Composable
+    @get:Composable
     val raceVideoLabel: String
-    @Composable
+    @get:Composable
     val raceVideoLabelLocked: String
-    @Composable
+    @get:Composable
     val raceVideoLockedBody: String
-    @Composable
+    @get:Composable
     val raceVideoNotFound: String
-    @Composable
+    @get:Composable
     val raceVideoFallbackLabel: String
-    @Composable
+    @get:Composable
     val raceCloseModelDetail: String
-    @Composable
+    @get:Composable
     val raceOpenModelDetail: String
-    @Composable
+    @get:Composable
     val raceScoreComponents: String
     @Composable
     fun raceWeightBoth(effective: String, configured: String): String
     @Composable
     fun raceWeightEffectiveOnly(effective: String): String
-    @Composable
+    @get:Composable
     val raceExpertConsensusTitle: String
     @Composable
     fun raceStarTag(n: Int, pct: Int): String
@@ -291,11 +291,11 @@ interface Strings {
     fun raceSurpriseTag(n: Int, pct: Int): String
     @Composable
     fun raceAvoidTag(n: Int, pct: Int): String
-    @Composable
+    @get:Composable
     val raceExpertScoreTitle: String
     @Composable
     fun raceSupportConfidence(pct: String): String
-    @Composable
+    @get:Composable
     val raceMarketMoveTitle: String
     @Composable
     fun raceMarketFirst(pct: String): String
@@ -303,11 +303,11 @@ interface Strings {
     fun raceMarketTo(pct: String): String
     @Composable
     fun raceMarketSamples(n: Int): String
-    @Composable
+    @get:Composable
     val raceMarketScoreTitle: String
-    @Composable
+    @get:Composable
     val raceFieldSignalTitle: String
-    @Composable
+    @get:Composable
     val raceFieldCombinedTitle: String
     @Composable
     fun raceFieldTjk(value: String): String
@@ -315,73 +315,73 @@ interface Strings {
     fun raceFieldExpert(value: String): String
     @Composable
     fun raceFieldSamples(n: Int): String
-    @Composable
+    @get:Composable
     val raceLearningEffectTitle: String
     @Composable
     fun raceLearningBase(value: String): String
     @Composable
     fun raceLearningFinal(value: String): String
-    @Composable
+    @get:Composable
     val raceDeepViewTitle: String
 
     // ---- Home screen ----
-    @Composable
+    @get:Composable
     val homeDataFetchFailed: String
-    @Composable
+    @get:Composable
     val homeRefreshFailedStale: String
-    @Composable
+    @get:Composable
     val homeAllCities: String
-    @Composable
+    @get:Composable
     val homeRetryButton: String
-    @Composable
+    @get:Composable
     val homeNoRacesToShow: String
-    @Composable
+    @get:Composable
     val homeUpcomingRacesTitle: String
-    @Composable
+    @get:Composable
     val homeUpcomingRacesSubtitle: String
-    @Composable
+    @get:Composable
     val homeRacesPreparing: String
-    @Composable
+    @get:Composable
     val homeLiveUpdating: String
-    @Composable
+    @get:Composable
     val homeTagline: String
-    @Composable
+    @get:Composable
     val homeLogoDescription: String
-    @Composable
+    @get:Composable
     val homeAccountDescription: String
-    @Composable
+    @get:Composable
     val homeHistoryDescription: String
-    @Composable
+    @get:Composable
     val homeRefreshDescription: String
-    @Composable
+    @get:Composable
     val homeNextRaceLabel: String
-    @Composable
+    @get:Composable
     val homeOpenAnalysis: String
-    @Composable
+    @get:Composable
     val homeModelFavorite: String
     @Composable
     fun homeCourseNumber(n: Int): String
-    @Composable
+    @get:Composable
     val homeOpenRaceAnalysis: String
     @Composable
     fun homeCourseNumberCaps(n: Int): String
     @Composable
     fun homeSurprisePrefix(number: Int, name: String): String
-    @Composable
+    @get:Composable
     val homeOtherRemainingRaces: String
     @Composable
     fun homeUpcomingCount(n: Int): String
-    @Composable
+    @get:Composable
     val homeCloseOtherRaces: String
-    @Composable
+    @get:Composable
     val homeOpenOtherRaces: String
-    @Composable
+    @get:Composable
     val homeSixfoldTitle: String
-    @Composable
+    @get:Composable
     val homeSixfoldSubtitle: String
-    @Composable
+    @get:Composable
     val homeOpenSixfold: String
-    @Composable
+    @get:Composable
     val homeFavoriteSummaryFallback: String
     @Composable
     fun homeAgf(pct: String): String
@@ -393,135 +393,135 @@ interface Strings {
     fun homeCityRaceLabel(city: String, number: Int): String
     @Composable
     fun homeFavoritePrefix(number: Int, name: String): String
-    @Composable
+    @get:Composable
     val homeCountdownKaldi: String
 
     // ---- Analytics components (shared) ----
-    @Composable
+    @get:Composable
     val uncertaintyLow: String
-    @Composable
+    @get:Composable
     val uncertaintyMedium: String
-    @Composable
+    @get:Composable
     val uncertaintyHigh: String
-    @Composable
+    @get:Composable
     val uncertaintyVeryHigh: String
-    @Composable
+    @get:Composable
     val uncertaintyLowCaps: String
-    @Composable
+    @get:Composable
     val uncertaintyMediumCaps: String
-    @Composable
+    @get:Composable
     val uncertaintyHighCaps: String
-    @Composable
+    @get:Composable
     val uncertaintyVeryHighCaps: String
-    @Composable
+    @get:Composable
     val explanationClose: String
-    @Composable
+    @get:Composable
     val explanationTop3Close: String
-    @Composable
+    @get:Composable
     val explanationClearLeader: String
     @Composable
     fun uncertaintyLine(level: String, explanation: String): String
-    @Composable
+    @get:Composable
     val strategySingle: String
-    @Composable
+    @get:Composable
     val strategyCompact: String
-    @Composable
+    @get:Composable
     val strategySpread: String
-    @Composable
+    @get:Composable
     val strategyBalanced: String
-    @Composable
+    @get:Composable
     val strategyOneCandidate: String
     @Composable
     fun strategyCandidates(n: Int): String
-    @Composable
+    @get:Composable
     val strategyBackendDefault: String
     @Composable
     fun strategyLine(mode: String, reason: String): String
-    @Composable
+    @get:Composable
     val componentAgf: String
-    @Composable
+    @get:Composable
     val componentExpert: String
-    @Composable
+    @get:Composable
     val componentForm: String
-    @Composable
+    @get:Composable
     val componentHp: String
-    @Composable
+    @get:Composable
     val componentMarket: String
-    @Composable
+    @get:Composable
     val componentWeight: String
-    @Composable
+    @get:Composable
     val componentField: String
-    @Composable
+    @get:Composable
     val marketStrongUp: String
-    @Composable
+    @get:Composable
     val marketUp: String
-    @Composable
+    @get:Composable
     val marketFlat: String
-    @Composable
+    @get:Composable
     val marketDown: String
-    @Composable
+    @get:Composable
     val marketStrongDown: String
-    @Composable
+    @get:Composable
     val marketNone: String
 
     // ---- History screens ----
-    @Composable
+    @get:Composable
     val historyFetchFailed: String
-    @Composable
+    @get:Composable
     val historyLoading: String
-    @Composable
+    @get:Composable
     val historyEmptyTitle: String
-    @Composable
+    @get:Composable
     val historyEmptyBody: String
-    @Composable
+    @get:Composable
     val historyTitle: String
     @Composable
     fun historySnapshotCount(n: Int): String
-    @Composable
+    @get:Composable
     val historyHeaderTitle: String
     @Composable
     fun historyExpertRowCount(n: Int): String
-    @Composable
+    @get:Composable
     val historyModelPerformanceTitle: String
     @Composable
     fun historyBasedOnRaces(n: Int): String
-    @Composable
+    @get:Composable
     val historyTop1Hit: String
-    @Composable
+    @get:Composable
     val historyTop3Coverage: String
-    @Composable
+    @get:Composable
     val historyRaceLabel: String
-    @Composable
+    @get:Composable
     val historyCityTop1: String
     @Composable
     fun historyResultRatio(hits: Int, total: Int, pct: Int): String
-    @Composable
+    @get:Composable
     val historyDetailRankTitle: String
-    @Composable
+    @get:Composable
     val historyDetailRankSubtitle: String
-    @Composable
+    @get:Composable
     val historyResultNotReady: String
-    @Composable
+    @get:Composable
     val historyModelLeaderWon: String
-    @Composable
+    @get:Composable
     val historyRaceCompleted: String
-    @Composable
+    @get:Composable
     val historyModelLeaderLabel: String
-    @Composable
+    @get:Composable
     val historyWinnerLabel: String
-    @Composable
+    @get:Composable
     val historyPending: String
     @Composable
     fun historyExpertRecordCount(n: Int): String
-    @Composable
+    @get:Composable
     val historyWon: String
-    @Composable
+    @get:Composable
     val historyExactHit: String
-    @Composable
+    @get:Composable
     val historyModelRank: String
-    @Composable
+    @get:Composable
     val historyActualRank: String
-    @Composable
+    @get:Composable
     val historyModelScore: String
     @Composable
     fun historyCityAndDate(city: String, date: String): String
