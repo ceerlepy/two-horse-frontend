@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.HistoryRace
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.theme.Border
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
@@ -60,6 +61,7 @@ fun HistoryScreen(
     )
 
     val context = LocalContext.current
+    val strings = LocalStrings.current
 
     val repository =
         remember {
@@ -94,7 +96,7 @@ fun HistoryScreen(
             .onFailure {
                 error =
                     it.message
-                        ?: "Geçmiş alınamadı"
+                        ?: strings.historyFetchFailed
             }
 
         loading = false
@@ -140,7 +142,7 @@ fun HistoryScreen(
 
                         Text(
                             text =
-                                "Geçmiş yarışlar yükleniyor",
+                                strings.historyLoading,
                             color =
                                 Muted,
                             fontSize =
@@ -172,7 +174,7 @@ fun HistoryScreen(
                         Text(
                             text =
                                 error
-                                    ?: "Geçmiş alınamadı",
+                                    ?: strings.historyFetchFailed,
                             modifier =
                                 Modifier.padding(
                                     14.dp
@@ -218,7 +220,7 @@ fun HistoryScreen(
 
                         Text(
                             text =
-                                "Henüz tamamlanmış yarış yok",
+                                strings.historyEmptyTitle,
                             color =
                                 Ink,
                             fontWeight =
@@ -227,7 +229,7 @@ fun HistoryScreen(
 
                         Text(
                             text =
-                                "Başlayan yarışların snapshotları burada görünür.",
+                                strings.historyEmptyBody,
                             color =
                                 Muted,
                             fontSize =
@@ -262,7 +264,7 @@ fun HistoryScreen(
                     ) {
                         Text(
                             text =
-                                "Geçmiş",
+                                strings.historyTitle,
                             color =
                                 Ink,
                             fontSize =
@@ -273,7 +275,7 @@ fun HistoryScreen(
 
                         Text(
                             text =
-                                "${history.size} dondurulmuş yarış snapshotı",
+                                strings.historySnapshotCount(history.size),
                             color =
                                 Muted,
                             fontSize =
@@ -324,6 +326,8 @@ fun HistoryScreen(
 private fun HistoryHeader(
     onBack: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Row(
         modifier =
             Modifier
@@ -342,7 +346,7 @@ private fun HistoryHeader(
                 imageVector =
                     Icons.Default.ArrowBack,
                 contentDescription =
-                    "Geri",
+                    strings.back,
                 tint =
                     Ink
             )
@@ -350,7 +354,7 @@ private fun HistoryHeader(
 
         Text(
             text =
-                "Geçmiş Yarışlar",
+                strings.historyHeaderTitle,
             color =
                 Ink,
             fontSize =
@@ -366,6 +370,8 @@ private fun HistoryRaceCard(
     race: HistoryRace,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier
@@ -429,7 +435,7 @@ private fun HistoryRaceCard(
 
                     Text(
                         text =
-                            "${race.raceNumber}. K",
+                            strings.historyRaceNumberAbbrev(race.raceNumber),
                         color =
                             Green,
                         fontSize =
@@ -489,8 +495,9 @@ private fun HistoryRaceCard(
 
                 Text(
                     text =
-                        "${race.runners.size} at · " +
-                        "${race.expertPredictionCount} uzman satırı",
+                        strings.raceHorseCount(race.runners.size) +
+                        " · " +
+                        strings.historyExpertRowCount(race.expertPredictionCount),
                     color =
                         Muted,
                     fontSize =
@@ -515,6 +522,8 @@ private fun HistoryRaceCard(
 private fun HistoryStats(
     history: List<HistoryRace>
 ) {
+    val strings = LocalStrings.current
+
     val completed =
         history.filter {
             race ->
@@ -658,7 +667,7 @@ private fun HistoryStats(
         ) {
             Text(
                 text =
-                    "Model performansı",
+                    strings.historyModelPerformanceTitle,
                 color =
                     Ink,
                 fontSize =
@@ -669,7 +678,7 @@ private fun HistoryStats(
 
             Text(
                 text =
-                    "${completed.size} sonuçlanmış yarış üzerinden",
+                    strings.historyBasedOnRaces(completed.size),
                 color =
                     Muted,
                 fontSize =
@@ -694,7 +703,7 @@ private fun HistoryStats(
                             1f
                         ),
                     label =
-                        "Top-1 isabet",
+                        strings.historyTop1Hit,
                     value =
                         "%$top1Percent"
                 )
@@ -705,7 +714,7 @@ private fun HistoryStats(
                             1f
                         ),
                     label =
-                        "Top-3 kapsama",
+                        strings.historyTop3Coverage,
                     value =
                         "%$top3Percent"
                 )
@@ -716,7 +725,7 @@ private fun HistoryStats(
                             1f
                         ),
                     label =
-                        "Yarış",
+                        strings.historyRaceLabel,
                     value =
                         completed.size
                             .toString()
@@ -734,7 +743,7 @@ private fun HistoryStats(
 
                 Text(
                     text =
-                        "Şehir bazlı Top-1",
+                        strings.historyCityTop1,
                     color =
                         Ink,
                     fontSize =
@@ -791,7 +800,11 @@ private fun HistoryStats(
 
                             Text(
                                 text =
-                                    "${item.second}/${item.third} · %$percent",
+                                    strings.historyResultRatio(
+                                        item.second,
+                                        item.third,
+                                        percent
+                                    ),
                                 color =
                                     Green,
                                 fontSize =

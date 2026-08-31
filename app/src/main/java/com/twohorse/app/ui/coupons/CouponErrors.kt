@@ -1,63 +1,64 @@
 package com.twohorse.app.ui.coupons
 
 import com.twohorse.app.data.api.ApiException
+import com.twohorse.app.i18n.Strings
 
-fun couponErrorMessage(throwable: Throwable): String {
+fun couponErrorMessage(throwable: Throwable, strings: Strings): String {
     val api = throwable as? ApiException
 
     return when (api?.apiCode) {
         "CITY_REQUIRED" ->
-            "Şehir seçimi gerekli."
+            strings.couponErrorCityRequired
 
         "VALID_BUDGET_REQUIRED" ->
-            "Geçerli bir bütçe seç."
+            strings.couponErrorValidBudgetRequired
 
         "SIXFOLD_WINDOW_NOT_FOUND",
         "SIXFOLD_NOT_FOUND",
         "NO_SIXFOLD_WINDOW" ->
-            "Bu şehir için seçtiğin altılı henüz tanımlı değil."
+            strings.couponErrorSixfoldNotFound
 
         "NOT_ENOUGH_RACES",
         "INSUFFICIENT_RACES" ->
-            "Bu altılıyı oluşturmak için yeterli yarış yok."
+            strings.couponErrorNotEnoughRaces
 
         "NO_RUNNERS",
         "NO_USABLE_RUNNERS" ->
-            "Kupon oluşturmak için yeterli at verisi bulunamadı."
+            strings.couponErrorNoRunners
 
         "TIER_UPGRADE_REQUIRED" ->
-            "Bu özellik için üyeliğini yükseltmen gerekiyor."
+            strings.couponErrorTierUpgradeRequired
 
         "TIER_BUDGET_CAP_EXCEEDED" ->
-            "Bu bütçe Gold üyelikte kilitli. Premium'a yükselterek sınırsız bütçe kullanabilirsin."
+            strings.couponErrorBudgetCapExceeded
 
         "AUTH_REQUIRED" ->
-            "Oturumun sona ermiş olabilir, tekrar giriş yap."
+            strings.couponErrorAuthRequired
 
         else -> when {
             api?.statusCode == 404 ->
-                "İstenen yarış veya altılı bulunamadı."
+                strings.couponErrorNotFound
 
             api?.statusCode == 400 ->
-                "Kupon isteği geçersiz. Şehir, altılı ve bütçeyi kontrol et."
+                strings.couponErrorBadRequest
 
             api?.statusCode != null && api.statusCode >= 500 ->
-                "Backend şu anda kupon oluşturamıyor. Biraz sonra tekrar dene."
+                strings.couponErrorServerUnavailable
 
             throwable.message?.contains(
                 "Unable to resolve host",
                 ignoreCase = true
             ) == true ->
-                "İnternet bağlantısı kurulamadı."
+                strings.couponErrorNoInternet
 
             throwable.message?.contains(
                 "timeout",
                 ignoreCase = true
             ) == true ->
-                "İstek zaman aşımına uğradı. Tekrar dene."
+                strings.couponErrorTimeout
 
             else ->
-                "Kupon oluşturulamadı."
+                strings.couponErrorGeneric
         }
     }
 }

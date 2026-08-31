@@ -28,6 +28,7 @@ import com.twohorse.app.domain.model.CouponLeg
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -49,8 +50,11 @@ private fun couponRaceStartMillis(
     }.getOrNull()
 }
 
-private fun poolLabel(pool: String): String =
-    if (pool == "fivefold") "Beşli" else "Altılı"
+@Composable
+private fun poolLabel(pool: String): String {
+    val strings = LocalStrings.current
+    return if (pool == "fivefold") strings.poolLabelFivefold else strings.poolLabelSixfold
+}
 
 private const val GOLD_MAX_COUPON_BUDGET_TL = 1500.0
 
@@ -65,6 +69,7 @@ fun CouponScreen(
     BackHandler(onBack = onBack)
 
     val context = LocalContext.current
+    val strings = LocalStrings.current
 
     val tier = currentUser?.tier ?: "free"
     val canGenerateCoupons = tier != "free"
@@ -212,7 +217,7 @@ fun CouponScreen(
             requestCity.isBlank()
         ) {
             error =
-                "Şehir seçilemedi."
+                strings.couponCitySelectFailed
 
             return
         }
@@ -291,7 +296,7 @@ fun CouponScreen(
                             null
 
                         error =
-                            "Backend beklenmeyen kupon penceresi döndürdü."
+                            strings.couponUnexpectedWindow
                     }
 
                     !budgetMatches ||
@@ -300,7 +305,7 @@ fun CouponScreen(
                             null
 
                         error =
-                            "Backend bütçe sınırını aşan kupon döndürdü."
+                            strings.couponBudgetExceeded
                     }
 
                     else -> {
@@ -336,7 +341,8 @@ fun CouponScreen(
 
                     error =
                         couponErrorMessage(
-                            throwable
+                            throwable,
+                            strings
                         )
                 }
             }
@@ -400,7 +406,7 @@ fun CouponScreen(
                             )
 
                             Text(
-                                text = "Kuponları Oluştur",
+                                text = strings.couponGenerateButton,
                                 fontWeight = FontWeight.ExtraBold
                             )
                         }
@@ -433,7 +439,7 @@ fun CouponScreen(
                         )
 
                         Text(
-                            text = "Kupon üretmek için Gold'a yükselt",
+                            text = strings.couponUpgradeButton,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
@@ -481,8 +487,8 @@ fun CouponScreen(
                     )
             ) {
                 SectionTitle(
-                    title = "Şehir",
-                    subtitle = "Kupon oluşturulacak yarış programı"
+                    title = strings.couponCityTitle,
+                    subtitle = strings.couponCitySubtitle
                 )
             }
         }
@@ -525,8 +531,8 @@ fun CouponScreen(
                     )
             ) {
                 SectionTitle(
-                    title = "Kupon Türü",
-                    subtitle = "Altılı (6 ayak) veya Beşli (5 ayak) Ganyan"
+                    title = strings.couponTypeTitle,
+                    subtitle = strings.couponTypeSubtitle
                 )
 
                 Spacer(
@@ -539,7 +545,7 @@ fun CouponScreen(
                         Arrangement.spacedBy(8.dp)
                 ) {
                     SelectChip(
-                        text = "Altılı",
+                        text = strings.poolLabelSixfold,
                         selected =
                             pool == "sixfold",
                         onClick = {
@@ -552,7 +558,7 @@ fun CouponScreen(
                     )
 
                     SelectChip(
-                        text = "Beşli",
+                        text = strings.poolLabelFivefold,
                         selected =
                             pool == "fivefold",
                         onClick = {
@@ -576,7 +582,7 @@ fun CouponScreen(
             ) {
                 SectionTitle(
                     title = poolLabel(pool),
-                    subtitle = "Programdaki ${poolLabel(pool).lowercase()} penceresini seç"
+                    subtitle = strings.couponWindowSubtitle(poolLabel(pool).lowercase())
                 )
 
                 Spacer(
@@ -589,7 +595,7 @@ fun CouponScreen(
                         Arrangement.spacedBy(8.dp)
                 ) {
                     SelectChip(
-                        text = "1. ${poolLabel(pool)}",
+                        text = strings.couponWindowOrdinal(1, poolLabel(pool)),
                         selected =
                             sixfold == 1,
                         onClick = {
@@ -605,7 +611,7 @@ fun CouponScreen(
                     )
 
                     SelectChip(
-                        text = "2. ${poolLabel(pool)}",
+                        text = strings.couponWindowOrdinal(2, poolLabel(pool)),
                         selected =
                             sixfold == 2,
                         onClick = {
@@ -631,8 +637,8 @@ fun CouponScreen(
                     )
             ) {
                 SectionTitle(
-                    title = "Üst Bütçe",
-                    subtitle = "En yüksek kupon tavanı. 500 ve 750 TL sabit girişten başlayıp bu tavana kadar eşit aralıklı kademeler üretilir"
+                    title = strings.couponBudgetTitle,
+                    subtitle = strings.couponBudgetSubtitle
                 )
 
                 Spacer(
@@ -708,7 +714,12 @@ fun CouponScreen(
                 ) {
                     Text(
                         text =
-                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. ${poolLabel(lastGeneratedPool ?: "sixfold")} · ${lastGeneratedBudget?.toInt()} TL üst bütçe",
+                            strings.couponGeneratedSummary(
+                                lastGeneratedCity ?: "",
+                                lastGeneratedSixfold ?: 1,
+                                poolLabel(lastGeneratedPool ?: "sixfold"),
+                                lastGeneratedBudget?.toInt() ?: 0
+                            ),
                         modifier =
                             Modifier.padding(
                                 horizontal =
@@ -743,7 +754,9 @@ fun CouponScreen(
                 item {
                     ErrorCard(
                         message =
-                            "Bu ${poolLabel(lastGeneratedPool ?: couponResult.pool)} penceresinin ilk ayağı başladı, tahmin artık gösterilmiyor."
+                            strings.couponWindowStarted(
+                                poolLabel(lastGeneratedPool ?: couponResult.pool)
+                            )
                     )
                 }
             } else {
@@ -751,8 +764,7 @@ fun CouponScreen(
             if (couponResult.coupons.isEmpty()) {
                 item {
                     ErrorCard(
-                        message =
-                            "Bu seçim için uygun kupon üretilemedi. Bütçeyi artırmayı veya diğer pencereyi seçmeyi dene."
+                        message = strings.couponNoneGenerated
                     )
                 }
             }
@@ -813,6 +825,8 @@ fun CouponScreen(
 private fun CouponHeader(
     onBack: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Row(
         modifier =
             Modifier
@@ -831,7 +845,7 @@ private fun CouponHeader(
                 imageVector =
                     Icons.Default.ArrowBack,
                 contentDescription =
-                    "Geri",
+                    strings.back,
                 tint = Ink
             )
         }
@@ -839,7 +853,7 @@ private fun CouponHeader(
         Column {
             Text(
                 text =
-                    "Kupon",
+                    strings.couponHeaderTitle,
                 color =
                     Ink,
                 fontSize =
@@ -862,6 +876,8 @@ private fun CouponHeader(
 
 @Composable
 private fun CouponIntro() {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier.fillMaxWidth(),
@@ -906,7 +922,7 @@ private fun CouponIntro() {
             ) {
                 Text(
                     text =
-                        "Kademeli bütçeye göre optimize et",
+                        strings.couponIntroTitle,
                     color =
                         Ink,
                     fontWeight =
@@ -917,7 +933,7 @@ private fun CouponIntro() {
 
                 Text(
                     text =
-                        "Model olasılıklarını kullanarak tüm ayakları birlikte optimize eder ve 500 TL'den seçtiğin üst bütçeye kadar artan kuponlar üretir.",
+                        strings.couponIntroSubtitle,
                     color =
                         Muted,
                     fontSize =
@@ -1032,10 +1048,12 @@ private fun ErrorCard(
 private fun ResultSummary(
     result: CouponResult
 ) {
+    val strings = LocalStrings.current
+
     Column {
         Text(
             text =
-                "${result.city} · ${result.sixfold}. ${poolLabel(result.pool)}",
+                "${result.city} · ${strings.couponWindowOrdinal(result.sixfold, poolLabel(result.pool))}",
             color =
                 Ink,
             fontSize =
@@ -1046,10 +1064,8 @@ private fun ResultSummary(
 
         Text(
             text =
-                "${result.startRace ?: "?"}. koşu → " +
-                "${result.endRace ?: "?"}. koşu · " +
-                "Üst bütçe ${result.budgetTl.toInt()} TL · " +
-                "${result.coupons.size} kupon",
+                "${strings.couponRaceRange(result.startRace?.toString() ?: "?", result.endRace?.toString() ?: "?")} · " +
+                strings.couponMaxBudgetAndCount(result.budgetTl.toInt(), result.coupons.size),
             color =
                 Muted,
             fontSize =
@@ -1061,8 +1077,10 @@ private fun ResultSummary(
         ) {
             Text(
                 text =
-                    "Birim fiyat ${"%.2f".format(result.unitPriceTl)} TL · " +
-                    "Çarpan ${result.multiplier}",
+                    strings.couponUnitPriceAndMultiplier(
+                        "%.2f".format(result.unitPriceTl),
+                        result.multiplier
+                    ),
                 color =
                     Muted,
                 fontSize =
@@ -1073,7 +1091,7 @@ private fun ResultSummary(
         result.generatedAt?.let {
             Text(
                 text =
-                    "Backend üretim zamanı: $it",
+                    strings.couponGeneratedAt(it),
                 color =
                     Muted,
                 fontSize =
@@ -1089,6 +1107,8 @@ private fun CouponCard(
     tierIndex: Int,
     tierCount: Int
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier.fillMaxWidth(),
@@ -1119,7 +1139,7 @@ private fun CouponCard(
                 ) {
                     Text(
                         text =
-                            "${coupon.budgetTl.toInt()} TL Kupon",
+                            strings.couponAmountLabel(coupon.budgetTl.toInt()),
                         color =
                             Ink,
                         fontSize =
@@ -1130,7 +1150,7 @@ private fun CouponCard(
 
                     Text(
                         text =
-                            "Kademe $tierIndex / $tierCount",
+                            strings.couponTierLabel(tierIndex, tierCount),
                         color =
                             Muted,
                         fontSize =
@@ -1175,7 +1195,7 @@ private fun CouponCard(
                     modifier =
                         Modifier.weight(1f),
                     title =
-                        "Kombinasyon",
+                        strings.couponMetricCombinations,
                     value =
                         coupon.combinations
                             .toString()
@@ -1185,7 +1205,7 @@ private fun CouponCard(
                     modifier =
                         Modifier.weight(1f),
                     title =
-                        "Kapsama",
+                        strings.couponMetricCoverage,
                     value =
                         probabilityText(
                             coupon.estimatedSurvivalProbability
@@ -1232,6 +1252,8 @@ private fun CouponLegRow(
     legIndex: Int,
     leg: CouponLeg
 ) {
+    val strings = LocalStrings.current
+
     Row(
         modifier =
             Modifier.fillMaxWidth(),
@@ -1306,9 +1328,10 @@ private fun CouponLegRow(
 
             Text(
                 text =
-                    "Ayak kapsama: " +
-                    probabilityText(
-                        leg.coverageProbability
+                    strings.couponLegCoverage(
+                        probabilityText(
+                            leg.coverageProbability
+                        )
                     ),
                 color =
                     Muted,
@@ -1375,6 +1398,8 @@ private fun probabilityText(
 
 @Composable
 private fun CouponBudgetLadderInfo() {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier.fillMaxWidth(),
@@ -1405,7 +1430,7 @@ private fun CouponBudgetLadderInfo() {
         ) {
             Text(
                 text =
-                    "Bütçe kademeleri",
+                    strings.couponLadderTitle,
                 color =
                     Ink,
                 fontSize =
@@ -1418,9 +1443,9 @@ private fun CouponBudgetLadderInfo() {
                 symbol =
                     "1",
                 title =
-                    "500 TL — sabit giriş",
+                    strings.couponLadderFixed1Title,
                 description =
-                    "Her bütçede aynı, en düşük maliyetli kupon",
+                    strings.couponLadderFixed1Desc,
                 foreground =
                     Green,
                 background =
@@ -1431,9 +1456,9 @@ private fun CouponBudgetLadderInfo() {
                 symbol =
                     "2",
                 title =
-                    "750 TL — sabit ikinci",
+                    strings.couponLadderFixed2Title,
                 description =
-                    "Her bütçede aynı, biraz daha geniş kapsam",
+                    strings.couponLadderFixed2Desc,
                 foreground =
                     Gold,
                 background =
@@ -1444,9 +1469,9 @@ private fun CouponBudgetLadderInfo() {
                 symbol =
                     "3-6",
                 title =
-                    "Eşit aralıklı kademeler",
+                    strings.couponLadderVariableTitle,
                 description =
-                    "750 TL'den seçtiğin üst bütçeye kadar 4 kupon daha, artan kapsamayla",
+                    strings.couponLadderVariableDesc,
                 foreground =
                     Red,
                 background =
@@ -1455,7 +1480,7 @@ private fun CouponBudgetLadderInfo() {
 
             Text(
                 text =
-                    "Her kademe backend optimizer tarafından kendi bütçe sınırı içinde ayrı ayrı hesaplanır.",
+                    strings.couponLadderFooter,
                 color =
                     Muted,
                 fontSize =

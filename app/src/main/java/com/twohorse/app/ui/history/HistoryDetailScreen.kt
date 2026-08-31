@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.Horse
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.theme.Border
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
@@ -45,6 +46,8 @@ fun HistoryDetailScreen(
     onBack: () -> Unit
 ) {
     BackHandler(onBack = onBack)
+
+    val strings = LocalStrings.current
 
     val ranked =
         historyRace.runners
@@ -108,7 +111,7 @@ fun HistoryDetailScreen(
                     )
             ) {
                 Text(
-                    text = "Model sırası ve gerçek sonuç",
+                    text = strings.historyDetailRankTitle,
                     color = Ink,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.ExtraBold
@@ -116,7 +119,7 @@ fun HistoryDetailScreen(
 
                 Text(
                     text =
-                        "Yarış öncesi model sıralaması gerçek bitiriş derecesiyle karşılaştırılır.",
+                        strings.historyDetailRankSubtitle,
                     color = Muted,
                     fontSize = 10.sp
                 )
@@ -152,6 +155,8 @@ private fun HistoryHeader(
     race: HistoryRace,
     onBack: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Row(
         modifier =
             Modifier
@@ -167,7 +172,7 @@ private fun HistoryHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Geri",
+                contentDescription = strings.back,
                 tint = Ink
             )
         }
@@ -177,7 +182,7 @@ private fun HistoryHeader(
         ) {
             Text(
                 text =
-                    "${race.city} · ${race.raceNumber}. Koşu",
+                    strings.historyCityAndRace(race.city, race.raceNumber),
                 color = Ink,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -187,7 +192,7 @@ private fun HistoryHeader(
 
             Text(
                 text =
-                    "${race.raceDate} · ${race.startTime}",
+                    strings.historyDateAndTime(race.raceDate, race.startTime),
                 color = Muted,
                 fontSize = 10.sp
             )
@@ -203,6 +208,8 @@ private fun ResultSummaryCard(
     resultAvailable: Boolean,
     top1Hit: Boolean
 ) {
+    val strings = LocalStrings.current
+
     val background =
         when {
             !resultAvailable ->
@@ -239,13 +246,13 @@ private fun ResultSummaryCard(
                 text =
                     when {
                         !resultAvailable ->
-                            "Sonuç henüz hazır değil"
+                            strings.historyResultNotReady
 
                         top1Hit ->
-                            "✓ Model lideri yarışı kazandı"
+                            strings.historyModelLeaderWon
 
                         else ->
-                            "Yarış sonucu tamamlandı"
+                            strings.historyRaceCompleted
                     },
                 color =
                     if (top1Hit)
@@ -266,7 +273,7 @@ private fun ResultSummaryCard(
             ) {
                 SummaryValue(
                     modifier = Modifier.weight(1f),
-                    label = "Model lideri",
+                    label = strings.historyModelLeaderLabel,
                     value =
                         modelLeader
                             ?.let {
@@ -277,7 +284,7 @@ private fun ResultSummaryCard(
 
                 SummaryValue(
                     modifier = Modifier.weight(1f),
-                    label = "Kazanan",
+                    label = strings.historyWinnerLabel,
                     value =
                         winner
                             ?.let {
@@ -286,7 +293,7 @@ private fun ResultSummaryCard(
                             ?: if (resultAvailable)
                                 "—"
                             else
-                                "Bekleniyor"
+                                strings.historyPending
                 )
             }
 
@@ -296,8 +303,9 @@ private fun ResultSummaryCard(
 
             Text(
                 text =
-                    "${race.runners.size} at · " +
-                    "${race.expertPredictionCount} uzman kaydı",
+                    strings.raceHorseCount(race.runners.size) +
+                    " · " +
+                    strings.historyExpertRecordCount(race.expertPredictionCount),
                 color = Muted,
                 fontSize = 10.sp
             )
@@ -349,6 +357,8 @@ private fun HistoricalHorseCard(
     horse: Horse,
     modelRank: Int
 ) {
+    val strings = LocalStrings.current
+
     val finish =
         horse.finishPosition
 
@@ -448,13 +458,13 @@ private fun HistoricalHorseCard(
                 when {
                     won -> {
                         ResultBadge(
-                            text = "KAZANDI"
+                            text = strings.historyWon
                         )
                     }
 
                     exactHit -> {
                         ResultBadge(
-                            text = "✓ İSABET"
+                            text = strings.historyExactHit
                         )
                     }
                 }
@@ -470,13 +480,13 @@ private fun HistoricalHorseCard(
             ) {
                 ResultMetric(
                     modifier = Modifier.weight(1f),
-                    label = "Model sırası",
+                    label = strings.historyModelRank,
                     value = "$modelRank."
                 )
 
                 ResultMetric(
                     modifier = Modifier.weight(1f),
-                    label = "Gerçek derece",
+                    label = strings.historyActualRank,
                     value =
                         finish
                             ?.let {
@@ -487,7 +497,7 @@ private fun HistoricalHorseCard(
 
                 ResultMetric(
                     modifier = Modifier.weight(1f),
-                    label = "Model puanı",
+                    label = strings.historyModelScore,
                     value =
                         horse.score
                             ?.let {
