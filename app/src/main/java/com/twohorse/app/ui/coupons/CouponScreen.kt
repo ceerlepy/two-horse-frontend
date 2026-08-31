@@ -24,8 +24,30 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Coupon
 import com.twohorse.app.domain.model.CouponLeg
 import com.twohorse.app.domain.model.CouponResult
+import com.twohorse.app.domain.model.Race
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.OffsetDateTime
+
+private fun couponRaceStartMillis(
+    race: Race
+): Long? {
+    val value =
+        race.startsAt
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: return null
+
+    return runCatching {
+        Instant.parse(value).toEpochMilli()
+    }.recoverCatching {
+        OffsetDateTime.parse(value).toInstant().toEpochMilli()
+    }.getOrNull()
+}
+
+private fun poolLabel(pool: String): String =
+    if (pool == "fivefold") "Beşli" else "Altılı"
 
 @Composable
 fun CouponScreen(
@@ -54,6 +76,29 @@ fun CouponScreen(
         remember {
             mutableIntStateOf(1)
         }
+
+    var pool by
+        remember {
+            mutableStateOf("sixfold")
+        }
+
+    var todayRaces by
+        remember {
+            mutableStateOf<List<Race>>(emptyList())
+        }
+
+    LaunchedEffect(selectedCity) {
+        repository.today()
+            .onSuccess { today ->
+                todayRaces =
+                    today.meetings
+                        .firstOrNull {
+                            it.city.equals(selectedCity, ignoreCase = true)
+                        }
+                        ?.races
+                        ?: emptyList()
+            }
+    }
 
     var budget by
         remember {
@@ -95,6 +140,11 @@ fun CouponScreen(
             mutableStateOf<Double?>(null)
         }
 
+    var lastGeneratedPool by
+        remember {
+            mutableStateOf<String?>(null)
+        }
+
     fun invalidateGeneration() {
         requestVersion++
 
@@ -115,6 +165,9 @@ fun CouponScreen(
 
         lastGeneratedBudget =
             null
+
+        lastGeneratedPool =
+            null
     }
 
     suspend fun generate() {
@@ -129,6 +182,9 @@ fun CouponScreen(
 
         val requestSixfold =
             sixfold
+
+        val requestPool =
+            pool
 
         val requestBudget =
             budget
@@ -162,7 +218,9 @@ fun CouponScreen(
                 sixfold =
                     requestSixfold,
                 multiplier =
-                    1
+                    1,
+                pool =
+                    requestPool
             )
 
         if (
@@ -187,6 +245,10 @@ fun CouponScreen(
                     couponResult.sixfold ==
                         requestSixfold
 
+                val poolMatches =
+                    couponResult.pool ==
+                        requestPool
+
                 val budgetMatches =
                     couponResult.budgetTl <=
                         requestBudget +
@@ -204,7 +266,8 @@ fun CouponScreen(
 
                 when {
                     !cityMatches ||
-                    !sixfoldMatches -> {
+                    !sixfoldMatches ||
+                    !poolMatches -> {
                         result =
                             null
 
@@ -236,6 +299,9 @@ fun CouponScreen(
 
                         lastGeneratedBudget =
                             requestBudget
+
+                        lastGeneratedPool =
+                            requestPool
                     }
                 }
             }
@@ -406,8 +472,8 @@ fun CouponScreen(
                     )
             ) {
                 SectionTitle(
-                    title = "Altılı",
-                    subtitle = "Programdaki altılı penceresini seç"
+                    title = "Kupon Türü",
+                    subtitle = "Altılı (6 ayak) veya Beşli (5 ayak) Ganyan"
                 )
 
                 Spacer(
@@ -420,7 +486,57 @@ fun CouponScreen(
                         Arrangement.spacedBy(8.dp)
                 ) {
                     SelectChip(
-                        text = "1. Altılı",
+                        text = "Altılı",
+                        selected =
+                            pool == "sixfold",
+                        onClick = {
+                            if (pool != "sixfold") {
+                                invalidateGeneration()
+
+                                pool = "sixfold"
+                            }
+                        }
+                    )
+
+                    SelectChip(
+                        text = "Beşli",
+                        selected =
+                            pool == "fivefold",
+                        onClick = {
+                            if (pool != "fivefold") {
+                                invalidateGeneration()
+
+                                pool = "fivefold"
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        item {
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
+                SectionTitle(
+                    title = poolLabel(pool),
+                    subtitle = "Programdaki ${poolLabel(pool).lowercase()} penceresini seç"
+                )
+
+                Spacer(
+                    modifier =
+                        Modifier.height(8.dp)
+                )
+
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(8.dp)
+                ) {
+                    SelectChip(
+                        text = "1. ${poolLabel(pool)}",
                         selected =
                             sixfold == 1,
                         onClick = {
@@ -436,7 +552,7 @@ fun CouponScreen(
                     )
 
                     SelectChip(
-                        text = "2. Altılı",
+                        text = "2. ${poolLabel(pool)}",
                         selected =
                             sixfold == 2,
                         onClick = {
@@ -539,7 +655,7 @@ fun CouponScreen(
                 ) {
                     Text(
                         text =
-                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. Altılı · ${lastGeneratedBudget?.toInt()} TL bütçe",
+                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. ${poolLabel(lastGeneratedPool ?: "sixfold")} · ${lastGeneratedBudget?.toInt()} TL bütçe",
                         modifier =
                             Modifier.padding(
                                 horizontal =
@@ -558,12 +674,32 @@ fun CouponScreen(
             }
         }
 
+        val windowStartMillis =
+            result?.startRace?.let { raceNumber ->
+                todayRaces
+                    .firstOrNull { it.number == raceNumber }
+                    ?.let(::couponRaceStartMillis)
+            }
+
+        val windowStarted =
+            windowStartMillis != null &&
+            System.currentTimeMillis() >= windowStartMillis
+
         result?.let { couponResult ->
+            if (windowStarted) {
+                item {
+                    ErrorCard(
+                        message =
+                            "Bu ${poolLabel(lastGeneratedPool ?: couponResult.pool)} penceresinin ilk ayağı başladı, tahmin artık gösterilmiyor."
+                    )
+                }
+            } else {
+
             if (couponResult.coupons.isEmpty()) {
                 item {
                     ErrorCard(
                         message =
-                            "Bu seçim için uygun kupon üretilemedi. Bütçeyi artırmayı veya diğer altılıyı seçmeyi dene."
+                            "Bu seçim için uygun kupon üretilemedi. Bütçeyi artırmayı veya diğer pencereyi seçmeyi dene."
                     )
                 }
             }
@@ -602,6 +738,7 @@ fun CouponScreen(
                         coupon = coupon
                     )
                 }
+            }
             }
         }
 
@@ -644,7 +781,7 @@ private fun CouponHeader(
         Column {
             Text(
                 text =
-                    "Altılı Kupon",
+                    "Kupon",
                 color =
                     Ink,
                 fontSize =
@@ -840,7 +977,7 @@ private fun ResultSummary(
     Column {
         Text(
             text =
-                "${result.city} · ${result.sixfold}. Altılı",
+                "${result.city} · ${result.sixfold}. ${poolLabel(result.pool)}",
             color =
                 Ink,
             fontSize =

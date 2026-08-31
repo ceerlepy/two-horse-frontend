@@ -196,11 +196,15 @@ class TwoHorseApi(
         city: String,
         budgetTl: Double,
         sixfold: Int = 1,
-        multiplier: Int = 1
+        multiplier: Int = 1,
+        pool: String = "sixfold"
     ): CouponResult =
         withContext(
             Dispatchers.IO
         ) {
+            val legCount =
+                if (pool == "fivefold") 5 else 6
+
             val url =
                 (
                     baseUrl +
@@ -223,6 +227,10 @@ class TwoHorseApi(
                     .addQueryParameter(
                         "multiplier",
                         multiplier.toString()
+                    )
+                    .addQueryParameter(
+                        "pool",
+                        pool
                     )
                     .build()
 
@@ -264,9 +272,15 @@ class TwoHorseApi(
                     city
                 )
 
+            val responsePool =
+                json.optString(
+                    "pool",
+                    pool
+                )
+
             val responseSixfold =
                 json.optInt(
-                    "sixfold",
+                    "windowNumber",
                     sixfold
                 )
 
@@ -303,7 +317,7 @@ class TwoHorseApi(
                 startRace != null &&
                 endRace != null &&
                 endRace >= startRace &&
-                endRace - startRace == 5
+                endRace - startRace == legCount - 1
             ) {
                 "INVALID_COUPON_RESPONSE_WINDOW"
             }
@@ -324,7 +338,7 @@ class TwoHorseApi(
                 }
 
                 require(
-                    coupon.legs.size == 6
+                    coupon.legs.size == legCount
                 ) {
                     "INVALID_COUPON_LEG_COUNT"
                 }
@@ -333,6 +347,9 @@ class TwoHorseApi(
             CouponResult(
                 city =
                     responseCity,
+
+                pool =
+                    responsePool,
 
                 sixfold =
                     responseSixfold,
