@@ -3,6 +3,7 @@ package com.twohorse.app.data.repository
 import com.twohorse.app.data.api.TwoHorseApi
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.HistoryRace
+import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.TodayData
 
 class TwoHorseRepository(
@@ -20,6 +21,28 @@ class TwoHorseRepository(
         Result<List<HistoryRace>> =
         runCatching {
             api.getHistory()
+        }
+
+    suspend fun horseVideos(
+        raceDate: String,
+        city: String,
+        raceNumber: Int,
+        horseNumber: Int
+    ): Result<List<HorseVideo>> =
+        runCatching {
+            api.getHorseVideos(
+                raceDate =
+                    raceDate,
+
+                city =
+                    city,
+
+                raceNumber =
+                    raceNumber,
+
+                horseNumber =
+                    horseNumber
+            )
         }
 
     suspend fun coupons(

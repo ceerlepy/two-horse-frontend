@@ -1,5 +1,7 @@
 package com.twohorse.app.ui.race
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -18,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,7 @@ import com.twohorse.app.domain.model.*
 import com.twohorse.app.ui.components.*
 import com.twohorse.app.ui.theme.*
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @Composable
 fun RaceDetailScreen(
@@ -273,7 +277,10 @@ fun RaceDetailScreen(
                 ) {
                     HorseCard(
                         horse = horse,
-                        rank = index + 1
+                        rank = index + 1,
+                        raceDate = currentRace.raceDate,
+                        city = currentRace.city,
+                        raceNumber = currentRace.number
                     )
                 }
             }
@@ -924,7 +931,10 @@ private fun fieldSummary(
 @Composable
 private fun HorseCard(
     horse: Horse,
-    rank: Int
+    rank: Int,
+    raceDate: String?,
+    city: String,
+    raceNumber: Int
 ) {
     var expanded by
         remember(
@@ -934,6 +944,26 @@ private fun HorseCard(
                 rank == 1
             )
         }
+
+    var videoExpanded by
+        remember(horse.number) { mutableStateOf(false) }
+
+    var videoLoading by
+        remember(horse.number) { mutableStateOf(false) }
+
+    var videoFetched by
+        remember(horse.number) { mutableStateOf(false) }
+
+    var videos by
+        remember(horse.number) {
+            mutableStateOf<List<HorseVideo>>(emptyList())
+        }
+
+    val videoRepository =
+        remember { TwoHorseRepository() }
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Card(
         colors =
@@ -1125,6 +1155,111 @@ private fun HorseCard(
                     color = Muted,
                     fontSize = 10.sp
                 )
+            }
+
+            if (raceDate != null) {
+                Spacer(
+                    Modifier.height(10.dp)
+                )
+
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = {
+                            videoExpanded =
+                                !videoExpanded
+
+                            if (
+                                videoExpanded &&
+                                !videoFetched &&
+                                !videoLoading
+                            ) {
+                                videoLoading = true
+
+                                scope.launch {
+                                    videoRepository
+                                        .horseVideos(
+                                            raceDate =
+                                                raceDate,
+                                            city = city,
+                                            raceNumber = raceNumber,
+                                            horseNumber = horse.number
+                                        )
+                                        .onSuccess {
+                                            videos = it
+                                        }
+                                        .onFailure {
+                                            videos = emptyList()
+                                        }
+
+                                    videoFetched = true
+                                    videoLoading = false
+                                }
+                            }
+                        },
+                        contentPadding =
+                            PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = "Son 3 yarış videosu",
+                            color = Green,
+                            fontSize = 10.sp,
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+                    }
+
+                    if (videoLoading) {
+                        Spacer(Modifier.width(6.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(10.dp),
+                            strokeWidth = 1.5.dp,
+                            color = Green
+                        )
+                    }
+                }
+
+                if (videoExpanded && !videoLoading) {
+                    if (videoFetched && videos.isEmpty()) {
+                        Text(
+                            text =
+                                "Bu at için oynatılabilir geçmiş yarış videosu bulunamadı.",
+                            color = Muted,
+                            fontSize = 9.sp
+                        )
+                    } else {
+                        videos.forEachIndexed {
+                            index,
+                            video ->
+
+                            TextButton(
+                                onClick = {
+                                    runCatching {
+                                        context.startActivity(
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse(video.url)
+                                            )
+                                        )
+                                    }
+                                },
+                                contentPadding =
+                                    PaddingValues(vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text =
+                                        "${index + 1}. ${video.label.ifBlank { "Geçmiş yarış" }}",
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Ink
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(

@@ -95,7 +95,8 @@ data class Race(
     val surface: String = "",
     val horses: List<Horse> = emptyList(),
     val uncertainty: RaceUncertainty? = null,
-    val couponStrategy: RaceCouponStrategy? = null
+    val couponStrategy: RaceCouponStrategy? = null,
+    val raceDate: String? = null
 )
 
 data class Meeting(
@@ -154,4 +155,9 @@ data class HistoryRace(
     val runners: List<Horse>,
     val expertPredictionCount: Int,
     val finalizedAt: String?
+)
+
+data class HorseVideo(
+    val label: String,
+    val url: String
 )

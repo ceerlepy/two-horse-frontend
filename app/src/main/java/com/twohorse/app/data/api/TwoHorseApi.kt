@@ -371,6 +371,79 @@ class TwoHorseApi(
             )
         }
 
+    suspend fun getHorseVideos(
+        raceDate: String,
+        city: String,
+        raceNumber: Int,
+        horseNumber: Int
+    ): List<HorseVideo> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val url =
+                (
+                    baseUrl +
+                    "/api/horses/videos"
+                )
+                    .toHttpUrl()
+                    .newBuilder()
+                    .addQueryParameter(
+                        "raceDate",
+                        raceDate
+                    )
+                    .addQueryParameter(
+                        "city",
+                        city
+                    )
+                    .addQueryParameter(
+                        "raceNumber",
+                        raceNumber.toString()
+                    )
+                    .addQueryParameter(
+                        "horseNumber",
+                        horseNumber.toString()
+                    )
+                    .build()
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()
+                )
+
+            val videosArray =
+                json.optJSONArray(
+                    "videos"
+                )
+
+            buildList {
+                if (videosArray != null) {
+                    for (
+                        i in 0 until
+                        videosArray.length()
+                    ) {
+                        val item =
+                            videosArray.getJSONObject(i)
+
+                        add(
+                            HorseVideo(
+                                label =
+                                    item.optString(
+                                        "label"
+                                    ),
+                                url =
+                                    item.optString(
+                                        "url"
+                                    )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
     private fun getJson(
         path: String
     ): JSONObject {
@@ -442,6 +515,12 @@ class TwoHorseApi(
                 "races"
             )
 
+        val meetingDate =
+            json.optString(
+                "date",
+                fallbackDate
+            )
+
         val races =
             buildList {
                 if (
@@ -455,7 +534,8 @@ class TwoHorseApi(
                             parseRace(
                                 racesArray
                                     .getJSONObject(i),
-                                city
+                                city,
+                                meetingDate
                             )
                         )
                     }
@@ -464,18 +544,15 @@ class TwoHorseApi(
 
         return Meeting(
             city = city,
-            date =
-                json.optString(
-                    "date",
-                    fallbackDate
-                ),
+            date = meetingDate,
             races = races
         )
     }
 
     private fun parseRace(
         json: JSONObject,
-        fallbackCity: String
+        fallbackCity: String,
+        raceDate: String
     ): Race {
         val horsesJson =
             json.optJSONArray("runners")
@@ -634,7 +711,10 @@ class TwoHorseApi(
                 uncertainty,
 
             couponStrategy =
-                strategy
+                strategy,
+
+            raceDate =
+                raceDate
         )
     }
 
