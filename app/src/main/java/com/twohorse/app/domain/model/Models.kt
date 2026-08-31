@@ -163,3 +163,17 @@ data class HorseVideo(
     val label: String,
     val url: String
 )
+
+data class MembershipUser(
+    val id: String,
+    val email: String,
+    val displayName: String?,
+    val tier: String,
+    val tierSource: String,
+    val trialEndsAt: String?,
+    val subscriptionExpiresAt: String?
+) {
+    val isFree: Boolean get() = tier == "free"
+    val isGold: Boolean get() = tier == "gold"
+    val isPremium: Boolean get() = tier == "premium"
+}

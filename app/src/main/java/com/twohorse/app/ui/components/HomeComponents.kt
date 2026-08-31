@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -35,7 +36,8 @@ import com.twohorse.app.ui.theme.*
 fun TwoHorseHeader(
     refreshing: Boolean,
     onRefresh: () -> Unit,
-    onHistory: () -> Unit
+    onHistory: () -> Unit,
+    onAccount: () -> Unit = {}
 ) {
     val compact =
         isCompactScreen()
@@ -111,6 +113,19 @@ fun TwoHorseHeader(
                     color = Muted,
                     fontSize = 12.sp,
                     maxLines = 1
+                )
+            }
+
+            IconButton(
+                onClick = onAccount,
+                modifier =
+                    Modifier.size(48.dp)
+            ) {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription =
+                        "Üyelik ve hesap",
+                    tint = Ink
                 )
             }
 

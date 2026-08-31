@@ -80,4 +80,7 @@ dependencies {
     )
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
+    implementation("androidx.security:security-crypto:1.0.0")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 }

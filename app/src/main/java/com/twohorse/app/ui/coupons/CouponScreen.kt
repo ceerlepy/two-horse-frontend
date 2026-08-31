@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,6 +26,7 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Coupon
 import com.twohorse.app.domain.model.CouponLeg
 import com.twohorse.app.domain.model.CouponResult
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
@@ -50,17 +52,28 @@ private fun couponRaceStartMillis(
 private fun poolLabel(pool: String): String =
     if (pool == "fivefold") "Beşli" else "Altılı"
 
+private const val GOLD_MAX_COUPON_BUDGET_TL = 1500.0
+
 @Composable
 fun CouponScreen(
     cities: List<String>,
     initialCity: String?,
-    onBack: () -> Unit
+    currentUser: MembershipUser?,
+    onBack: () -> Unit,
+    onUpgradeClick: () -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
+    val context = LocalContext.current
+
+    val tier = currentUser?.tier ?: "free"
+    val canGenerateCoupons = tier != "free"
+    val maxBudgetTl =
+        if (tier == "gold") GOLD_MAX_COUPON_BUDGET_TL else Double.MAX_VALUE
+
     val repository =
         remember {
-            TwoHorseRepository()
+            TwoHorseRepository(context)
         }
 
     var selectedCity by
@@ -103,7 +116,12 @@ fun CouponScreen(
 
     var budget by
         remember {
-            mutableStateOf(3000.0)
+            mutableStateOf(
+                if (tier == "gold")
+                    GOLD_MAX_COUPON_BUDGET_TL
+                else
+                    3000.0
+            )
         }
 
     var loading by
@@ -340,37 +358,71 @@ fun CouponScreen(
             Surface(
                 color = Bg
             ) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            generate()
-                        }
-                    },
-                    enabled =
-                        !loading &&
-                        selectedCity.isNotBlank(),
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 18.dp,
-                                vertical = 12.dp
+                if (canGenerateCoupons) {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                generate()
+                            }
+                        },
+                        enabled =
+                            !loading &&
+                            selectedCity.isNotBlank(),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 18.dp,
+                                    vertical = 12.dp
+                                )
+                                .height(54.dp),
+                        shape =
+                            RoundedCornerShape(16.dp),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Green
                             )
-                            .height(54.dp),
-                    shape =
-                        RoundedCornerShape(16.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Green
-                        )
-                ) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(22.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
+                    ) {
+                        if (loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(22.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Stars,
+                                contentDescription = null
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(8.dp)
+                            )
+
+                            Text(
+                                text = "Kuponları Oluştur",
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = onUpgradeClick,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 18.dp,
+                                    vertical = 12.dp
+                                )
+                                .height(54.dp),
+                        shape =
+                            RoundedCornerShape(16.dp),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Gold
+                            )
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Stars,
                             contentDescription = null
@@ -381,7 +433,7 @@ fun CouponScreen(
                         )
 
                         Text(
-                            text = "Kuponları Oluştur",
+                            text = "Kupon üretmek için Gold'a yükselt",
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
@@ -600,7 +652,7 @@ fun CouponScreen(
                             3000.0,
                             5000.0,
                             10000.0
-                        )
+                        ).filter { it <= maxBudgetTl }
                     ) { value ->
                         SelectChip(
                             text =

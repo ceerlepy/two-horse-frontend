@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,11 +58,14 @@ import kotlin.math.max
 fun HomeScreen(
     onRaceClick: (Race) -> Unit,
     onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onAccountClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     val repository =
         remember {
-            TwoHorseRepository()
+            TwoHorseRepository(context)
         }
 
     val lifecycleOwner =
@@ -315,7 +319,8 @@ fun HomeScreen(
                         refreshKey++
                     }
                 },
-                onHistory = onHistoryClick
+                onHistory = onHistoryClick,
+                onAccount = onAccountClick
             )
         }
 
