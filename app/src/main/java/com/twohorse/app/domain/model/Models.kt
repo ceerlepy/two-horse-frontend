@@ -141,7 +141,8 @@ data class CouponResult(
     val date: String? = null,
     val unitPriceTl: Double? = null,
     val multiplier: Int = 1,
-    val generatedAt: String? = null
+    val generatedAt: String? = null,
+    val pool: String = "sixfold"
 )
 
 data class HistoryRace(
