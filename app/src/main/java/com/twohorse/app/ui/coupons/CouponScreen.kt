@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -102,7 +103,7 @@ fun CouponScreen(
 
     var budget by
         remember {
-            mutableStateOf(500.0)
+            mutableStateOf(3000.0)
         }
 
     var loading by
@@ -416,7 +417,7 @@ fun CouponScreen(
                         Modifier.height(12.dp)
                 )
 
-                CouponProfileLegend()
+                CouponBudgetLadderInfo()
             }
         }
 
@@ -578,8 +579,8 @@ fun CouponScreen(
                     )
             ) {
                 SectionTitle(
-                    title = "Bütçe",
-                    subtitle = "Optimizer bu tavanı aşmadan seçim yapar"
+                    title = "Üst Bütçe",
+                    subtitle = "En yüksek kupon tavanı. 500 ve 750 TL sabit girişten başlayıp bu tavana kadar eşit aralıklı kademeler üretilir"
                 )
 
                 Spacer(
@@ -593,12 +594,12 @@ fun CouponScreen(
                 ) {
                     items(
                         listOf(
-                            100.0,
-                            250.0,
                             500.0,
-                            1000.0,
-                            2000.0,
-                            3000.0
+                            750.0,
+                            1500.0,
+                            3000.0,
+                            5000.0,
+                            10000.0
                         )
                     ) { value ->
                         SelectChip(
@@ -655,7 +656,7 @@ fun CouponScreen(
                 ) {
                     Text(
                         text =
-                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. ${poolLabel(lastGeneratedPool ?: "sixfold")} · ${lastGeneratedBudget?.toInt()} TL bütçe",
+                            "${lastGeneratedCity} · ${lastGeneratedSixfold}. ${poolLabel(lastGeneratedPool ?: "sixfold")} · ${lastGeneratedBudget?.toInt()} TL üst bütçe",
                         modifier =
                             Modifier.padding(
                                 horizontal =
@@ -717,7 +718,7 @@ fun CouponScreen(
                 }
             }
 
-            items(
+            val visibleCoupons =
                 couponResult.coupons
                     .filter {
                         coupon ->
@@ -727,7 +728,10 @@ fun CouponScreen(
                             couponResult.budgetTl +
                             0.01
                     }
-            ) { coupon ->
+
+            itemsIndexed(
+                visibleCoupons
+            ) { index, coupon ->
                 Column(
                     modifier =
                         Modifier.padding(
@@ -735,7 +739,9 @@ fun CouponScreen(
                         )
                 ) {
                     CouponCard(
-                        coupon = coupon
+                        coupon = coupon,
+                        tierIndex = index + 1,
+                        tierCount = visibleCoupons.size
                     )
                 }
             }
@@ -848,7 +854,7 @@ private fun CouponIntro() {
             ) {
                 Text(
                     text =
-                        "Bütçeye göre optimize et",
+                        "Kademeli bütçeye göre optimize et",
                     color =
                         Ink,
                     fontWeight =
@@ -859,7 +865,7 @@ private fun CouponIntro() {
 
                 Text(
                     text =
-                        "Model olasılıklarını kullanarak altı ayağı birlikte optimize eder.",
+                        "Model olasılıklarını kullanarak tüm ayakları birlikte optimize eder ve 500 TL'den seçtiğin üst bütçeye kadar artan kuponlar üretir.",
                     color =
                         Muted,
                     fontSize =
@@ -990,7 +996,8 @@ private fun ResultSummary(
             text =
                 "${result.startRace ?: "?"}. koşu → " +
                 "${result.endRace ?: "?"}. koşu · " +
-                "Bütçe ${result.budgetTl.toInt()} TL",
+                "Üst bütçe ${result.budgetTl.toInt()} TL · " +
+                "${result.coupons.size} kupon",
             color =
                 Muted,
             fontSize =
@@ -1026,7 +1033,9 @@ private fun ResultSummary(
 
 @Composable
 private fun CouponCard(
-    coupon: Coupon
+    coupon: Coupon,
+    tierIndex: Int,
+    tierCount: Int
 ) {
     Card(
         modifier =
@@ -1058,9 +1067,7 @@ private fun CouponCard(
                 ) {
                     Text(
                         text =
-                            profileTitle(
-                                coupon.profile
-                            ),
+                            "${coupon.budgetTl.toInt()} TL Kupon",
                         color =
                             Ink,
                         fontSize =
@@ -1071,7 +1078,7 @@ private fun CouponCard(
 
                     Text(
                         text =
-                            coupon.profile,
+                            "Kademe $tierIndex / $tierCount",
                         color =
                             Muted,
                         fontSize =
@@ -1297,29 +1304,6 @@ private fun SmallMetric(
     }
 }
 
-private fun profileTitle(
-    profile: String
-): String =
-    when (
-        profile.lowercase()
-    ) {
-        "cautious" ->
-            "Temkinli"
-
-        "balanced" ->
-            "Dengeli"
-
-        "maximum-coverage",
-        "maximum_coverage",
-        "max-coverage" ->
-            "Maksimum Kapsama"
-
-        else ->
-            profile.ifBlank {
-                "Optimize Kupon"
-            }
-    }
-
 private fun probabilityText(
     value: Double?
 ): String {
@@ -1337,63 +1321,8 @@ private fun probabilityText(
 }
 
 
-private fun visualCouponProfileTitle(
-    profile: String
-): String {
-    val normalized =
-        profile
-            .trim()
-            .lowercase()
-
-    return when {
-        normalized.contains("safe") ||
-        normalized.contains("conservative") ||
-        normalized.contains("guven") ->
-            "Güvenli Kupon"
-
-        normalized.contains("balanced") ||
-        normalized.contains("denge") ->
-            "Dengeli Kupon"
-
-        normalized.contains("aggressive") ||
-        normalized.contains("agres") ->
-            "Agresif Kupon"
-
-        else ->
-            profile
-    }
-}
-
-private fun visualCouponProfileDescription(
-    profile: String
-): String {
-    val normalized =
-        profile
-            .trim()
-            .lowercase()
-
-    return when {
-        normalized.contains("safe") ||
-        normalized.contains("conservative") ||
-        normalized.contains("guven") ->
-            "Daha güçlü adaylara yoğunlaşır; kuponu kontrollü tutmayı hedefler."
-
-        normalized.contains("balanced") ||
-        normalized.contains("denge") ->
-            "Güçlü adaylarla alternatifleri dengeler."
-
-        normalized.contains("aggressive") ||
-        normalized.contains("agres") ->
-            "Daha geniş kapsama ve sürpriz senaryolarına alan açar."
-
-        else ->
-            "Optimizer tarafından oluşturulan kupon profili."
-    }
-}
-
-
 @Composable
-private fun CouponProfileLegend() {
+private fun CouponBudgetLadderInfo() {
     Card(
         modifier =
             Modifier.fillMaxWidth(),
@@ -1424,7 +1353,7 @@ private fun CouponProfileLegend() {
         ) {
             Text(
                 text =
-                    "Kupon profilleri",
+                    "Bütçe kademeleri",
                 color =
                     Ink,
                 fontSize =
@@ -1433,39 +1362,39 @@ private fun CouponProfileLegend() {
                     FontWeight.ExtraBold
             )
 
-            ProfileLegendRow(
+            LadderLegendRow(
                 symbol =
-                    "✓",
+                    "1",
                 title =
-                    "Güvenli",
+                    "500 TL — sabit giriş",
                 description =
-                    "Güçlü adaylara yoğunlaşır · daha kontrollü kapsam",
+                    "Her bütçede aynı, en düşük maliyetli kupon",
                 foreground =
                     Green,
                 background =
                     PaleGreen
             )
 
-            ProfileLegendRow(
+            LadderLegendRow(
                 symbol =
-                    "●",
+                    "2",
                 title =
-                    "Dengeli",
+                    "750 TL — sabit ikinci",
                 description =
-                    "Risk, maliyet ve kapsama arasında orta yol",
+                    "Her bütçede aynı, biraz daha geniş kapsam",
                 foreground =
                     Gold,
                 background =
                     PaleGold
             )
 
-            ProfileLegendRow(
+            LadderLegendRow(
                 symbol =
-                    "⚡",
+                    "3-6",
                 title =
-                    "Agresif",
+                    "Eşit aralıklı kademeler",
                 description =
-                    "Sürpriz senaryolara daha fazla alan açar",
+                    "750 TL'den seçtiğin üst bütçeye kadar 4 kupon daha, artan kapsamayla",
                 foreground =
                     Red,
                 background =
@@ -1474,7 +1403,7 @@ private fun CouponProfileLegend() {
 
             Text(
                 text =
-                    "Her profil backend optimizer tarafından bütçe sınırı içinde hesaplanır.",
+                    "Her kademe backend optimizer tarafından kendi bütçe sınırı içinde ayrı ayrı hesaplanır.",
                 color =
                     Muted,
                 fontSize =
@@ -1485,7 +1414,7 @@ private fun CouponProfileLegend() {
 }
 
 @Composable
-private fun ProfileLegendRow(
+private fun LadderLegendRow(
     symbol: String,
     title: String,
     description: String,
