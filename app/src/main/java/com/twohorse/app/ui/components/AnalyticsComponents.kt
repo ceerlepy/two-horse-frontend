@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.domain.model.*
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.theme.*
 
 @Composable
@@ -77,6 +78,8 @@ fun ScoreProgress(
     score: Double?,
     subtitle: String? = null
 ) {
+    val strings = LocalStrings.current
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -94,7 +97,7 @@ fun ScoreProgress(
             Text(
                 text = score?.let {
                     "%.1f".format(it)
-                } ?: "Veri yok",
+                } ?: strings.noData,
                 color =
                     if (score == null)
                         Muted
@@ -202,6 +205,8 @@ fun RaceInsightSummary(
     race: Race,
     dark: Boolean = false
 ) {
+    val strings = LocalStrings.current
+
     val uncertainty =
         race.uncertainty
 
@@ -229,16 +234,16 @@ fun RaceInsightSummary(
                     it.level.lowercase()
                 ) {
                     "low" ->
-                        "DÜŞÜK"
+                        strings.uncertaintyLowCaps
 
                     "medium" ->
-                        "ORTA"
+                        strings.uncertaintyMediumCaps
 
                     "high" ->
-                        "YÜKSEK"
+                        strings.uncertaintyHighCaps
 
                     "very-high" ->
-                        "ÇOK YÜKSEK"
+                        strings.uncertaintyVeryHighCaps
 
                     else ->
                         it.level.uppercase()
@@ -247,18 +252,18 @@ fun RaceInsightSummary(
             val explanation =
                 when {
                     it.topMargin <= 3.0 ->
-                        "İlk adaylar birbirine çok yakın"
+                        strings.explanationClose
 
                     it.topMargin <= 7.0 ->
-                        "İlk 3 at birbirine yakın"
+                        strings.explanationTop3Close
 
                     else ->
-                        "Model lideri belirgin şekilde ayrışıyor"
+                        strings.explanationClearLeader
                 }
 
             Text(
                 text =
-                    "BELİRSİZLİK $level · $explanation",
+                    strings.uncertaintyLine(level, explanation),
                 color =
                     if (dark)
                         Color.White.copy(
@@ -281,39 +286,39 @@ fun RaceInsightSummary(
                     it.mode.lowercase()
                 ) {
                     "single" ->
-                        "TEK"
+                        strings.strategySingle
 
                     "compact",
                     "narrow" ->
-                        "DAR KUPON"
+                        strings.strategyCompact
 
                     "spread",
                     "wide",
                     "broad" ->
-                        "GENİŞ KUPON"
+                        strings.strategySpread
 
                     else ->
-                        "DENGELİ KUPON"
+                        strings.strategyBalanced
                 }
 
             val reason =
                 when {
                     it.horseNumbers.size == 1 ->
-                        "1 güçlü tek adayı"
+                        strings.strategyOneCandidate
 
                     it.horseNumbers.isNotEmpty() ->
-                        "${it.horseNumbers.size} güçlü aday"
+                        strings.strategyCandidates(it.horseNumbers.size)
 
                     it.reason.isNotBlank() ->
                         it.reason
 
                     else ->
-                        "Backend strateji önerisi"
+                        strings.strategyBackendDefault
                 }
 
             Text(
                 text =
-                    "$mode · $reason",
+                    strings.strategyLine(mode, reason),
                 color =
                     if (dark)
                         Gold
@@ -330,34 +335,42 @@ fun RaceInsightSummary(
     }
 }
 
+@Composable
 fun componentTitle(
     key: String
-): String =
-    when (
+): String {
+    val strings = LocalStrings.current
+
+    return when (
         key.lowercase()
     ) {
-        "agf" -> "AGF"
-        "expert" -> "Uzman"
-        "form" -> "Form"
-        "hp" -> "HP"
-        "market" -> "Piyasa"
-        "weight" -> "Kilo"
-        "field" -> "Saha"
+        "agf" -> strings.componentAgf
+        "expert" -> strings.componentExpert
+        "form" -> strings.componentForm
+        "hp" -> strings.componentHp
+        "market" -> strings.componentMarket
+        "weight" -> strings.componentWeight
+        "field" -> strings.componentField
         else -> key
     }
+}
 
+@Composable
 fun uncertaintyText(
     value: String
-): String =
-    when (
+): String {
+    val strings = LocalStrings.current
+
+    return when (
         value.lowercase()
     ) {
-        "low" -> "Düşük"
-        "medium" -> "Orta"
-        "high" -> "Yüksek"
-        "very-high" -> "Çok yüksek"
+        "low" -> strings.uncertaintyLow
+        "medium" -> strings.uncertaintyMedium
+        "high" -> strings.uncertaintyHigh
+        "very-high" -> strings.uncertaintyVeryHigh
         else -> value
     }
+}
 
 fun marketArrow(
     direction: String
@@ -373,30 +386,34 @@ fun marketArrow(
         else -> "·"
     }
 
+@Composable
 fun marketText(
     direction: String
-): String =
-    when (
+): String {
+    val strings = LocalStrings.current
+
+    return when (
         direction.lowercase()
     ) {
         "strong-up" ->
-            "Güçlü yükseliş"
+            strings.marketStrongUp
 
         "up" ->
-            "Yükseliş"
+            strings.marketUp
 
         "flat" ->
-            "Yatay"
+            strings.marketFlat
 
         "down" ->
-            "Düşüş"
+            strings.marketDown
 
         "strong-down" ->
-            "Güçlü düşüş"
+            strings.marketStrongDown
 
         else ->
-            "Yeterli piyasa hareketi yok"
+            strings.marketNone
     }
+}
 
 @Composable
 fun ShimmerBlock(

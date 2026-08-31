@@ -1,63 +1,143 @@
 package com.twohorse.app.ui.coupons
 
+import androidx.compose.runtime.Composable
 import com.twohorse.app.data.api.ApiException
+import com.twohorse.app.i18n.Strings
 
-fun couponErrorMessage(throwable: Throwable): String {
+sealed interface CouponError {
+    data object CityRequired : CouponError
+    data object ValidBudgetRequired : CouponError
+    data object SixfoldNotFound : CouponError
+    data object NotEnoughRaces : CouponError
+    data object NoRunners : CouponError
+    data object TierUpgradeRequired : CouponError
+    data object BudgetCapExceeded : CouponError
+    data object AuthRequired : CouponError
+    data object NotFound : CouponError
+    data object BadRequest : CouponError
+    data object ServerUnavailable : CouponError
+    data object NoInternet : CouponError
+    data object Timeout : CouponError
+    data object Generic : CouponError
+    data object CitySelectFailed : CouponError
+    data object UnexpectedWindow : CouponError
+    data object BudgetExceeded : CouponError
+}
+
+@Composable
+fun couponErrorText(
+    error: CouponError,
+    strings: Strings
+): String =
+    when (error) {
+        CouponError.CityRequired ->
+            strings.couponErrorCityRequired
+
+        CouponError.ValidBudgetRequired ->
+            strings.couponErrorValidBudgetRequired
+
+        CouponError.SixfoldNotFound ->
+            strings.couponErrorSixfoldNotFound
+
+        CouponError.NotEnoughRaces ->
+            strings.couponErrorNotEnoughRaces
+
+        CouponError.NoRunners ->
+            strings.couponErrorNoRunners
+
+        CouponError.TierUpgradeRequired ->
+            strings.couponErrorTierUpgradeRequired
+
+        CouponError.BudgetCapExceeded ->
+            strings.couponErrorBudgetCapExceeded
+
+        CouponError.AuthRequired ->
+            strings.couponErrorAuthRequired
+
+        CouponError.NotFound ->
+            strings.couponErrorNotFound
+
+        CouponError.BadRequest ->
+            strings.couponErrorBadRequest
+
+        CouponError.ServerUnavailable ->
+            strings.couponErrorServerUnavailable
+
+        CouponError.NoInternet ->
+            strings.couponErrorNoInternet
+
+        CouponError.Timeout ->
+            strings.couponErrorTimeout
+
+        CouponError.Generic ->
+            strings.couponErrorGeneric
+
+        CouponError.CitySelectFailed ->
+            strings.couponCitySelectFailed
+
+        CouponError.UnexpectedWindow ->
+            strings.couponUnexpectedWindow
+
+        CouponError.BudgetExceeded ->
+            strings.couponBudgetExceeded
+    }
+
+fun couponErrorFromThrowable(throwable: Throwable): CouponError {
     val api = throwable as? ApiException
 
     return when (api?.apiCode) {
         "CITY_REQUIRED" ->
-            "Şehir seçimi gerekli."
+            CouponError.CityRequired
 
         "VALID_BUDGET_REQUIRED" ->
-            "Geçerli bir bütçe seç."
+            CouponError.ValidBudgetRequired
 
         "SIXFOLD_WINDOW_NOT_FOUND",
         "SIXFOLD_NOT_FOUND",
         "NO_SIXFOLD_WINDOW" ->
-            "Bu şehir için seçtiğin altılı henüz tanımlı değil."
+            CouponError.SixfoldNotFound
 
         "NOT_ENOUGH_RACES",
         "INSUFFICIENT_RACES" ->
-            "Bu altılıyı oluşturmak için yeterli yarış yok."
+            CouponError.NotEnoughRaces
 
         "NO_RUNNERS",
         "NO_USABLE_RUNNERS" ->
-            "Kupon oluşturmak için yeterli at verisi bulunamadı."
+            CouponError.NoRunners
 
         "TIER_UPGRADE_REQUIRED" ->
-            "Bu özellik için üyeliğini yükseltmen gerekiyor."
+            CouponError.TierUpgradeRequired
 
         "TIER_BUDGET_CAP_EXCEEDED" ->
-            "Bu bütçe Gold üyelikte kilitli. Premium'a yükselterek sınırsız bütçe kullanabilirsin."
+            CouponError.BudgetCapExceeded
 
         "AUTH_REQUIRED" ->
-            "Oturumun sona ermiş olabilir, tekrar giriş yap."
+            CouponError.AuthRequired
 
         else -> when {
             api?.statusCode == 404 ->
-                "İstenen yarış veya altılı bulunamadı."
+                CouponError.NotFound
 
             api?.statusCode == 400 ->
-                "Kupon isteği geçersiz. Şehir, altılı ve bütçeyi kontrol et."
+                CouponError.BadRequest
 
             api?.statusCode != null && api.statusCode >= 500 ->
-                "Backend şu anda kupon oluşturamıyor. Biraz sonra tekrar dene."
+                CouponError.ServerUnavailable
 
             throwable.message?.contains(
                 "Unable to resolve host",
                 ignoreCase = true
             ) == true ->
-                "İnternet bağlantısı kurulamadı."
+                CouponError.NoInternet
 
             throwable.message?.contains(
                 "timeout",
                 ignoreCase = true
             ) == true ->
-                "İstek zaman aşımına uğradı. Tekrar dene."
+                CouponError.Timeout
 
             else ->
-                "Kupon oluşturulamadı."
+                CouponError.Generic
         }
     }
 }

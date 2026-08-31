@@ -26,6 +26,10 @@ import com.twohorse.app.Config
 import com.twohorse.app.billing.BillingManager
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.MembershipUser
+import com.twohorse.app.i18n.Language
+import com.twohorse.app.i18n.currentLanguage
+import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.auth.LanguageToggle
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -33,8 +37,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+private sealed interface AccountMessage {
+    data class PurchaseActivated(val tier: String) : AccountMessage
+    data object PurchaseVerifyFailed : AccountMessage
+}
+
 private fun formatIsoDate(
-    value: String?
+    value: String?,
+    language: Language
 ): String? {
     val raw =
         value?.trim()?.takeIf { it.isNotEmpty() }
@@ -46,20 +56,11 @@ private fun formatIsoDate(
             .format(
                 DateTimeFormatter.ofPattern(
                     "d MMMM yyyy",
-                    Locale("tr")
+                    Locale(language.code)
                 )
             )
     }.getOrDefault(raw)
 }
-
-private fun tierTitle(
-    tier: String
-): String =
-    when (tier) {
-        "gold" -> "Gold"
-        "premium" -> "Premium"
-        else -> "Free"
-    }
 
 @Composable
 fun AccountScreen(
@@ -73,6 +74,7 @@ fun AccountScreen(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val strings = LocalStrings.current
 
     val billingManager =
         remember {
@@ -94,7 +96,7 @@ fun AccountScreen(
         remember { mutableStateOf(false) }
 
     var message by
-        remember { mutableStateOf<String?>(null) }
+        remember { mutableStateOf<AccountMessage?>(null) }
 
     LaunchedEffect(Unit) {
         repository.me()
@@ -149,11 +151,11 @@ fun AccountScreen(
                     }
 
                     message =
-                        "${tierTitle(updated.tier)} aktif edildi."
+                        AccountMessage.PurchaseActivated(updated.tier)
                 }
                 .onFailure {
                     message =
-                        "Satın alma doğrulanamadı. Birazdan tekrar dene."
+                        AccountMessage.PurchaseVerifyFailed
                 }
 
             purchaseInFlight = false
@@ -186,17 +188,20 @@ fun AccountScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Geri",
+                        contentDescription = strings.back,
                         tint = Ink
                     )
                 }
 
                 Text(
-                    text = "Üyelik",
+                    text = strings.accountTitle,
+                    modifier = Modifier.weight(1f),
                     color = Ink,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.ExtraBold
                 )
+
+                LanguageToggle()
             }
 
             Column(
@@ -210,7 +215,18 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                message?.let {
+                message?.let { msg ->
+                    val messageText =
+                        when (msg) {
+                            is AccountMessage.PurchaseActivated ->
+                                strings.accountPurchaseActivated(
+                                    strings.accountTierTitle(msg.tier)
+                                )
+
+                            AccountMessage.PurchaseVerifyFailed ->
+                                strings.accountPurchaseVerifyFailed
+                        }
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
@@ -220,7 +236,7 @@ fun AccountScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = it,
+                            text = messageText,
                             modifier = Modifier.padding(12.dp),
                             color = Green,
                             fontSize = 12.sp,
@@ -233,9 +249,8 @@ fun AccountScreen(
 
                 if (activeUser?.tier != "gold" && activeUser?.tier != "premium") {
                     UpgradeCard(
-                        title = "Gold",
-                        description =
-                            "Tüm model sinyalleri açık · 1500 TL'ye kadar kupon üretimi",
+                        title = strings.accountTierTitle("gold"),
+                        description = strings.accountGoldDescription,
                         price =
                             goldProduct
                                 ?.subscriptionOfferDetails
@@ -261,9 +276,8 @@ fun AccountScreen(
 
                 if (activeUser?.tier != "premium") {
                     UpgradeCard(
-                        title = "Premium",
-                        description =
-                            "Gold'un hepsi + at videosu arşivi + sınırsız kupon bütçesi",
+                        title = strings.accountTierTitle("premium"),
+                        description = strings.accountPremiumDescription,
                         price =
                             premiumProduct
                                 ?.subscriptionOfferDetails
@@ -309,7 +323,7 @@ fun AccountScreen(
                             Spacer(modifier = Modifier.width(10.dp))
 
                             Text(
-                                text = "Zaten Premium'sun, her şey açık.",
+                                text = strings.accountAlreadyPremium,
                                 color = Green,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
@@ -341,7 +355,7 @@ fun AccountScreen(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Text("Çıkış Yap")
+                    Text(strings.accountLogout)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -354,6 +368,9 @@ fun AccountScreen(
 private fun CurrentTierCard(
     user: MembershipUser
 ) {
+    val strings = LocalStrings.current
+    val language = currentLanguage()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors =
@@ -377,7 +394,7 @@ private fun CurrentTierCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = tierTitle(user.tier),
+                    text = strings.accountTierTitle(user.tier),
                     color = Ink,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold
@@ -393,29 +410,29 @@ private fun CurrentTierCard(
             )
 
             val trialEnds =
-                formatIsoDate(user.trialEndsAt)
+                formatIsoDate(user.trialEndsAt, language)
 
             val subscriptionEnds =
-                formatIsoDate(user.subscriptionExpiresAt)
+                formatIsoDate(user.subscriptionExpiresAt, language)
 
             when {
                 user.tierSource == "trial" && trialEnds != null ->
                     Text(
-                        text = "Deneme süresi $trialEnds tarihine kadar",
+                        text = strings.accountTrialEndsAt(trialEnds),
                         color = Muted,
                         fontSize = 11.sp
                     )
 
                 user.tierSource == "play_subscription" && subscriptionEnds != null ->
                     Text(
-                        text = "Abonelik $subscriptionEnds tarihinde yenilenir",
+                        text = strings.accountSubscriptionRenewsAt(subscriptionEnds),
                         color = Muted,
                         fontSize = 11.sp
                     )
 
                 user.tierSource == "manual" ->
                     Text(
-                        text = "Süresiz",
+                        text = strings.accountUnlimited,
                         color = Muted,
                         fontSize = 11.sp
                     )
@@ -434,6 +451,8 @@ private fun UpgradeCard(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors =
@@ -494,9 +513,9 @@ private fun UpgradeCard(
                 Text(
                     text =
                         if (enabled)
-                            "$title'a Yükselt"
+                            strings.accountUpgradeTo(title)
                         else
-                            "Yükleniyor…",
+                            strings.accountLoadingEllipsis,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )

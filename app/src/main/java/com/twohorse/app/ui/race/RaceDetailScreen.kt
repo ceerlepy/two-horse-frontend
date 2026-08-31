@@ -27,10 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.*
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.*
 import com.twohorse.app.ui.theme.*
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
+
+private sealed interface RaceDetailError {
+    data object NotFoundInProgram : RaceDetailError
+    data object RefreshFailed : RaceDetailError
+}
 
 @Composable
 fun RaceDetailScreen(
@@ -40,6 +46,8 @@ fun RaceDetailScreen(
     onOpenCoupons: (String) -> Unit
 ) {
     BackHandler(onBack = onBack)
+
+    val strings = LocalStrings.current
 
     val canViewVideos =
         currentUser?.tier == "premium"
@@ -69,7 +77,7 @@ fun RaceDetailScreen(
 
     var error by
         remember {
-            mutableStateOf<String?>(null)
+            mutableStateOf<RaceDetailError?>(null)
         }
 
     var refreshKey by
@@ -114,12 +122,12 @@ fun RaceDetailScreen(
                     currentRace = fresh
                 } else {
                     error =
-                        "Yarış güncel programda bulunamadı. Son bilinen veri gösteriliyor."
+                        RaceDetailError.NotFoundInProgram
                 }
             }
             .onFailure {
                 error =
-                    "Yarış yenilenemedi. Son bilinen veri gösteriliyor."
+                    RaceDetailError.RefreshFailed
             }
 
         refreshing = false
@@ -173,10 +181,17 @@ fun RaceDetailScreen(
             )
         }
 
-        error?.let {
+        error?.let { raceError ->
             item {
                 Notice(
-                    text = it
+                    text =
+                        when (raceError) {
+                            RaceDetailError.NotFoundInProgram ->
+                                strings.raceNotFoundInProgram
+
+                            RaceDetailError.RefreshFailed ->
+                                strings.raceRefreshFailed
+                        }
                 )
             }
         }
@@ -240,7 +255,7 @@ fun RaceDetailScreen(
                 ) {
                     Text(
                         text =
-                            "Bu şehir için Altılı Kupon",
+                            strings.raceCouponButton,
                         fontWeight =
                             FontWeight.Black
                     )
@@ -260,9 +275,9 @@ fun RaceDetailScreen(
                 ) {
                     SectionHeader(
                         title =
-                            "Olası sıralama · tüm atlar",
+                            strings.raceAllHorsesTitle,
                         subtitle =
-                            "${horses.size} at"
+                            strings.raceHorseCount(horses.size)
                     )
                 }
             }
@@ -342,6 +357,8 @@ private fun RaceHeader(
     onRefresh: () -> Unit,
     onBack: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     val compact =
         isCompactScreen()
 
@@ -364,7 +381,7 @@ private fun RaceHeader(
         ) {
             Icon(
                 Icons.Default.ArrowBack,
-                contentDescription = "Geri",
+                contentDescription = strings.back,
                 tint = Ink
             )
         }
@@ -375,7 +392,7 @@ private fun RaceHeader(
         ) {
             Text(
                 text =
-                    "${race.city} · ${race.number}. Koşu",
+                    strings.raceCityAndNumber(race.city, race.number),
                 color = Ink,
                 fontSize =
                     if (compact)
@@ -412,7 +429,7 @@ private fun RaceHeader(
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription =
-                        "Yarışı yenile",
+                        strings.raceRefresh,
                     tint = Ink
                 )
             }
@@ -426,6 +443,8 @@ private fun ResultHero(
     rival: Horse?,
     surprise: Horse?
 ) {
+    val strings = LocalStrings.current
+
     Card(
         colors =
             CardDefaults.cardColors(
@@ -440,7 +459,7 @@ private fun ResultHero(
         ) {
             Text(
                 text =
-                    "OLASI KAZANAN",
+                    strings.raceLikelyWinner,
                 color = Gold,
                 fontWeight =
                     FontWeight.ExtraBold,
@@ -472,13 +491,13 @@ private fun ResultHero(
 
                     Text(
                         text =
-                            "Güven Puanı ${
+                            strings.raceConfidenceScore(
                                 favorite.score
                                     ?.let {
                                         "%.1f".format(it)
                                     }
                                     ?: "—"
-                            }/100",
+                            ),
                         color =
                             Color.White.copy(
                                 alpha = 0.72f
@@ -517,62 +536,64 @@ private fun ResultHero(
             )
 
             DarkMetric(
-                "AGF",
+                strings.raceAgf,
                 favorite.agfPercent
                     ?.let {
                         "%${"%.1f".format(it)}"
                     }
-                    ?: "Veri yok"
+                    ?: strings.noData
             )
 
             DarkMetric(
-                "HP",
+                strings.raceHp,
                 favorite.hp
                     ?.let {
-                        "$it puan"
+                        strings.raceHpPoints(it)
                     }
-                    ?: "Veri yok"
+                    ?: strings.noData
             )
 
             DarkMetric(
-                "Uzman desteği",
+                strings.raceExpertSupport,
                 expertSummary(
                     favorite
                 )
             )
 
             DarkMetric(
-                "Saha",
+                strings.raceField,
                 fieldSummary(
                     favorite
                 )
             )
 
             DarkMetric(
-                "Piyasa",
+                strings.raceMarket,
                 marketSummary(
                     favorite
                 )
             )
 
             DarkMetric(
-                "Form",
+                strings.raceForm,
                 favorite.recentForm
                     .ifBlank {
-                        "Veri yok"
+                        strings.noData
                     }
             )
 
             favorite.learningAdjustment
                 ?.let {
                     DarkMetric(
-                        "Learning",
-                        "${
-                            if (it >= 0)
-                                "+"
-                            else
-                                ""
-                        }${"%.1f".format(it)} puan"
+                        strings.raceLearning,
+                        strings.raceLearningDelta(
+                            "${
+                                if (it >= 0)
+                                    "+"
+                                else
+                                    ""
+                            }${"%.1f".format(it)}"
+                        )
                     )
                 }
 
@@ -598,10 +619,11 @@ private fun ResultHero(
                 rival?.let {
                     Text(
                         text =
-                            "En ciddi rakip: #${it.number} ${it.name} · ${
-                                it.score?.roundToInt()
-                                    ?: 0
-                            }/100",
+                            strings.raceTopRival(
+                                it.number,
+                                it.name,
+                                it.score?.roundToInt() ?: 0
+                            ),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight =
@@ -616,10 +638,11 @@ private fun ResultHero(
 
                     Text(
                         text =
-                            "💣 Sürpriz: #${it.number} ${it.name} · ${
-                                it.score?.roundToInt()
-                                    ?: 0
-                            }/100",
+                            strings.raceSurprise(
+                                it.number,
+                                it.name,
+                                it.score?.roundToInt() ?: 0
+                            ),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight =
@@ -671,6 +694,8 @@ private fun DarkMetric(
 private fun RaceRiskCard(
     race: Race
 ) {
+    val strings = LocalStrings.current
+
     Card(
         colors =
             CardDefaults.cardColors(
@@ -689,7 +714,7 @@ private fun RaceRiskCard(
         ) {
             Text(
                 text =
-                    "Yarış risk haritası",
+                    strings.raceRiskMapTitle,
                 color = Ink,
                 fontSize = 14.sp,
                 fontWeight =
@@ -711,7 +736,7 @@ private fun RaceRiskCard(
                 ) {
                     MiniMetric(
                         Modifier.weight(1f),
-                        "Belirsizlik",
+                        strings.raceUncertaintyMetric,
                         uncertaintyText(
                             it.level
                         )
@@ -719,7 +744,7 @@ private fun RaceRiskCard(
 
                     MiniMetric(
                         Modifier.weight(1f),
-                        "Lider farkı",
+                        strings.raceLeaderMarginMetric,
                         "%.1f".format(
                             it.topMargin
                         )
@@ -727,7 +752,7 @@ private fun RaceRiskCard(
 
                     MiniMetric(
                         Modifier.weight(1f),
-                        "Genişleme",
+                        strings.raceExpansionMetric,
                         "%.1f".format(
                             it.expansionPressure
                         )
@@ -772,6 +797,8 @@ private fun ExpandableAnalysisHeader(
     expanded: Boolean,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier
@@ -800,7 +827,7 @@ private fun ExpandableAnalysisHeader(
             ) {
                 Text(
                     text =
-                        "Detaylı model analizi",
+                        strings.raceDeepAnalysisTitle,
                     color = Ink,
                     fontWeight =
                         FontWeight.Black
@@ -808,7 +835,7 @@ private fun ExpandableAnalysisHeader(
 
                 Text(
                     text =
-                        "Ağırlıklar, learning ve sinyal bileşenleri",
+                        strings.raceDeepAnalysisSubtitle,
                     color = Muted,
                     fontSize = 10.sp
                 )
@@ -821,9 +848,9 @@ private fun ExpandableAnalysisHeader(
                     Icons.Default.KeyboardArrowDown,
                 contentDescription =
                     if (expanded)
-                        "Detaylı analizi kapat"
+                        strings.raceCloseDeepAnalysis
                     else
-                        "Detaylı analizi aç"
+                        strings.raceOpenDeepAnalysis
             )
         }
     }
@@ -854,10 +881,13 @@ private fun Notice(
     }
 }
 
+@Composable
 private fun raceMeta(
     race: Race
-): String =
-    listOf(
+): String {
+    val strings = LocalStrings.current
+
+    return listOf(
         race.distance,
         race.surface
     )
@@ -866,47 +896,54 @@ private fun raceMeta(
         }
         .joinToString(" · ")
         .ifBlank {
-            "Koşu bilgisi"
+            strings.raceInfoFallback
         }
+}
 
+@Composable
 private fun expertSummary(
     horse: Horse
 ): String {
+    val strings = LocalStrings.current
+
     val e =
         horse.expertConsensus
-            ?: return "Kaynak bekleniyor / bulunamadı"
+            ?: return strings.raceExpertSourceMissing
 
     return buildString {
         append(
-            "${e.sourceCount} kaynak"
+            strings.raceExpertSourcesCount(e.sourceCount)
         )
 
         if (e.favoriteCount > 0) {
             append(
-                " · ${e.favoriteCount} favori"
+                " · ${strings.raceExpertFavoriteCount(e.favoriteCount)}"
             )
         }
 
         if (e.bankoCount > 0) {
             append(
-                " · ⭐ ${e.bankoCount} banko"
+                " · ${strings.raceExpertBankoCount(e.bankoCount)}"
             )
         }
 
         if (e.strongCount > 0) {
             append(
-                " · ${e.strongCount} güçlü"
+                " · ${strings.raceExpertStrongCount(e.strongCount)}"
             )
         }
     }
 }
 
+@Composable
 private fun marketSummary(
     horse: Horse
 ): String {
+    val strings = LocalStrings.current
+
     val m =
         horse.marketMovement
-            ?: return "Veri yok"
+            ?: return strings.noData
 
     return buildString {
         append(
@@ -928,15 +965,19 @@ private fun marketSummary(
     }
 }
 
+@Composable
 private fun fieldSummary(
     horse: Horse
-): String =
-    horse.fieldSignal
+): String {
+    val strings = LocalStrings.current
+
+    return horse.fieldSignal
         ?.score
         ?.let {
-            "Birleşik ${"%.1f".format(it)}"
+            strings.raceFieldCombined("%.1f".format(it))
         }
-        ?: "Veri yok"
+        ?: strings.noData
+}
 
 @Composable
 private fun HorseCard(
@@ -947,6 +988,8 @@ private fun HorseCard(
     raceNumber: Int,
     canViewVideos: Boolean
 ) {
+    val strings = LocalStrings.current
+
     var expanded by
         remember(
             horse.number
@@ -1104,7 +1147,7 @@ private fun HorseCard(
             ) {
                 MiniMetric(
                     Modifier.weight(1f),
-                    "Güven",
+                    strings.raceGuven,
                     horse.confidence
                         ?.let {
                             "${(it * 100).roundToInt()}%"
@@ -1116,7 +1159,7 @@ private fun HorseCard(
 
                 MiniMetric(
                     Modifier.weight(1f),
-                    "AGF",
+                    strings.raceAgf,
                     horse.agfPercent
                         ?.let {
                             "%${"%.1f".format(it)}"
@@ -1126,7 +1169,7 @@ private fun HorseCard(
 
                 MiniMetric(
                     Modifier.weight(1f),
-                    "HP",
+                    strings.raceHp,
                     horse.hp
                         ?.toString()
                         ?: "—"
@@ -1154,7 +1197,7 @@ private fun HorseCard(
                 )
 
                 Text(
-                    text = "Form",
+                    text = strings.raceForm,
                     color = Ink,
                     fontSize = 11.sp,
                     fontWeight =
@@ -1218,9 +1261,9 @@ private fun HorseCard(
                         Text(
                             text =
                                 if (canViewVideos)
-                                    "Son 3 yarış videosu"
+                                    strings.raceVideoLabel
                                 else
-                                    "Son 3 yarış videosu 🔒 Premium",
+                                    strings.raceVideoLabelLocked,
                             color =
                                 if (canViewVideos)
                                     Green
@@ -1246,14 +1289,14 @@ private fun HorseCard(
                     if (!canViewVideos) {
                         Text(
                             text =
-                                "At videosu arşivi Premium üyelikte açılır.",
+                                strings.raceVideoLockedBody,
                             color = Muted,
                             fontSize = 9.sp
                         )
                     } else if (videoFetched && videos.isEmpty()) {
                         Text(
                             text =
-                                "Bu at için oynatılabilir geçmiş yarış videosu bulunamadı.",
+                                strings.raceVideoNotFound,
                             color = Muted,
                             fontSize = 9.sp
                         )
@@ -1278,7 +1321,7 @@ private fun HorseCard(
                             ) {
                                 Text(
                                     text =
-                                        "${index + 1}. ${video.label.ifBlank { "Geçmiş yarış" }}",
+                                        "${index + 1}. ${video.label.ifBlank { strings.raceVideoFallbackLabel }}",
                                     fontSize = 10.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -1305,9 +1348,9 @@ private fun HorseCard(
                 Text(
                     text =
                         if (expanded)
-                            "Model detayını kapat"
+                            strings.raceCloseModelDetail
                         else
-                            "Model detayını aç",
+                            strings.raceOpenModelDetail,
                     color = Green,
                     fontSize = 10.sp,
                     fontWeight =
@@ -1330,7 +1373,7 @@ private fun HorseCard(
 
                     Text(
                         text =
-                            "Skor bileşenleri",
+                            strings.raceScoreComponents,
                         color = Ink,
                         fontSize = 12.sp,
                         fontWeight =
@@ -1351,15 +1394,10 @@ private fun HorseCard(
                                 score =
                                     it.score,
                                 subtitle =
-                                    "Etkin ağırlık ${
-                                        "%.1f".format(
-                                            it.effectiveWeight
-                                        )
-                                    } · yapılandırılmış ${
-                                        "%.1f".format(
-                                            it.configuredWeight
-                                        )
-                                    }"
+                                    strings.raceWeightBoth(
+                                        "%.1f".format(it.effectiveWeight),
+                                        "%.1f".format(it.configuredWeight)
+                                    )
                             )
 
                             Spacer(
@@ -1376,6 +1414,8 @@ private fun HorseCard(
 private fun ExpertConsensusSection(
     value: ExpertConsensusSummary?
 ) {
+    val strings = LocalStrings.current
+
     if (
         value == null ||
         value.sourceCount <= 0
@@ -1389,7 +1429,7 @@ private fun ExpertConsensusSection(
 
     Text(
         text =
-            "👥 Uzman konsensüsü",
+            strings.raceExpertConsensusTitle,
         color = Ink,
         fontSize = 11.sp,
         fontWeight =
@@ -1409,14 +1449,14 @@ private fun ExpertConsensusSection(
                 Arrangement.spacedBy(5.dp)
         ) {
             AnalyticsChip(
-                "${value.sourceCount} kaynak"
+                strings.raceExpertSourcesCount(value.sourceCount)
             )
 
             if (
                 value.favoriteCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.favoriteCount} favori (%${value.favoriteScore.roundToInt()})",
+                    "${strings.raceExpertFavoriteCount(value.favoriteCount)} (%${value.favoriteScore.roundToInt()})",
                     strong = true
                 )
             }
@@ -1425,7 +1465,7 @@ private fun ExpertConsensusSection(
                 value.bankoCount > 0
             ) {
                 AnalyticsChip(
-                    "⭐ ${value.bankoCount} banko (%${value.bankoScore.roundToInt()})",
+                    "${strings.raceExpertBankoCount(value.bankoCount)} (%${value.bankoScore.roundToInt()})",
                     strong = true
                 )
             }
@@ -1439,7 +1479,8 @@ private fun ExpertConsensusSection(
                 value.strongCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.strongCount} güçlü (%${value.strongScore.roundToInt()})"
+                    strings.raceExpertStrongCount(value.strongCount) +
+                        " (%${value.strongScore.roundToInt()})"
                 )
             }
 
@@ -1447,7 +1488,7 @@ private fun ExpertConsensusSection(
                 value.starCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.starCount} yıldız (%${value.starScore.roundToInt()})"
+                    strings.raceStarTag(value.starCount, value.starScore.roundToInt())
                 )
             }
 
@@ -1455,7 +1496,7 @@ private fun ExpertConsensusSection(
                 value.rivalCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.rivalCount} rakip (%${value.rivalScore.roundToInt()})"
+                    strings.raceRivalTag(value.rivalCount, value.rivalScore.roundToInt())
                 )
             }
 
@@ -1463,7 +1504,7 @@ private fun ExpertConsensusSection(
                 value.surpriseCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.surpriseCount} sürpriz (%${value.surpriseScore.roundToInt()})"
+                    strings.raceSurpriseTag(value.surpriseCount, value.surpriseScore.roundToInt())
                 )
             }
 
@@ -1471,7 +1512,7 @@ private fun ExpertConsensusSection(
                 value.avoidCount > 0
             ) {
                 AnalyticsChip(
-                    "${value.avoidCount} olumsuz (%${value.avoidScore.roundToInt()})",
+                    strings.raceAvoidTag(value.avoidCount, value.avoidScore.roundToInt()),
                     danger = true
                 )
             }
@@ -1498,16 +1539,14 @@ private fun ExpertConsensusSection(
         )
 
         ScoreProgress(
-            title = "Uzman skoru",
+            title = strings.raceExpertScoreTitle,
             score = it,
             subtitle =
                 value.supportConfidence
                     ?.let { confidence ->
-                        "Destek güveni ${
-                            "%.1f".format(
-                                confidence * 100
-                            )
-                        }%"
+                        strings.raceSupportConfidence(
+                            "%.1f".format(confidence * 100)
+                        )
                     }
         )
     }
@@ -1517,6 +1556,8 @@ private fun ExpertConsensusSection(
 private fun MarketSection(
     value: MarketMovement?
 ) {
+    val strings = LocalStrings.current
+
     if (value == null) {
         return
     }
@@ -1587,7 +1628,7 @@ private fun MarketSection(
         ) {
             Text(
                 text =
-                    "📈 Piyasa hareketi",
+                    strings.raceMarketMoveTitle,
                 color = Ink,
                 fontSize = 11.sp,
                 fontWeight =
@@ -1605,13 +1646,13 @@ private fun MarketSection(
 
                         value.firstAgf?.let {
                             append(
-                                " · ilk %${"%.1f".format(it)}"
+                                " · ${strings.raceMarketFirst("%.1f".format(it))}"
                             )
                         }
 
                         value.latestAgf?.let {
                             append(
-                                " → %${"%.1f".format(it)}"
+                                " ${strings.raceMarketTo("%.1f".format(it))}"
                             )
                         }
 
@@ -1619,7 +1660,7 @@ private fun MarketSection(
                             value.sampleSize > 0
                         ) {
                             append(
-                                " · ${value.sampleSize} ölçüm"
+                                " · ${strings.raceMarketSamples(value.sampleSize)}"
                             )
                         }
                     },
@@ -1637,7 +1678,7 @@ private fun MarketSection(
 
         ScoreProgress(
             title =
-                "Piyasa skoru",
+                strings.raceMarketScoreTitle,
             score = it
         )
     }
@@ -1647,6 +1688,8 @@ private fun MarketSection(
 private fun FieldSection(
     value: FieldSignal?
 ) {
+    val strings = LocalStrings.current
+
     if (value == null) {
         return
     }
@@ -1656,7 +1699,7 @@ private fun FieldSection(
     )
 
     Text(
-        text = "🏇 Saha sinyali",
+        text = strings.raceFieldSignalTitle,
         color = Ink,
         fontSize = 11.sp,
         fontWeight =
@@ -1670,13 +1713,13 @@ private fun FieldSection(
 
         ScoreProgress(
             title =
-                "Birleşik saha",
+                strings.raceFieldCombinedTitle,
             score = it,
             subtitle =
                 buildString {
                     value.tjkScore?.let {
                         append(
-                            "TJK ${"%.1f".format(it)}"
+                            strings.raceFieldTjk("%.1f".format(it))
                         )
                     }
 
@@ -1686,7 +1729,7 @@ private fun FieldSection(
                         }
 
                         append(
-                            "Uzman ${"%.1f".format(it)}"
+                            strings.raceFieldExpert("%.1f".format(it))
                         )
                     }
 
@@ -1694,7 +1737,7 @@ private fun FieldSection(
                         value.tjkSampleSize > 0
                     ) {
                         append(
-                            " · ${value.tjkSampleSize} örnek"
+                            " · ${strings.raceFieldSamples(value.tjkSampleSize)}"
                         )
                     }
                 }
@@ -1706,6 +1749,8 @@ private fun FieldSection(
 private fun LearningSection(
     horse: Horse
 ) {
+    val strings = LocalStrings.current
+
     val base =
         horse.baseScore
 
@@ -1732,7 +1777,7 @@ private fun LearningSection(
             Modifier.padding(10.dp)
         ) {
             Text(
-                text = "🧠 Learning etkisi",
+                text = strings.raceLearningEffectTitle,
                 color = Green,
                 fontSize = 10.sp,
                 fontWeight =
@@ -1744,7 +1789,7 @@ private fun LearningSection(
                     buildString {
                         base?.let {
                             append(
-                                "Base ${"%.1f".format(it)}"
+                                strings.raceLearningBase("%.1f".format(it))
                             )
                         }
 
@@ -1754,7 +1799,7 @@ private fun LearningSection(
                             }
 
                             append(
-                                "Final ${"%.1f".format(it)}"
+                                strings.raceLearningFinal("%.1f".format(it))
                             )
                         }
 
@@ -1782,6 +1827,8 @@ private fun LearningSection(
 private fun DeepAnalysisCard(
     horse: Horse
 ) {
+    val strings = LocalStrings.current
+
     Card(
         colors =
             CardDefaults.cardColors(
@@ -1798,7 +1845,7 @@ private fun DeepAnalysisCard(
         ) {
             Text(
                 text =
-                    "Modelin derin görünümü",
+                    strings.raceDeepViewTitle,
                 color = Ink,
                 fontSize = 14.sp,
                 fontWeight =
@@ -1826,11 +1873,9 @@ private fun DeepAnalysisCard(
                         score =
                             it.score,
                         subtitle =
-                            "Etkin ağırlık ${
-                                "%.1f".format(
-                                    it.effectiveWeight
-                                )
-                            }"
+                            strings.raceWeightEffectiveOnly(
+                                "%.1f".format(it.effectiveWeight)
+                            )
                     )
 
                     Spacer(

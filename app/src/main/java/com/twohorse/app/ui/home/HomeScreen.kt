@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
 import com.twohorse.app.ui.components.NextRaceHero
@@ -62,6 +63,7 @@ fun HomeScreen(
     onAccountClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val strings = LocalStrings.current
 
     val repository =
         remember {
@@ -230,9 +232,7 @@ fun HomeScreen(
                 }
             }
             .onFailure {
-                error =
-                    it.message
-                        ?: "Veri alınamadı"
+                error = it.message
 
                 showingStaleData =
                     data != null
@@ -334,7 +334,7 @@ fun HomeScreen(
                             horizontal = 18.dp
                         ),
                     text =
-                        "Yenileme başarısız. Son başarılı veri gösteriliyor.",
+                        strings.homeRefreshFailedStale,
                     color =
                         Muted,
                     fontSize =
@@ -360,7 +360,7 @@ fun HomeScreen(
                     item {
                         CityChip(
                             city =
-                                "Tümü",
+                                strings.homeAllCities,
                             selected =
                                 selectedCity == null,
                             onClick = {
@@ -414,7 +414,7 @@ fun HomeScreen(
                     EmptyRaceState(
                         message =
                             error
-                                ?: "Veri alınamadı"
+                                ?: strings.homeDataFetchFailed
                     )
 
                     Button(
@@ -428,7 +428,7 @@ fun HomeScreen(
                     ) {
                         Text(
                             text =
-                                "Tekrar Dene"
+                                strings.homeRetryButton
                         )
                     }
                 }
@@ -439,7 +439,7 @@ fun HomeScreen(
             item {
                 EmptyRaceState(
                     message =
-                        "Gösterilecek yarış bulunamadı"
+                        strings.homeNoRacesToShow
                 )
             }
         } else {
@@ -510,7 +510,7 @@ fun HomeScreen(
                     ) {
                         Text(
                             text =
-                                "Yaklaşan koşular",
+                                strings.homeUpcomingRacesTitle,
                             color = Ink,
                             fontSize = 19.sp,
                             fontWeight =
@@ -519,7 +519,7 @@ fun HomeScreen(
 
                         Text(
                             text =
-                                "Sıradaki program özeti",
+                                strings.homeUpcomingRacesSubtitle,
                             color = Muted,
                             fontSize = 11.sp
                         )
@@ -680,6 +680,7 @@ private fun displayRaceTime(
         }
 }
 
+@Composable
 private fun countdownText(
     race: Race,
     nowMillis: Long
@@ -704,7 +705,7 @@ private fun countdownText(
     if (
         seconds <= 0
     ) {
-        return "Başlıyor"
+        return LocalStrings.current.startingSoon
     }
 
     val hours =
@@ -740,6 +741,8 @@ private fun countdownText(
 
 @Composable
 private fun HomeLoadingSkeleton() {
+    val strings = LocalStrings.current
+
     Column(
         modifier =
             Modifier
@@ -768,7 +771,7 @@ private fun HomeLoadingSkeleton() {
 
         Text(
             text =
-                "Bugünün yarışları hazırlanıyor",
+                strings.homeRacesPreparing,
             color = Muted,
             fontSize = 11.sp
         )

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.twohorse.app.R
 import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.theme.*
 
 @Composable
@@ -39,6 +40,7 @@ fun TwoHorseHeader(
     onHistory: () -> Unit,
     onAccount: () -> Unit = {}
 ) {
+    val strings = LocalStrings.current
     val compact =
         isCompactScreen()
 
@@ -65,7 +67,7 @@ fun TwoHorseHeader(
                         R.drawable.two_horse_logo
                     ),
                 contentDescription =
-                    "Two Horse logosu",
+                    strings.homeLogoDescription,
                 contentScale =
                     ContentScale.Fit,
                 modifier =
@@ -107,9 +109,9 @@ fun TwoHorseHeader(
                 Text(
                     text =
                         if (refreshing)
-                            "Canlı veri güncelleniyor…"
+                            strings.homeLiveUpdating
                         else
-                            "Türkiye yarış analizi",
+                            strings.homeTagline,
                     color = Muted,
                     fontSize = 12.sp,
                     maxLines = 1
@@ -124,7 +126,7 @@ fun TwoHorseHeader(
                 Icon(
                     Icons.Default.AccountCircle,
                     contentDescription =
-                        "Üyelik ve hesap",
+                        strings.homeAccountDescription,
                     tint = Ink
                 )
             }
@@ -137,7 +139,7 @@ fun TwoHorseHeader(
                 Icon(
                     Icons.Default.History,
                     contentDescription =
-                        "Geçmiş yarışları aç",
+                        strings.homeHistoryDescription,
                     tint = Ink
                 )
             }
@@ -151,7 +153,7 @@ fun TwoHorseHeader(
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription =
-                        "Yarış verisini yenile",
+                        strings.homeRefreshDescription,
                     tint =
                         if (refreshing)
                             Muted
@@ -219,6 +221,7 @@ fun NextRaceHero(
     countdown: String,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
     val compact =
         isCompactScreen()
 
@@ -252,7 +255,7 @@ fun NextRaceHero(
                 ) {
                     Text(
                         text =
-                            "$countdown KALDI",
+                            "$countdown ${strings.homeCountdownKaldi}",
                         modifier =
                             Modifier.padding(
                                 horizontal = 11.dp,
@@ -286,7 +289,7 @@ fun NextRaceHero(
             )
 
             Text(
-                text = "Sıradaki yarış",
+                text = strings.homeNextRaceLabel,
                 color =
                     Color.White.copy(
                         alpha = 0.58f
@@ -298,7 +301,7 @@ fun NextRaceHero(
 
             Text(
                 text =
-                    "${race.city} · ${race.number}. Koşu",
+                    strings.raceCityAndNumber(race.city, race.number),
                 color = Color.White,
                 fontSize =
                     if (compact)
@@ -377,7 +380,7 @@ fun NextRaceHero(
                     ) {
                         Text(
                             text =
-                                "MODEL FAVORİSİ",
+                                strings.homeModelFavorite,
                             color =
                                 Color.White.copy(
                                     alpha = 0.56f
@@ -441,7 +444,7 @@ fun NextRaceHero(
                     RoundedCornerShape(15.dp)
             ) {
                 Text(
-                    text = "Analizi aç",
+                    text = strings.homeOpenAnalysis,
                     fontWeight =
                         FontWeight.Black
                 )
@@ -456,6 +459,7 @@ fun UpcomingRaceCard(
     time: String,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
     val compact =
         isCompactScreen()
 
@@ -509,7 +513,7 @@ fun UpcomingRaceCard(
 
                 Text(
                     text =
-                        "${race.number}. Koşu",
+                        strings.homeCourseNumber(race.number),
                     color = Green,
                     fontSize = 10.sp,
                     fontWeight =
@@ -534,7 +538,7 @@ fun UpcomingRaceCard(
             ) {
                 Text(
                     text =
-                        "${race.city} · ${race.number}. Koşu",
+                        strings.raceCityAndNumber(race.city, race.number),
                     color = Ink,
                     fontSize = 14.sp,
                     fontWeight =
@@ -553,7 +557,7 @@ fun UpcomingRaceCard(
                 favorite?.let {
                     Text(
                         text =
-                            "Favori: #${it.number} ${it.name}",
+                            strings.homeFavoritePrefix(it.number, it.name),
                         color = Green,
                         fontSize = 11.sp,
                         fontWeight =
@@ -568,7 +572,7 @@ fun UpcomingRaceCard(
             Icon(
                 Icons.Default.KeyboardArrowRight,
                 contentDescription =
-                    "Yarış analizini aç",
+                    strings.homeOpenRaceAnalysis,
                 tint = Muted
             )
         }
@@ -582,6 +586,8 @@ fun RaceCard(
     time: String,
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     val ranked =
         rankedHorses(race)
 
@@ -625,7 +631,7 @@ fun RaceCard(
                 ) {
                     Text(
                         text =
-                            "${race.city} · ${race.number}. KOŞU",
+                            strings.homeCourseNumberCaps(race.number).let { "${race.city} · $it" },
                         modifier =
                             Modifier.padding(
                                 horizontal = 9.dp,
@@ -718,7 +724,7 @@ fun RaceCard(
                     ) {
                         Text(
                             text =
-                                "MODEL FAVORİSİ",
+                                strings.homeModelFavorite,
                             color = Muted,
                             fontSize = 10.sp,
                             fontWeight =
@@ -758,7 +764,7 @@ fun RaceCard(
 
                     Text(
                         text =
-                            "💣 Sürpriz  #${horse.number} ${horse.name}",
+                            strings.homeSurprisePrefix(horse.number, horse.name),
                         color = Red,
                         fontSize = 12.sp,
                         fontWeight =
@@ -779,6 +785,8 @@ fun RemainingRacesToggle(
     expanded: Boolean,
     onToggle: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier
@@ -810,7 +818,7 @@ fun RemainingRacesToggle(
             ) {
                 Text(
                     text =
-                        "Diğer kalan koşular",
+                        strings.homeOtherRemainingRaces,
                     color = Ink,
                     fontSize = 14.sp,
                     fontWeight =
@@ -819,7 +827,7 @@ fun RemainingRacesToggle(
 
                 Text(
                     text =
-                        "$count yaklaşan koşu",
+                        strings.homeUpcomingCount(count),
                     color = Muted,
                     fontSize = 11.sp
                 )
@@ -832,9 +840,9 @@ fun RemainingRacesToggle(
                     Icons.Default.KeyboardArrowDown,
                 contentDescription =
                     if (expanded)
-                        "Diğer yarışları kapat"
+                        strings.homeCloseOtherRaces
                     else
-                        "Diğer yarışları aç",
+                        strings.homeOpenOtherRaces,
                 tint = Ink
             )
         }
@@ -845,6 +853,8 @@ fun RemainingRacesToggle(
 fun SixFoldEntryCard(
     onClick: () -> Unit
 ) {
+    val strings = LocalStrings.current
+
     Card(
         modifier =
             Modifier
@@ -887,7 +897,7 @@ fun SixFoldEntryCard(
                         .padding(start = 13.dp)
             ) {
                 Text(
-                    text = "Altılı Kupon",
+                    text = strings.homeSixfoldTitle,
                     color = Ink,
                     fontSize = 16.sp,
                     fontWeight =
@@ -896,7 +906,7 @@ fun SixFoldEntryCard(
 
                 Text(
                     text =
-                        "Bütçene göre optimize edilmiş kupon",
+                        strings.homeSixfoldSubtitle,
                     color = Muted,
                     fontSize = 12.sp
                 )
@@ -905,7 +915,7 @@ fun SixFoldEntryCard(
             Icon(
                 Icons.Default.KeyboardArrowRight,
                 contentDescription =
-                    "Altılı kupon ekranını aç",
+                    strings.homeOpenSixfold,
                 tint = Gold
             )
         }
@@ -988,12 +998,15 @@ private fun rankedHorses(
                 }
         )
 
+@Composable
 private fun favoriteSummary(
     horse: Horse
-): String =
-    buildList {
+): String {
+    val strings = LocalStrings.current
+
+    return buildList {
         horse.agfPercent?.let {
-            add("AGF %${"%.1f".format(it)}")
+            add(strings.homeAgf("%.1f".format(it)))
         }
 
         horse.expertConsensus
@@ -1002,22 +1015,26 @@ private fun favoriteSummary(
                 it > 0
             }
             ?.let {
-                add("Uzman $it kaynak")
+                add(strings.homeExpertSourceLabel(it))
             }
 
         horse.hp?.let {
-            add("HP $it")
+            add(strings.homeHpLabel(it))
         }
     }
         .joinToString(" · ")
         .ifBlank {
-            "Model lideri"
+            strings.homeFavoriteSummaryFallback
         }
+}
 
+@Composable
 private fun raceMeta(
     race: Race
-): String =
-    listOf(
+): String {
+    val strings = LocalStrings.current
+
+    return listOf(
         race.distance
             .takeIf {
                 it.isNotBlank()
@@ -1030,8 +1047,9 @@ private fun raceMeta(
         .filterNotNull()
         .joinToString(" · ")
         .ifBlank {
-            "Koşu bilgisi"
+            strings.raceInfoFallback
         }
+}
 
 private fun raceTime(
     race: Race
