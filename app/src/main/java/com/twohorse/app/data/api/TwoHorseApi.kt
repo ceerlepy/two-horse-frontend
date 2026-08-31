@@ -1175,6 +1175,11 @@ class TwoHorseApi(
                     "profile"
                 ),
 
+            budgetTl =
+                json.optDouble(
+                    "budgetTl"
+                ),
+
             totalTl =
                 json.optDouble(
                     "totalTl"

@@ -125,6 +125,7 @@ data class CouponLeg(
 
 data class Coupon(
     val profile: String,
+    val budgetTl: Double,
     val totalTl: Double,
     val combinations: Long,
     val estimatedSurvivalProbability: Double?,
