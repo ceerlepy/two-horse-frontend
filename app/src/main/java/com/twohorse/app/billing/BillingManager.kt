@@ -117,7 +117,7 @@ class BillingManager(
             client.queryProductDetailsAsync(params) { _, result ->
                 if (cont.isActive) {
                     cont.resume(
-                        result.productDetailsList
+                        result
                     )
                 }
             }
