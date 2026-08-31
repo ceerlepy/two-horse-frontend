@@ -19,7 +19,7 @@ grep -q '/api/coupons/generate' "$API_FILE"
 
 grep -q 'Scaffold' "$COUPON_FILE"
 grep -q 'bottomBar' "$COUPON_FILE"
-grep -q 'couponErrorMessage' "$COUPON_FILE"
+grep -q 'couponErrorFromThrowable' "$COUPON_FILE"
 
 grep -q 'modelScore' README.md
 grep -q 'GET /api/today' README.md
