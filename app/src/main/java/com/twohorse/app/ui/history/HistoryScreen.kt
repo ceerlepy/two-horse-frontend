@@ -94,9 +94,7 @@ fun HistoryScreen(
                 history = it
             }
             .onFailure {
-                error =
-                    it.message
-                        ?: strings.historyFetchFailed
+                error = it.message
             }
 
         loading = false

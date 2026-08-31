@@ -33,6 +33,11 @@ import com.twohorse.app.ui.theme.*
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
+private sealed interface RaceDetailError {
+    data object NotFoundInProgram : RaceDetailError
+    data object RefreshFailed : RaceDetailError
+}
+
 @Composable
 fun RaceDetailScreen(
     race: Race,
@@ -72,7 +77,7 @@ fun RaceDetailScreen(
 
     var error by
         remember {
-            mutableStateOf<String?>(null)
+            mutableStateOf<RaceDetailError?>(null)
         }
 
     var refreshKey by
@@ -117,12 +122,12 @@ fun RaceDetailScreen(
                     currentRace = fresh
                 } else {
                     error =
-                        strings.raceNotFoundInProgram
+                        RaceDetailError.NotFoundInProgram
                 }
             }
             .onFailure {
                 error =
-                    strings.raceRefreshFailed
+                    RaceDetailError.RefreshFailed
             }
 
         refreshing = false
@@ -176,10 +181,17 @@ fun RaceDetailScreen(
             )
         }
 
-        error?.let {
+        error?.let { raceError ->
             item {
                 Notice(
-                    text = it
+                    text =
+                        when (raceError) {
+                            RaceDetailError.NotFoundInProgram ->
+                                strings.raceNotFoundInProgram
+
+                            RaceDetailError.RefreshFailed ->
+                                strings.raceRefreshFailed
+                        }
                 )
             }
         }

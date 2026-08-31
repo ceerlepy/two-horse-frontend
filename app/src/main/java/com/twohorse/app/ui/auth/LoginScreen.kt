@@ -39,28 +39,65 @@ import com.twohorse.app.i18n.Strings
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
 
-private fun loginErrorMessage(
-    throwable: Throwable,
+private sealed interface LoginError {
+    data object InvalidCredentials : LoginError
+    data object EmailPasswordRequired : LoginError
+    data object EmailNotVerified : LoginError
+    data object NotConfigured : LoginError
+    data object Generic : LoginError
+    data object GoogleIncomplete : LoginError
+    data class GoogleFailed(val code: Int) : LoginError
+}
+
+@Composable
+private fun loginErrorText(
+    error: LoginError,
     strings: Strings
-): String {
+): String =
+    when (error) {
+        LoginError.InvalidCredentials ->
+            strings.loginErrorInvalidCredentials
+
+        LoginError.EmailPasswordRequired ->
+            strings.loginErrorEmailPasswordRequired
+
+        LoginError.EmailNotVerified ->
+            strings.loginErrorEmailNotVerified
+
+        LoginError.NotConfigured ->
+            strings.loginErrorNotConfigured
+
+        LoginError.Generic ->
+            strings.loginErrorGeneric
+
+        LoginError.GoogleIncomplete ->
+            strings.loginErrorGoogleIncomplete
+
+        is LoginError.GoogleFailed ->
+            strings.loginErrorGoogleFailed(error.code)
+    }
+
+private fun loginErrorFromThrowable(
+    throwable: Throwable
+): LoginError {
     val api = throwable as? TwoHorseApiException
 
     return when (api?.apiCode) {
         "INVALID_CREDENTIALS" ->
-            strings.loginErrorInvalidCredentials
+            LoginError.InvalidCredentials
 
         "EMAIL_AND_PASSWORD_REQUIRED" ->
-            strings.loginErrorEmailPasswordRequired
+            LoginError.EmailPasswordRequired
 
         "GOOGLE_EMAIL_NOT_VERIFIED" ->
-            strings.loginErrorEmailNotVerified
+            LoginError.EmailNotVerified
 
         "GOOGLE_CLIENT_ID_NOT_CONFIGURED",
         "SESSION_JWT_SECRET_NOT_CONFIGURED" ->
-            strings.loginErrorNotConfigured
+            LoginError.NotConfigured
 
         else ->
-            strings.loginErrorGeneric
+            LoginError.Generic
     }
 }
 
@@ -76,7 +113,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<LoginError?>(null) }
 
     val googleSignInClient =
         remember {
@@ -118,7 +155,7 @@ fun LoginScreen(
 
                 if (idToken == null) {
                     error =
-                        strings.loginErrorGoogleIncomplete
+                        LoginError.GoogleIncomplete
 
                     return@rememberLauncherForActivityResult
                 }
@@ -138,15 +175,14 @@ fun LoginScreen(
                         .onFailure { throwable ->
                             loading = false
                             error =
-                                loginErrorMessage(
-                                    throwable,
-                                    strings
+                                loginErrorFromThrowable(
+                                    throwable
                                 )
                         }
                 }
             } catch (e: ApiException) {
                 error =
-                    strings.loginErrorGoogleFailed(
+                    LoginError.GoogleFailed(
                         e.statusCode
                     )
             }
@@ -160,7 +196,7 @@ fun LoginScreen(
             password.isBlank()
         ) {
             error =
-                strings.loginErrorEmailPasswordRequired
+                LoginError.EmailPasswordRequired
 
             return
         }
@@ -181,9 +217,8 @@ fun LoginScreen(
                 .onFailure { throwable ->
                     loading = false
                     error =
-                        loginErrorMessage(
-                            throwable,
-                            strings
+                        loginErrorFromThrowable(
+                            throwable
                         )
                 }
         }
@@ -320,7 +355,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                error?.let { message ->
+                error?.let { loginError ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
@@ -330,7 +365,7 @@ fun LoginScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = message,
+                            text = loginErrorText(loginError, strings),
                             modifier = Modifier.padding(12.dp),
                             color = Red,
                             fontSize = 12.sp,

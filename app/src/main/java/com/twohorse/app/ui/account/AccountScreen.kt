@@ -37,6 +37,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+private sealed interface AccountMessage {
+    data class PurchaseActivated(val tier: String) : AccountMessage
+    data object PurchaseVerifyFailed : AccountMessage
+}
+
 private fun formatIsoDate(
     value: String?,
     language: Language
@@ -91,7 +96,7 @@ fun AccountScreen(
         remember { mutableStateOf(false) }
 
     var message by
-        remember { mutableStateOf<String?>(null) }
+        remember { mutableStateOf<AccountMessage?>(null) }
 
     LaunchedEffect(Unit) {
         repository.me()
@@ -146,13 +151,11 @@ fun AccountScreen(
                     }
 
                     message =
-                        strings.accountPurchaseActivated(
-                            strings.accountTierTitle(updated.tier)
-                        )
+                        AccountMessage.PurchaseActivated(updated.tier)
                 }
                 .onFailure {
                     message =
-                        strings.accountPurchaseVerifyFailed
+                        AccountMessage.PurchaseVerifyFailed
                 }
 
             purchaseInFlight = false
@@ -212,7 +215,18 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                message?.let {
+                message?.let { msg ->
+                    val messageText =
+                        when (msg) {
+                            is AccountMessage.PurchaseActivated ->
+                                strings.accountPurchaseActivated(
+                                    strings.accountTierTitle(msg.tier)
+                                )
+
+                            AccountMessage.PurchaseVerifyFailed ->
+                                strings.accountPurchaseVerifyFailed
+                        }
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
@@ -222,7 +236,7 @@ fun AccountScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = it,
+                            text = messageText,
                             modifier = Modifier.padding(12.dp),
                             color = Green,
                             fontSize = 12.sp,

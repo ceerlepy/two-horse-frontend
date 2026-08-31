@@ -232,9 +232,7 @@ fun HomeScreen(
                 }
             }
             .onFailure {
-                error =
-                    it.message
-                        ?: strings.homeDataFetchFailed
+                error = it.message
 
                 showingStaleData =
                     data != null

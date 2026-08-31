@@ -141,7 +141,7 @@ fun CouponScreen(
 
     var error by
         remember {
-            mutableStateOf<String?>(null)
+            mutableStateOf<CouponError?>(null)
         }
 
     var requestVersion by
@@ -217,7 +217,7 @@ fun CouponScreen(
             requestCity.isBlank()
         ) {
             error =
-                strings.couponCitySelectFailed
+                CouponError.CitySelectFailed
 
             return
         }
@@ -296,7 +296,7 @@ fun CouponScreen(
                             null
 
                         error =
-                            strings.couponUnexpectedWindow
+                            CouponError.UnexpectedWindow
                     }
 
                     !budgetMatches ||
@@ -305,7 +305,7 @@ fun CouponScreen(
                             null
 
                         error =
-                            strings.couponBudgetExceeded
+                            CouponError.BudgetExceeded
                     }
 
                     else -> {
@@ -340,9 +340,8 @@ fun CouponScreen(
                         null
 
                     error =
-                        couponErrorMessage(
-                            throwable,
-                            strings
+                        couponErrorFromThrowable(
+                            throwable
                         )
                 }
             }
@@ -682,10 +681,10 @@ fun CouponScreen(
             }
         }
 
-        error?.let { message ->
+        error?.let { couponError ->
             item {
                 ErrorCard(
-                    message = message
+                    message = couponErrorText(couponError, strings)
                 )
             }
         }
