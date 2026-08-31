@@ -4,14 +4,27 @@ import com.twohorse.app.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
+private val JSON_MEDIA_TYPE =
+    "application/json; charset=utf-8".toMediaType()
+
 class TwoHorseApi(
     private val baseUrl: String =
-        "https://two-horse-backend.veyseltosun-vt.workers.dev"
+        "https://two-horse-backend.veyseltosun-vt.workers.dev",
+
+    /*
+     * Supplies the current session token (if any) for every
+     * outgoing request. A plain lambda instead of a hard dependency
+     * on SessionStore keeps this class free of an Android Context.
+     */
+    private val tokenProvider: () -> String? =
+        { null }
 ) {
     private val client =
         OkHttpClient.Builder()
@@ -28,6 +41,27 @@ class TwoHorseApi(
                 TimeUnit.SECONDS
             )
             .retryOnConnectionFailure(true)
+            .addInterceptor { chain ->
+                val token =
+                    tokenProvider()
+
+                val request =
+                    if (token != null) {
+                        chain.request()
+                            .newBuilder()
+                            .addHeader(
+                                "authorization",
+                                "Bearer $token"
+                            )
+                            .build()
+                    } else {
+                        chain.request()
+                    }
+
+                chain.proceed(
+                    request
+                )
+            }
             .build()
 
     suspend fun getToday(): TodayData =
@@ -460,6 +494,192 @@ class TwoHorseApi(
                 }
             }
         }
+
+    data class AuthResult(
+        val token: String,
+        val user: MembershipUser
+    )
+
+    suspend fun authGoogle(
+        idToken: String
+    ): AuthResult =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/auth/google"
+                        )
+                        .post(
+                            JSONObject()
+                                .put(
+                                    "idToken",
+                                    idToken
+                                )
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            AuthResult(
+                token =
+                    json.getString(
+                        "token"
+                    ),
+
+                user =
+                    parseMembershipUser(
+                        json.getJSONObject(
+                            "user"
+                        )
+                    )
+            )
+        }
+
+    suspend fun authPassword(
+        email: String,
+        password: String
+    ): AuthResult =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/auth/login"
+                        )
+                        .post(
+                            JSONObject()
+                                .put(
+                                    "email",
+                                    email
+                                )
+                                .put(
+                                    "password",
+                                    password
+                                )
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            AuthResult(
+                token =
+                    json.getString(
+                        "token"
+                    ),
+
+                user =
+                    parseMembershipUser(
+                        json.getJSONObject(
+                            "user"
+                        )
+                    )
+            )
+        }
+
+    suspend fun authMe(): MembershipUser =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                getJson(
+                    "/api/auth/me"
+                )
+
+            parseMembershipUser(
+                json.getJSONObject(
+                    "user"
+                )
+            )
+        }
+
+    suspend fun verifyPurchase(
+        productId: String,
+        purchaseToken: String
+    ): MembershipUser =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/billing/verify-purchase"
+                        )
+                        .post(
+                            JSONObject()
+                                .put(
+                                    "productId",
+                                    productId
+                                )
+                                .put(
+                                    "purchaseToken",
+                                    purchaseToken
+                                )
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            parseMembershipUser(
+                json.getJSONObject(
+                    "user"
+                )
+            )
+        }
+
+    private fun parseMembershipUser(
+        json: JSONObject
+    ): MembershipUser =
+        MembershipUser(
+            id =
+                json.getString(
+                    "id"
+                ),
+
+            email =
+                json.getString(
+                    "email"
+                ),
+
+            displayName =
+                json.firstString(
+                    "displayName"
+                ),
+
+            tier =
+                json.getString(
+                    "tier"
+                ),
+
+            tierSource =
+                json.getString(
+                    "tierSource"
+                ),
+
+            trialEndsAt =
+                json.firstString(
+                    "trialEndsAt"
+                ),
+
+            subscriptionExpiresAt =
+                json.firstString(
+                    "subscriptionExpiresAt"
+                )
+        )
 
     private fun getJson(
         path: String

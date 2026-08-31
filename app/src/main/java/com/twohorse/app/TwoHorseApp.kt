@@ -1,21 +1,39 @@
 package com.twohorse.app
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.HistoryRace
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.ui.account.AccountScreen
+import com.twohorse.app.ui.auth.LoginScreen
 import com.twohorse.app.ui.coupons.CouponScreen
 import com.twohorse.app.ui.history.HistoryDetailScreen
 import com.twohorse.app.ui.history.HistoryScreen
 import com.twohorse.app.ui.home.HomeScreen
 import com.twohorse.app.ui.race.RaceDetailScreen
 import com.twohorse.app.ui.theme.Bg
+import com.twohorse.app.ui.theme.Green
 
 private sealed interface AppScreen {
+    data object Loading :
+        AppScreen
+
+    data object Login :
+        AppScreen
+
     data object Home :
+        AppScreen
+
+    data object Account :
         AppScreen
 
     data class RaceDetail(
@@ -41,12 +59,43 @@ private sealed interface AppScreen {
 
 @Composable
 fun TwoHorseApp() {
+    val context = LocalContext.current
+
+    val repository =
+        remember {
+            TwoHorseRepository(context)
+        }
+
     var screen by
         remember {
             mutableStateOf<AppScreen>(
-                AppScreen.Home
+                AppScreen.Loading
             )
         }
+
+    var currentUser by
+        remember {
+            mutableStateOf<MembershipUser?>(
+                null
+            )
+        }
+
+    LaunchedEffect(Unit) {
+        if (!repository.hasSession) {
+            screen = AppScreen.Login
+            return@LaunchedEffect
+        }
+
+        repository.me()
+            .onSuccess { user ->
+                currentUser = user
+                screen = AppScreen.Home
+            }
+            .onFailure {
+                repository.logout()
+                screen = AppScreen.Login
+            }
+    }
 
     fun couponBack(
         coupons: AppScreen.Coupons
@@ -63,8 +112,9 @@ fun TwoHorseApp() {
 
     BackHandler(
         enabled =
-            screen !is
-            AppScreen.Home
+            screen !is AppScreen.Home &&
+            screen !is AppScreen.Login &&
+            screen !is AppScreen.Loading
     ) {
         screen =
             when (
@@ -98,6 +148,27 @@ fun TwoHorseApp() {
             val current =
                 screen
         ) {
+            AppScreen.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Green
+                    )
+                }
+            }
+
+            AppScreen.Login -> {
+                LoginScreen(
+                    repository = repository,
+                    onLoginSuccess = { user ->
+                        currentUser = user
+                        screen = AppScreen.Home
+                    }
+                )
+            }
+
             AppScreen.Home -> {
                 HomeScreen(
                     onRaceClick = {
@@ -126,6 +197,28 @@ fun TwoHorseApp() {
                     onHistoryClick = {
                         screen =
                             AppScreen.History
+                    },
+
+                    onAccountClick = {
+                        screen =
+                            AppScreen.Account
+                    }
+                )
+            }
+
+            AppScreen.Account -> {
+                AccountScreen(
+                    repository = repository,
+                    initialUser = currentUser,
+                    onUserUpdated = { user ->
+                        currentUser = user
+                    },
+                    onBack = {
+                        screen = AppScreen.Home
+                    },
+                    onLoggedOut = {
+                        currentUser = null
+                        screen = AppScreen.Login
                     }
                 )
             }
@@ -134,6 +227,9 @@ fun TwoHorseApp() {
                 RaceDetailScreen(
                     race =
                         current.race,
+
+                    currentUser =
+                        currentUser,
 
                     onBack = {
                         screen =
@@ -166,10 +262,17 @@ fun TwoHorseApp() {
                     initialCity =
                         current.selectedCity,
 
+                    currentUser =
+                        currentUser,
+
                     onBack = {
                         couponBack(
                             current
                         )
+                    },
+
+                    onUpgradeClick = {
+                        screen = AppScreen.Account
                     }
                 )
             }

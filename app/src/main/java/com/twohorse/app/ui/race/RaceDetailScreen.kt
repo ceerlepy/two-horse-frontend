@@ -35,14 +35,23 @@ import kotlinx.coroutines.launch
 @Composable
 fun RaceDetailScreen(
     race: Race,
+    currentUser: MembershipUser?,
     onBack: () -> Unit,
     onOpenCoupons: (String) -> Unit
 ) {
     BackHandler(onBack = onBack)
 
+    val canViewVideos =
+        currentUser?.tier == "premium"
+
+    val screenContext =
+        LocalContext.current
+
     val repository =
         remember {
-            TwoHorseRepository()
+            TwoHorseRepository(
+                screenContext
+            )
         }
 
     var currentRace by
@@ -280,7 +289,8 @@ fun RaceDetailScreen(
                         rank = index + 1,
                         raceDate = currentRace.raceDate,
                         city = currentRace.city,
-                        raceNumber = currentRace.number
+                        raceNumber = currentRace.number,
+                        canViewVideos = canViewVideos
                     )
                 }
             }
@@ -934,7 +944,8 @@ private fun HorseCard(
     rank: Int,
     raceDate: String?,
     city: String,
-    raceNumber: Int
+    raceNumber: Int,
+    canViewVideos: Boolean
 ) {
     var expanded by
         remember(
@@ -959,10 +970,11 @@ private fun HorseCard(
             mutableStateOf<List<HorseVideo>>(emptyList())
         }
 
-    val videoRepository =
-        remember { TwoHorseRepository() }
-
     val context = LocalContext.current
+
+    val videoRepository =
+        remember { TwoHorseRepository(context) }
+
     val scope = rememberCoroutineScope()
 
     Card(
@@ -1173,6 +1185,7 @@ private fun HorseCard(
 
                             if (
                                 videoExpanded &&
+                                canViewVideos &&
                                 !videoFetched &&
                                 !videoLoading
                             ) {
@@ -1203,8 +1216,16 @@ private fun HorseCard(
                             PaddingValues(0.dp)
                     ) {
                         Text(
-                            text = "Son 3 yarış videosu",
-                            color = Green,
+                            text =
+                                if (canViewVideos)
+                                    "Son 3 yarış videosu"
+                                else
+                                    "Son 3 yarış videosu 🔒 Premium",
+                            color =
+                                if (canViewVideos)
+                                    Green
+                                else
+                                    Muted,
                             fontSize = 10.sp,
                             fontWeight =
                                 FontWeight.Bold
@@ -1222,7 +1243,14 @@ private fun HorseCard(
                 }
 
                 if (videoExpanded && !videoLoading) {
-                    if (videoFetched && videos.isEmpty()) {
+                    if (!canViewVideos) {
+                        Text(
+                            text =
+                                "At videosu arşivi Premium üyelikte açılır.",
+                            color = Muted,
+                            fontSize = 9.sp
+                        )
+                    } else if (videoFetched && videos.isEmpty()) {
                         Text(
                             text =
                                 "Bu at için oynatılabilir geçmiş yarış videosu bulunamadı.",

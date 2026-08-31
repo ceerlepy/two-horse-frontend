@@ -1,16 +1,88 @@
 package com.twohorse.app.data.repository
 
+import android.content.Context
 import com.twohorse.app.data.api.TwoHorseApi
+import com.twohorse.app.data.auth.SessionStore
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.TodayData
 
 class TwoHorseRepository(
-    private val api:
-        TwoHorseApi =
-        TwoHorseApi()
+    context: Context
 ) {
+    private val sessionStore =
+        SessionStore(
+            context.applicationContext
+        )
+
+    private val api =
+        TwoHorseApi(
+            tokenProvider = {
+                sessionStore.getToken()
+            }
+        )
+
+    val hasSession: Boolean
+        get() =
+            sessionStore.getToken() != null
+
+    suspend fun loginWithGoogle(
+        idToken: String
+    ): Result<MembershipUser> =
+        runCatching {
+            val result =
+                api.authGoogle(
+                    idToken
+                )
+
+            sessionStore.saveToken(
+                result.token
+            )
+
+            result.user
+        }
+
+    suspend fun loginWithPassword(
+        email: String,
+        password: String
+    ): Result<MembershipUser> =
+        runCatching {
+            val result =
+                api.authPassword(
+                    email,
+                    password
+                )
+
+            sessionStore.saveToken(
+                result.token
+            )
+
+            result.user
+        }
+
+    suspend fun me():
+        Result<MembershipUser> =
+        runCatching {
+            api.authMe()
+        }
+
+    fun logout() {
+        sessionStore.clear()
+    }
+
+    suspend fun verifyPurchase(
+        productId: String,
+        purchaseToken: String
+    ): Result<MembershipUser> =
+        runCatching {
+            api.verifyPurchase(
+                productId,
+                purchaseToken
+            )
+        }
+
     suspend fun today():
         Result<TodayData> =
         runCatching {

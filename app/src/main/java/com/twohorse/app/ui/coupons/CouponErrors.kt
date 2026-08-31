@@ -25,6 +25,15 @@ fun couponErrorMessage(throwable: Throwable): String {
         "NO_USABLE_RUNNERS" ->
             "Kupon oluşturmak için yeterli at verisi bulunamadı."
 
+        "TIER_UPGRADE_REQUIRED" ->
+            "Bu özellik için üyeliğini yükseltmen gerekiyor."
+
+        "TIER_BUDGET_CAP_EXCEEDED" ->
+            "Bu bütçe Gold üyelikte kilitli. Premium'a yükselterek sınırsız bütçe kullanabilirsin."
+
+        "AUTH_REQUIRED" ->
+            "Oturumun sona ermiş olabilir, tekrar giriş yap."
+
         else -> when {
             api?.statusCode == 404 ->
                 "İstenen yarış veya altılı bulunamadı."
