@@ -40,6 +40,7 @@ import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
+import com.twohorse.app.ui.components.ForeignEntryCard
 import com.twohorse.app.ui.components.NextRaceHero
 import com.twohorse.app.ui.components.RaceCard
 import com.twohorse.app.ui.components.RemainingRacesToggle
@@ -60,7 +61,8 @@ fun HomeScreen(
     onRaceClick: (Race) -> Unit,
     onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
     onHistoryClick: () -> Unit = {},
-    onAccountClick: () -> Unit = {}
+    onAccountClick: () -> Unit = {},
+    onForeignClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val strings = LocalStrings.current
@@ -484,6 +486,19 @@ fun HomeScreen(
                                 selectedCity
                             )
                         }
+                    )
+                }
+            }
+
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    ForeignEntryCard(
+                        onClick = onForeignClick
                     )
                 }
             }

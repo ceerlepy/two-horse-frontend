@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -917,6 +918,79 @@ fun SixFoldEntryCard(
                 contentDescription =
                     strings.homeOpenSixfold,
                 tint = Gold
+            )
+        }
+    }
+}
+
+@Composable
+fun ForeignEntryCard(
+    onClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(
+                    onClick = onClick
+                ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    PaleGreen
+            ),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Row(
+            modifier =
+                Modifier.padding(16.dp),
+            verticalAlignment =
+                Alignment.CenterVertically
+        ) {
+            Surface(
+                color = Green,
+                shape =
+                    RoundedCornerShape(14.dp)
+            ) {
+                Icon(
+                    Icons.Default.Public,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier =
+                        Modifier.padding(11.dp)
+                )
+            }
+
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(start = 13.dp)
+            ) {
+                Text(
+                    text = strings.homeForeignTitle,
+                    color = Ink,
+                    fontSize = 16.sp,
+                    fontWeight =
+                        FontWeight.Black
+                )
+
+                Text(
+                    text =
+                        strings.homeForeignSubtitle,
+                    color = Muted,
+                    fontSize = 12.sp
+                )
+            }
+
+            Icon(
+                Icons.Default.KeyboardArrowRight,
+                contentDescription =
+                    strings.homeOpenForeign,
+                tint = Green
             )
         }
     }

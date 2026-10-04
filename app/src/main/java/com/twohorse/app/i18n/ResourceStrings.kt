@@ -415,6 +415,65 @@ object ResourceStrings : Strings {
     override val raceVideoFallbackLabel: String
         @Composable get() = stringResource(R.string.race_video_fallback_label)
 
+    override val homeForeignTitle: String
+        @Composable get() = stringResource(R.string.home_foreign_title)
+
+    override val homeForeignSubtitle: String
+        @Composable get() = stringResource(R.string.home_foreign_subtitle)
+
+    override val homeOpenForeign: String
+        @Composable get() = stringResource(R.string.home_open_foreign)
+
+    override val foreignTitle: String
+        @Composable get() = stringResource(R.string.foreign_title)
+
+    override val foreignSubtitle: String
+        @Composable get() = stringResource(R.string.foreign_subtitle)
+
+    override val foreignEmpty: String
+        @Composable get() = stringResource(R.string.foreign_empty)
+
+    override val foreignLoadFailed: String
+        @Composable get() = stringResource(R.string.foreign_load_failed)
+
+    override val foreignAgfNote: String
+        @Composable get() = stringResource(R.string.foreign_agf_note)
+
+    @Composable
+    override fun foreignRaceTitle(number: String): String =
+        stringResource(R.string.foreign_race_title, number)
+
+    override val foreignBack: String
+        @Composable get() = stringResource(R.string.foreign_back)
+
+    override val raceTrainingTitle: String
+        @Composable get() = stringResource(R.string.race_training_title)
+
+    override val raceTrainingSubtitle: String
+        @Composable get() = stringResource(R.string.race_training_subtitle)
+
+    override val raceTrainingOpen: String
+        @Composable get() = stringResource(R.string.race_training_open)
+
+    override val raceTrainingClose: String
+        @Composable get() = stringResource(R.string.race_training_close)
+
+    override val raceTrainingEmpty: String
+        @Composable get() = stringResource(R.string.race_training_empty)
+
+    override val raceTrainingUnavailable: String
+        @Composable get() = stringResource(R.string.race_training_unavailable)
+
+    override val raceTrainingRetry: String
+        @Composable get() = stringResource(R.string.race_training_retry)
+
+    override val raceTrainingVideo: String
+        @Composable get() = stringResource(R.string.race_training_video)
+
+    @Composable
+    override fun raceTrainingJockey(name: String): String =
+        stringResource(R.string.race_training_jockey, name)
+
     override val raceCloseModelDetail: String
         @Composable get() = stringResource(R.string.race_close_model_detail)
 

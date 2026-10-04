@@ -495,6 +495,309 @@ class TwoHorseApi(
             }
         }
 
+    suspend fun getForeignMeetings(): List<ForeignMeeting> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/foreign"
+                        )
+                        .get()
+                        .build()
+                )
+
+            fun JSONObject.optionalDouble(
+                key: String
+            ): Double? =
+                if (isNull(key) || !has(key)) null
+                else optDouble(key).takeIf { !it.isNaN() }
+
+            fun JSONObject.optionalString(
+                key: String
+            ): String? =
+                if (isNull(key)) null
+                else optString(key).takeIf { it.isNotBlank() }
+
+            val meetingsArray =
+                json.optJSONArray(
+                    "meetings"
+                )
+
+            buildList {
+                if (meetingsArray == null) {
+                    return@buildList
+                }
+
+                for (
+                    m in 0 until
+                    meetingsArray.length()
+                ) {
+                    val meeting =
+                        meetingsArray.getJSONObject(m)
+
+                    val racesArray =
+                        meeting.optJSONArray(
+                            "races"
+                        )
+
+                    val races =
+                        buildList {
+                            if (racesArray == null) {
+                                return@buildList
+                            }
+
+                            for (
+                                r in 0 until
+                                racesArray.length()
+                            ) {
+                                val race =
+                                    racesArray.getJSONObject(r)
+
+                                val runnersArray =
+                                    race.optJSONArray(
+                                        "runners"
+                                    )
+
+                                val runners =
+                                    buildList {
+                                        if (runnersArray == null) {
+                                            return@buildList
+                                        }
+
+                                        for (
+                                            h in 0 until
+                                            runnersArray.length()
+                                        ) {
+                                            val runner =
+                                                runnersArray.getJSONObject(h)
+
+                                            add(
+                                                ForeignRunner(
+                                                    number =
+                                                        runner.optInt(
+                                                            "number"
+                                                        ),
+                                                    name =
+                                                        runner.optString(
+                                                            "name"
+                                                        ),
+                                                    jockey =
+                                                        runner.optionalString(
+                                                            "jockey"
+                                                        ),
+                                                    weight =
+                                                        runner.optionalDouble(
+                                                            "weight"
+                                                        ),
+                                                    agfPercent =
+                                                        runner.optionalDouble(
+                                                            "agfPercent"
+                                                        ),
+                                                    recentForm =
+                                                        runner.optionalString(
+                                                            "recentForm"
+                                                        )
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                add(
+                                    ForeignRace(
+                                        raceNumber =
+                                            race.optInt(
+                                                "raceNumber"
+                                            ),
+                                        time =
+                                            race.optionalString(
+                                                "time"
+                                            ),
+                                        distanceMeters =
+                                            race.optInt(
+                                                "distanceMeters"
+                                            ).takeIf { it > 0 },
+                                        track =
+                                            race.optionalString(
+                                                "track"
+                                            ),
+                                        runners =
+                                            runners
+                                    )
+                                )
+                            }
+                        }
+
+                    add(
+                        ForeignMeeting(
+                            city =
+                                meeting.optString(
+                                    "city"
+                                ),
+                            country =
+                                meeting.optionalString(
+                                    "country"
+                                ),
+                            races =
+                                races
+                        )
+                    )
+                }
+            }
+        }
+
+    suspend fun getRaceTraining(
+        raceDate: String,
+        city: String,
+        raceNumber: Int
+    ): RaceTraining =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val url =
+                (
+                    baseUrl +
+                    "/api/races/training"
+                )
+                    .toHttpUrl()
+                    .newBuilder()
+                    .addQueryParameter(
+                        "raceDate",
+                        raceDate
+                    )
+                    .addQueryParameter(
+                        "city",
+                        city
+                    )
+                    .addQueryParameter(
+                        "raceNumber",
+                        raceNumber.toString()
+                    )
+                    .build()
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()
+                )
+
+            val horsesArray =
+                json.optJSONArray(
+                    "horses"
+                )
+
+            fun JSONObject.nullableString(
+                key: String
+            ): String? =
+                if (isNull(key)) null
+                else optString(key).takeIf { it.isNotBlank() }
+
+            val horses =
+                buildList {
+                    if (horsesArray != null) {
+                        for (
+                            i in 0 until
+                            horsesArray.length()
+                        ) {
+                            val item =
+                                horsesArray.getJSONObject(i)
+
+                            val splitsArray =
+                                item.optJSONArray(
+                                    "splits"
+                                )
+
+                            val splits =
+                                buildList {
+                                    if (splitsArray != null) {
+                                        for (
+                                            j in 0 until
+                                            splitsArray.length()
+                                        ) {
+                                            val split =
+                                                splitsArray.getJSONObject(j)
+
+                                            add(
+                                                TrainingSplit(
+                                                    distanceMeters =
+                                                        split.optInt(
+                                                            "distanceMeters"
+                                                        ),
+                                                    time =
+                                                        split.optString(
+                                                            "time"
+                                                        )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                            add(
+                                HorseTraining(
+                                    horseNumber =
+                                        item.optInt(
+                                            "horseNumber"
+                                        ),
+                                    horseName =
+                                        item.optString(
+                                            "horseName"
+                                        ),
+                                    trainingDate =
+                                        item.nullableString(
+                                            "trainingDate"
+                                        ),
+                                    track =
+                                        item.nullableString(
+                                            "track"
+                                        ),
+                                    trackCondition =
+                                        item.nullableString(
+                                            "trackCondition"
+                                        ),
+                                    trainingType =
+                                        item.nullableString(
+                                            "trainingType"
+                                        ),
+                                    hippodrome =
+                                        item.nullableString(
+                                            "hippodrome"
+                                        ),
+                                    jockey =
+                                        item.nullableString(
+                                            "jockey"
+                                        ),
+                                    splits =
+                                        splits,
+                                    videoUrl =
+                                        item.nullableString(
+                                            "videoUrl"
+                                        )
+                                )
+                            )
+                        }
+                    }
+                }
+
+            RaceTraining(
+                status =
+                    json.optString(
+                        "status",
+                        "unavailable"
+                    ),
+                fetchedAt =
+                    json.nullableString(
+                        "fetchedAt"
+                    ),
+                horses =
+                    horses
+            )
+        }
+
     data class AuthResult(
         val token: String,
         val user: MembershipUser
