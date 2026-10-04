@@ -121,6 +121,16 @@
     <string name="race_video_locked_body">At videosu arşivi Premium üyelikte açılır.</string>
     <string name="race_video_not_found">Bu at için oynatılabilir geçmiş yarış videosu bulunamadı.</string>
     <string name="race_video_fallback_label">Geçmiş yarış</string>
+    <string name="home_foreign_title">Yurt Dışı Koşular</string>
+    <string name="home_foreign_subtitle">İngiltere, Fransa, ABD ve diğer ülkelerde bugünkü TJK koşuları</string>
+    <string name="home_open_foreign">Yurt dışı koşuları aç</string>
+    <string name="foreign_title">Yurt Dışı Koşular</string>
+    <string name="foreign_subtitle">TJK programı ve AGF sırası</string>
+    <string name="foreign_empty">Bugün TJK programında yurt dışı koşu yok.</string>
+    <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
+    <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Yurt dışı koşular için yapay zeka tahmini henüz yok.</string>
+    <string name="foreign_race_title">%1$s. Koşu</string>
+    <string name="foreign_back">Geri</string>
     <string name="race_training_title">İdman Bilgileri</string>
     <string name="race_training_subtitle">Atların TJK\'daki son idman galopları</string>
     <string name="race_training_open">İdman bilgilerini aç</string>

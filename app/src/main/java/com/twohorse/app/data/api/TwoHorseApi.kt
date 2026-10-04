@@ -495,6 +495,159 @@ class TwoHorseApi(
             }
         }
 
+    suspend fun getForeignMeetings(): List<ForeignMeeting> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/foreign"
+                        )
+                        .get()
+                        .build()
+                )
+
+            fun JSONObject.optionalDouble(
+                key: String
+            ): Double? =
+                if (isNull(key) || !has(key)) null
+                else optDouble(key).takeIf { !it.isNaN() }
+
+            fun JSONObject.optionalString(
+                key: String
+            ): String? =
+                if (isNull(key)) null
+                else optString(key).takeIf { it.isNotBlank() }
+
+            val meetingsArray =
+                json.optJSONArray(
+                    "meetings"
+                )
+
+            buildList {
+                if (meetingsArray == null) {
+                    return@buildList
+                }
+
+                for (
+                    m in 0 until
+                    meetingsArray.length()
+                ) {
+                    val meeting =
+                        meetingsArray.getJSONObject(m)
+
+                    val racesArray =
+                        meeting.optJSONArray(
+                            "races"
+                        )
+
+                    val races =
+                        buildList {
+                            if (racesArray == null) {
+                                return@buildList
+                            }
+
+                            for (
+                                r in 0 until
+                                racesArray.length()
+                            ) {
+                                val race =
+                                    racesArray.getJSONObject(r)
+
+                                val runnersArray =
+                                    race.optJSONArray(
+                                        "runners"
+                                    )
+
+                                val runners =
+                                    buildList {
+                                        if (runnersArray == null) {
+                                            return@buildList
+                                        }
+
+                                        for (
+                                            h in 0 until
+                                            runnersArray.length()
+                                        ) {
+                                            val runner =
+                                                runnersArray.getJSONObject(h)
+
+                                            add(
+                                                ForeignRunner(
+                                                    number =
+                                                        runner.optInt(
+                                                            "number"
+                                                        ),
+                                                    name =
+                                                        runner.optString(
+                                                            "name"
+                                                        ),
+                                                    jockey =
+                                                        runner.optionalString(
+                                                            "jockey"
+                                                        ),
+                                                    weight =
+                                                        runner.optionalDouble(
+                                                            "weight"
+                                                        ),
+                                                    agfPercent =
+                                                        runner.optionalDouble(
+                                                            "agfPercent"
+                                                        ),
+                                                    recentForm =
+                                                        runner.optionalString(
+                                                            "recentForm"
+                                                        )
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                add(
+                                    ForeignRace(
+                                        raceNumber =
+                                            race.optInt(
+                                                "raceNumber"
+                                            ),
+                                        time =
+                                            race.optionalString(
+                                                "time"
+                                            ),
+                                        distanceMeters =
+                                            race.optInt(
+                                                "distanceMeters"
+                                            ).takeIf { it > 0 },
+                                        track =
+                                            race.optionalString(
+                                                "track"
+                                            ),
+                                        runners =
+                                            runners
+                                    )
+                                )
+                            }
+                        }
+
+                    add(
+                        ForeignMeeting(
+                            city =
+                                meeting.optString(
+                                    "city"
+                                ),
+                            country =
+                                meeting.optionalString(
+                                    "country"
+                                ),
+                            races =
+                                races
+                        )
+                    )
+                }
+            }
+        }
+
     suspend fun getRaceTraining(
         raceDate: String,
         city: String,

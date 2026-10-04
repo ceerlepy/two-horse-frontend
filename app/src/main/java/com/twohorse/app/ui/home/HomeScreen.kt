@@ -60,7 +60,8 @@ fun HomeScreen(
     onRaceClick: (Race) -> Unit,
     onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
     onHistoryClick: () -> Unit = {},
-    onAccountClick: () -> Unit = {}
+    onAccountClick: () -> Unit = {},
+    onForeignClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val strings = LocalStrings.current
@@ -484,6 +485,19 @@ fun HomeScreen(
                                 selectedCity
                             )
                         }
+                    )
+                }
+            }
+
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    ForeignEntryCard(
+                        onClick = onForeignClick
                     )
                 }
             }

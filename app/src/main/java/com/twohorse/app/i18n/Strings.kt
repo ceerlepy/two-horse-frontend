@@ -272,6 +272,26 @@ interface Strings {
     @get:Composable
     val raceVideoFallbackLabel: String
     @get:Composable
+    val homeForeignTitle: String
+    @get:Composable
+    val homeForeignSubtitle: String
+    @get:Composable
+    val homeOpenForeign: String
+    @get:Composable
+    val foreignTitle: String
+    @get:Composable
+    val foreignSubtitle: String
+    @get:Composable
+    val foreignEmpty: String
+    @get:Composable
+    val foreignLoadFailed: String
+    @get:Composable
+    val foreignAgfNote: String
+    @Composable
+    fun foreignRaceTitle(number: String): String
+    @get:Composable
+    val foreignBack: String
+    @get:Composable
     val raceTrainingTitle: String
     @get:Composable
     val raceTrainingSubtitle: String

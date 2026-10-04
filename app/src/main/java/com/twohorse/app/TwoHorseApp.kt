@@ -18,6 +18,7 @@ import com.twohorse.app.ui.auth.LoginScreen
 import com.twohorse.app.ui.coupons.CouponScreen
 import com.twohorse.app.ui.history.HistoryDetailScreen
 import com.twohorse.app.ui.history.HistoryScreen
+import com.twohorse.app.ui.foreign.ForeignScreen
 import com.twohorse.app.ui.home.HomeScreen
 import com.twohorse.app.ui.race.RaceDetailScreen
 import com.twohorse.app.ui.theme.Bg
@@ -49,6 +50,9 @@ private sealed interface AppScreen {
         AppScreen
 
     data object History :
+        AppScreen
+
+    data object Foreign :
         AppScreen
 
     data class HistoryDetail(
@@ -202,6 +206,20 @@ fun TwoHorseApp() {
                     onAccountClick = {
                         screen =
                             AppScreen.Account
+                    },
+
+                    onForeignClick = {
+                        screen =
+                            AppScreen.Foreign
+                    }
+                )
+            }
+
+            AppScreen.Foreign -> {
+                ForeignScreen(
+                    onBack = {
+                        screen =
+                            AppScreen.Home
                     }
                 )
             }

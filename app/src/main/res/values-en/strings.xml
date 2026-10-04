@@ -121,6 +121,16 @@
     <string name="race_video_locked_body">The horse video archive unlocks with Premium.</string>
     <string name="race_video_not_found">No playable past race video was found for this horse.</string>
     <string name="race_video_fallback_label">Past race</string>
+    <string name="home_foreign_title">Foreign Races</string>
+    <string name="home_foreign_subtitle">Today\'s TJK-listed races in the UK, France, USA and more</string>
+    <string name="home_open_foreign">Open foreign races</string>
+    <string name="foreign_title">Foreign Races</string>
+    <string name="foreign_subtitle">TJK card and AGF order</string>
+    <string name="foreign_empty">There are no foreign races on today\'s TJK card.</string>
+    <string name="foreign_load_failed">Foreign races could not be loaded.</string>
+    <string name="foreign_agf_note">Horses are ordered by AGF. There is no AI prediction for foreign races yet.</string>
+    <string name="foreign_race_title">Race %1$s</string>
+    <string name="foreign_back">Back</string>
     <string name="race_training_title">Training</string>
     <string name="race_training_subtitle">Each horse\'s latest TJK training gallop</string>
     <string name="race_training_open">Open training info</string>

@@ -4,6 +4,7 @@ import android.content.Context
 import com.twohorse.app.data.api.TwoHorseApi
 import com.twohorse.app.data.auth.SessionStore
 import com.twohorse.app.domain.model.CouponResult
+import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.MembershipUser
@@ -116,6 +117,12 @@ class TwoHorseRepository(
                 horseNumber =
                     horseNumber
             )
+        }
+
+    suspend fun foreignMeetings():
+        Result<List<ForeignMeeting>> =
+        runCatching {
+            api.getForeignMeetings()
         }
 
     suspend fun raceTraining(

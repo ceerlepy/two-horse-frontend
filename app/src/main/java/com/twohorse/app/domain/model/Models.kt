@@ -189,6 +189,29 @@ data class RaceTraining(
     val horses: List<HorseTraining>
 )
 
+data class ForeignRunner(
+    val number: Int,
+    val name: String,
+    val jockey: String?,
+    val weight: Double?,
+    val agfPercent: Double?,
+    val recentForm: String?
+)
+
+data class ForeignRace(
+    val raceNumber: Int,
+    val time: String?,
+    val distanceMeters: Int?,
+    val track: String?,
+    val runners: List<ForeignRunner>
+)
+
+data class ForeignMeeting(
+    val city: String,
+    val country: String?,
+    val races: List<ForeignRace>
+)
+
 data class MembershipUser(
     val id: String,
     val email: String,
