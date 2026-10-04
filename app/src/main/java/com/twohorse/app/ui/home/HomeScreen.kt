@@ -40,6 +40,7 @@ import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
+import com.twohorse.app.ui.components.ForeignEntryCard
 import com.twohorse.app.ui.components.NextRaceHero
 import com.twohorse.app.ui.components.RaceCard
 import com.twohorse.app.ui.components.RemainingRacesToggle
