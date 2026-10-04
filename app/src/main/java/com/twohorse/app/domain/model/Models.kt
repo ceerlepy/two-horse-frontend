@@ -164,6 +164,31 @@ data class HorseVideo(
     val url: String
 )
 
+data class TrainingSplit(
+    val distanceMeters: Int,
+    val time: String
+)
+
+data class HorseTraining(
+    val horseNumber: Int,
+    val horseName: String,
+    val trainingDate: String?,
+    val track: String?,
+    val trackCondition: String?,
+    val trainingType: String?,
+    val hippodrome: String?,
+    val jockey: String?,
+    val splits: List<TrainingSplit>,
+    val videoUrl: String?
+)
+
+data class RaceTraining(
+    /* "ready", "empty" or "unavailable" (backend contract). */
+    val status: String,
+    val fetchedAt: String?,
+    val horses: List<HorseTraining>
+)
+
 data class MembershipUser(
     val id: String,
     val email: String,

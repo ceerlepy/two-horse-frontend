@@ -121,6 +121,15 @@
     <string name="race_video_locked_body">The horse video archive unlocks with Premium.</string>
     <string name="race_video_not_found">No playable past race video was found for this horse.</string>
     <string name="race_video_fallback_label">Past race</string>
+    <string name="race_training_title">Training</string>
+    <string name="race_training_subtitle">Each horse\'s latest TJK training gallop</string>
+    <string name="race_training_open">Open training info</string>
+    <string name="race_training_close">Close training info</string>
+    <string name="race_training_empty">TJK has no training record for this race.</string>
+    <string name="race_training_unavailable">Training info could not be loaded right now. Please try again shortly.</string>
+    <string name="race_training_retry">Try again</string>
+    <string name="race_training_video">Training video</string>
+    <string name="race_training_jockey">Training jockey: %1$s</string>
     <string name="race_close_model_detail">Close model detail</string>
     <string name="race_open_model_detail">Open model detail</string>
     <string name="race_score_components">Score components</string>

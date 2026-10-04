@@ -88,6 +88,11 @@ Frontend geçmiş yarışları bugünkü modelle yeniden hesaplamaz.
 GET /api/today
 GET /api/history
 GET /api/coupons/generate
+GET /api/races/training
+
+`/api/races/training?raceDate&city&raceNumber` yarış detayındaki "İdman Bilgileri"
+bölümünü besler: her atın TJK'daki son idman galobu (tarih, pist, tür, hipodrom,
+idman jokeyi, ara dereceler). `videoUrl` yalnızca Premium'da dolu gelir.
 
 ## Today Contract
 

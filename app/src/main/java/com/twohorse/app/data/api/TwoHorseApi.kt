@@ -495,6 +495,156 @@ class TwoHorseApi(
             }
         }
 
+    suspend fun getRaceTraining(
+        raceDate: String,
+        city: String,
+        raceNumber: Int
+    ): RaceTraining =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val url =
+                (
+                    baseUrl +
+                    "/api/races/training"
+                )
+                    .toHttpUrl()
+                    .newBuilder()
+                    .addQueryParameter(
+                        "raceDate",
+                        raceDate
+                    )
+                    .addQueryParameter(
+                        "city",
+                        city
+                    )
+                    .addQueryParameter(
+                        "raceNumber",
+                        raceNumber.toString()
+                    )
+                    .build()
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()
+                )
+
+            val horsesArray =
+                json.optJSONArray(
+                    "horses"
+                )
+
+            fun JSONObject.nullableString(
+                key: String
+            ): String? =
+                if (isNull(key)) null
+                else optString(key).takeIf { it.isNotBlank() }
+
+            val horses =
+                buildList {
+                    if (horsesArray != null) {
+                        for (
+                            i in 0 until
+                            horsesArray.length()
+                        ) {
+                            val item =
+                                horsesArray.getJSONObject(i)
+
+                            val splitsArray =
+                                item.optJSONArray(
+                                    "splits"
+                                )
+
+                            val splits =
+                                buildList {
+                                    if (splitsArray != null) {
+                                        for (
+                                            j in 0 until
+                                            splitsArray.length()
+                                        ) {
+                                            val split =
+                                                splitsArray.getJSONObject(j)
+
+                                            add(
+                                                TrainingSplit(
+                                                    distanceMeters =
+                                                        split.optInt(
+                                                            "distanceMeters"
+                                                        ),
+                                                    time =
+                                                        split.optString(
+                                                            "time"
+                                                        )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                            add(
+                                HorseTraining(
+                                    horseNumber =
+                                        item.optInt(
+                                            "horseNumber"
+                                        ),
+                                    horseName =
+                                        item.optString(
+                                            "horseName"
+                                        ),
+                                    trainingDate =
+                                        item.nullableString(
+                                            "trainingDate"
+                                        ),
+                                    track =
+                                        item.nullableString(
+                                            "track"
+                                        ),
+                                    trackCondition =
+                                        item.nullableString(
+                                            "trackCondition"
+                                        ),
+                                    trainingType =
+                                        item.nullableString(
+                                            "trainingType"
+                                        ),
+                                    hippodrome =
+                                        item.nullableString(
+                                            "hippodrome"
+                                        ),
+                                    jockey =
+                                        item.nullableString(
+                                            "jockey"
+                                        ),
+                                    splits =
+                                        splits,
+                                    videoUrl =
+                                        item.nullableString(
+                                            "videoUrl"
+                                        )
+                                )
+                            )
+                        }
+                    }
+                }
+
+            RaceTraining(
+                status =
+                    json.optString(
+                        "status",
+                        "unavailable"
+                    ),
+                fetchedAt =
+                    json.nullableString(
+                        "fetchedAt"
+                    ),
+                horses =
+                    horses
+            )
+        }
+
     data class AuthResult(
         val token: String,
         val user: MembershipUser

@@ -7,6 +7,7 @@ import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.MembershipUser
+import com.twohorse.app.domain.model.RaceTraining
 import com.twohorse.app.domain.model.TodayData
 
 class TwoHorseRepository(
@@ -114,6 +115,24 @@ class TwoHorseRepository(
 
                 horseNumber =
                     horseNumber
+            )
+        }
+
+    suspend fun raceTraining(
+        raceDate: String,
+        city: String,
+        raceNumber: Int
+    ): Result<RaceTraining> =
+        runCatching {
+            api.getRaceTraining(
+                raceDate =
+                    raceDate,
+
+                city =
+                    city,
+
+                raceNumber =
+                    raceNumber
             )
         }
 

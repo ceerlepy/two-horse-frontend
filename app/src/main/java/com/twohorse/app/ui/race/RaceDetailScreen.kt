@@ -318,6 +318,22 @@ fun RaceDetailScreen(
                         horizontal = 18.dp
                     )
             ) {
+                RaceTrainingSection(
+                    raceDate = currentRace.raceDate,
+                    city = currentRace.city,
+                    raceNumber = currentRace.number,
+                    repository = repository
+                )
+            }
+        }
+
+        item {
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
                 ExpandableAnalysisHeader(
                     expanded =
                         deepExpanded,
@@ -852,6 +868,269 @@ private fun ExpandableAnalysisHeader(
                     else
                         strings.raceOpenDeepAnalysis
             )
+        }
+    }
+}
+
+private sealed interface TrainingLoadState {
+    data object Idle : TrainingLoadState
+    data object Loading : TrainingLoadState
+    data class Loaded(val training: RaceTraining) : TrainingLoadState
+    data object Failed : TrainingLoadState
+}
+
+/* "2026-10-02" -> "02.10" */
+private fun shortTrainingDate(value: String?): String? {
+    val parts = value?.split("-") ?: return null
+    return if (parts.size == 3) "${parts[2]}.${parts[1]}" else value
+}
+
+@Composable
+private fun RaceTrainingSection(
+    raceDate: String?,
+    city: String,
+    raceNumber: Int,
+    repository: TwoHorseRepository
+) {
+    val strings = LocalStrings.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var expanded by
+        remember(city, raceNumber) {
+            mutableStateOf(false)
+        }
+
+    var state by
+        remember(city, raceNumber) {
+            mutableStateOf<TrainingLoadState>(TrainingLoadState.Idle)
+        }
+
+    fun load() {
+        state = TrainingLoadState.Loading
+        scope.launch {
+            state =
+                repository
+                    .raceTraining(
+                        raceDate = raceDate ?: "",
+                        city = city,
+                        raceNumber = raceNumber
+                    )
+                    .fold(
+                        onSuccess = {
+                            if (it.status == "unavailable")
+                                TrainingLoadState.Failed
+                            else
+                                TrainingLoadState.Loaded(it)
+                        },
+                        onFailure = {
+                            TrainingLoadState.Failed
+                        }
+                    )
+        }
+    }
+
+    Card(
+        modifier =
+            Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Column {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            expanded = !expanded
+                            if (
+                                expanded &&
+                                state == TrainingLoadState.Idle
+                            ) {
+                                load()
+                            }
+                        }
+                        .padding(15.dp),
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = strings.raceTrainingTitle,
+                        color = Ink,
+                        fontWeight = FontWeight.Black
+                    )
+
+                    Text(
+                        text = strings.raceTrainingSubtitle,
+                        color = Muted,
+                        fontSize = 10.sp
+                    )
+                }
+
+                Icon(
+                    if (expanded)
+                        Icons.Default.KeyboardArrowUp
+                    else
+                        Icons.Default.KeyboardArrowDown,
+                    contentDescription =
+                        if (expanded)
+                            strings.raceTrainingClose
+                        else
+                            strings.raceTrainingOpen
+                )
+            }
+
+            if (expanded) {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            start = 15.dp,
+                            end = 15.dp,
+                            bottom = 15.dp
+                        ),
+                    verticalArrangement =
+                        Arrangement.spacedBy(10.dp)
+                ) {
+                    when (val current = state) {
+                        TrainingLoadState.Idle,
+                        TrainingLoadState.Loading ->
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Green
+                            )
+
+                        TrainingLoadState.Failed -> {
+                            Text(
+                                text = strings.raceTrainingUnavailable,
+                                color = Muted,
+                                fontSize = 12.sp
+                            )
+                            TextButton(
+                                onClick = { load() }
+                            ) {
+                                Text(strings.raceTrainingRetry)
+                            }
+                        }
+
+                        is TrainingLoadState.Loaded -> {
+                            if (current.training.horses.isEmpty()) {
+                                Text(
+                                    text = strings.raceTrainingEmpty,
+                                    color = Muted,
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            current.training.horses.forEach { horse ->
+                                TrainingRow(
+                                    horse = horse,
+                                    onOpenVideo = { url ->
+                                        context.startActivity(
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse(url)
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrainingRow(
+    horse: HorseTraining,
+    onOpenVideo: (String) -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${horse.horseNumber}. ${horse.horseName}",
+                modifier = Modifier.weight(1f),
+                color = Ink,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            shortTrainingDate(horse.trainingDate)?.let {
+                Text(
+                    text = it,
+                    color = Muted,
+                    fontSize = 11.sp
+                )
+            }
+        }
+
+        val meta =
+            listOfNotNull(
+                listOfNotNull(horse.track, horse.trackCondition)
+                    .joinToString(" ")
+                    .takeIf { it.isNotBlank() },
+                horse.trainingType,
+                horse.hippodrome
+            ).joinToString(" · ")
+
+        if (meta.isNotBlank()) {
+            Text(
+                text = meta,
+                color = Muted,
+                fontSize = 11.sp
+            )
+        }
+
+        if (horse.splits.isNotEmpty()) {
+            Text(
+                text =
+                    horse.splits.joinToString("  ") {
+                        "${it.distanceMeters}m ${it.time}"
+                    },
+                color = Ink,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        horse.jockey?.let {
+            Text(
+                text = strings.raceTrainingJockey(it),
+                color = Muted,
+                fontSize = 10.sp
+            )
+        }
+
+        horse.videoUrl?.let { url ->
+            TextButton(
+                onClick = { onOpenVideo(url) },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    text = strings.raceTrainingVideo,
+                    fontSize = 11.sp
+                )
+            }
         }
     }
 }
