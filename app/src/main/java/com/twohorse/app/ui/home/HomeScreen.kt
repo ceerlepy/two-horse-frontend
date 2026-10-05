@@ -60,6 +60,7 @@ import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
 import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import kotlin.math.max
 import kotlinx.coroutines.delay
 
@@ -110,6 +111,13 @@ fun HomeScreen(
         }
 
     var error by
+        remember {
+            mutableStateOf<String?>(
+                null
+            )
+        }
+
+    var nextDayCity by
         remember {
             mutableStateOf<String?>(
                 null
@@ -332,6 +340,14 @@ fun HomeScreen(
             }
             .distinct()
 
+    /* Tomorrow's card replaces the "day over" card once it is published. */
+    val nextDay =
+        data?.nextDay
+            ?.takeIf {
+                upcomingCities.isEmpty() &&
+                    it.meetings.isNotEmpty()
+            }
+
     AutoRefreshEffect(
         nextStartMillis =
             allRaces
@@ -488,14 +504,36 @@ fun HomeScreen(
         } else if (
             filteredRaces.isEmpty()
         ) {
-            item {
-                EmptyRaceState(
-                    message =
-                        strings.homeNoRacesToShow
+            if (
+                nextDay != null
+            ) {
+                nextDayProgramItems(
+                    program = nextDay,
+                    selectedCity = nextDayCity,
+                    onCitySelected = {
+                        nextDayCity = it
+                    }
                 )
+            } else {
+                item {
+                    EmptyRaceState(
+                        message =
+                            strings.homeNoRacesToShow
+                    )
+                }
             }
         } else {
             if (
+                nextDay != null
+            ) {
+                nextDayProgramItems(
+                    program = nextDay,
+                    selectedCity = nextDayCity,
+                    onCitySelected = {
+                        nextDayCity = it
+                    }
+                )
+            } else if (
                 upcomingCities.isEmpty()
             ) {
                 item {
@@ -746,8 +784,12 @@ private fun displayRaceTime(
             ?: return "--:--"
 
     return runCatching {
+        // starts_at is UTC ("...Z"); races are shown in Turkey time.
         OffsetDateTime
             .parse(value)
+            .atZoneSameInstant(
+                ZoneId.of("Europe/Istanbul")
+            )
             .toLocalTime()
             .toString()
             .take(5)

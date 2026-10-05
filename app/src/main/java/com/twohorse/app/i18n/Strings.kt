@@ -721,6 +721,16 @@ interface Strings {
     val homeDayOverBody: String
     @get:Composable
     val homeDayOverButton: String
+    @Composable
+    fun homeNextDayTitle(date: String): String
+    @get:Composable
+    val homeNextDayNote: String
+    @Composable
+    fun homeNextDayRunnerWeight(weight: String): String
+    @Composable
+    fun homeNextDayRunnerForm(form: String): String
+    @Composable
+    fun homeNextDayRunnerCount(n: Int): String
     @get:Composable
     val myCouponsButton: String
     @get:Composable

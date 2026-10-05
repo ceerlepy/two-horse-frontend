@@ -1139,6 +1139,25 @@ object ResourceStrings : Strings {
     override val homeDayOverButton: String
         @Composable get() = stringResource(R.string.home_day_over_button)
 
+    @Composable
+    override fun homeNextDayTitle(date: String): String =
+        stringResource(R.string.home_next_day_title, date)
+
+    override val homeNextDayNote: String
+        @Composable get() = stringResource(R.string.home_next_day_note)
+
+    @Composable
+    override fun homeNextDayRunnerWeight(weight: String): String =
+        stringResource(R.string.home_next_day_runner_weight, weight)
+
+    @Composable
+    override fun homeNextDayRunnerForm(form: String): String =
+        stringResource(R.string.home_next_day_runner_form, form)
+
+    @Composable
+    override fun homeNextDayRunnerCount(n: Int): String =
+        stringResource(R.string.home_next_day_runner_count, n)
+
     override val myCouponsButton: String
         @Composable get() = stringResource(R.string.my_coupons_button)
 
