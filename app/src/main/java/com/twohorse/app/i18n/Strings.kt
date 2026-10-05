@@ -344,6 +344,18 @@ interface Strings {
     @Composable
     fun raceAvoidTag(n: Int, pct: Int): String
     @get:Composable
+    val raceValueModelTitle: String
+    @get:Composable
+    val raceValueUnderrated: String
+    @get:Composable
+    val raceValueOverrated: String
+    @Composable
+    fun raceValueVsAgf(market: String, model: String): String
+    @Composable
+    fun raceValueVsGanyan(market: String, model: String): String
+    @get:Composable
+    val raceValueNote: String
+    @get:Composable
     val raceExpertScoreTitle: String
     @Composable
     fun raceSupportConfidence(pct: String): String

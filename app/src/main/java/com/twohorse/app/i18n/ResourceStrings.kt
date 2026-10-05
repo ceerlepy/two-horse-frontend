@@ -532,6 +532,26 @@ object ResourceStrings : Strings {
     override fun raceAvoidTag(n: Int, pct: Int): String =
         stringResource(R.string.race_avoid_tag, n, pct)
 
+    override val raceValueModelTitle: String
+        @Composable get() = stringResource(R.string.race_value_model_title)
+
+    override val raceValueUnderrated: String
+        @Composable get() = stringResource(R.string.race_value_underrated)
+
+    override val raceValueOverrated: String
+        @Composable get() = stringResource(R.string.race_value_overrated)
+
+    @Composable
+    override fun raceValueVsAgf(market: String, model: String): String =
+        stringResource(R.string.race_value_vs_agf, market, model)
+
+    @Composable
+    override fun raceValueVsGanyan(market: String, model: String): String =
+        stringResource(R.string.race_value_vs_ganyan, market, model)
+
+    override val raceValueNote: String
+        @Composable get() = stringResource(R.string.race_value_note)
+
     override val raceExpertScoreTitle: String
         @Composable get() = stringResource(R.string.race_expert_score_title)
 
