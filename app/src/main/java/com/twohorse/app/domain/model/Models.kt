@@ -232,18 +232,45 @@ data class ForeignRunner(
     val recentForm: String?
 )
 
+data class ForeignRankedHorse(
+    val number: Int,
+    val name: String
+)
+
+/* An outside AI prediction site's picks for one foreign race. */
+data class ForeignAiPick(
+    val ranked: List<ForeignRankedHorse>,
+    val selection: List<Int>,
+    val comment: String
+)
+
+data class ForeignAiLeg(
+    val raceNumber: Int,
+    val selection: List<Int>
+)
+
+data class ForeignAiCoupon(
+    val altili: Int,
+    val startTime: String?,
+    val legs: List<ForeignAiLeg>,
+    val combinations: Int?,
+    val amountTl: Double?
+)
+
 data class ForeignRace(
     val raceNumber: Int,
     val time: String?,
     val distanceMeters: Int?,
     val track: String?,
-    val runners: List<ForeignRunner>
+    val runners: List<ForeignRunner>,
+    val aiPick: ForeignAiPick? = null
 )
 
 data class ForeignMeeting(
     val city: String,
     val country: String?,
-    val races: List<ForeignRace>
+    val races: List<ForeignRace>,
+    val aiCoupons: List<ForeignAiCoupon> = emptyList()
 )
 
 data class MembershipUser(

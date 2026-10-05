@@ -289,6 +289,18 @@ interface Strings {
     val foreignAgfNote: String
     @Composable
     fun foreignRaceTitle(number: String): String
+    @Composable
+    fun foreignAiTop(horse: String): String
+    @Composable
+    fun foreignAiSelection(numbers: String): String
+    @Composable
+    fun foreignAiCouponTitle(number: Int): String
+    @Composable
+    fun foreignAiCouponStart(time: String): String
+    @Composable
+    fun foreignAiCouponTotal(combinations: Int, amount: String): String
+    @Composable
+    fun foreignAiLeg(raceNumber: Int, numbers: String): String
     @get:Composable
     val foreignBack: String
     @get:Composable

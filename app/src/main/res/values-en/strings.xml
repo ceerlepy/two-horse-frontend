@@ -128,9 +128,15 @@
     <string name="foreign_subtitle">TJK card and AGF order</string>
     <string name="foreign_empty">There are no foreign races on today\'s TJK card.</string>
     <string name="foreign_load_failed">Foreign races could not be loaded.</string>
-    <string name="foreign_agf_note">Horses are ordered by AGF. There is no AI prediction for foreign races yet.</string>
+    <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels are an AI prediction site\'s picks.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
+    <string name="foreign_ai_top">AI pick: %1$s</string>
+    <string name="foreign_ai_selection">Coupon: %1$s</string>
+    <string name="foreign_ai_coupon_title">AI altılı %1$d</string>
+    <string name="foreign_ai_coupon_start">Starts %1$s</string>
+    <string name="foreign_ai_coupon_total">%1$d combinations · %2$s TL</string>
+    <string name="foreign_ai_leg">Race %1$d: %2$s</string>
     <string name="race_training_title">Training</string>
     <string name="race_training_subtitle">Each horse\'s latest TJK training gallop</string>
     <string name="race_training_open">Open training info</string>
