@@ -169,6 +169,8 @@
     <string name="foreign_empty">There are no foreign races on today\'s TJK card.</string>
     <string name="foreign_load_failed">Foreign races could not be loaded.</string>
     <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels are an AI prediction site\'s picks.</string>
+    <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
+    <string name="foreign_win_prob">Win %1$s%%</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
     <string name="foreign_ai_top">AI pick: %1$s</string>
