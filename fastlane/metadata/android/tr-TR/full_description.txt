@@ -8,7 +8,7 @@ Neler sunar:
 • Her at için skor, son yarışları, idman ve galop bilgileri
 • Bütçenize göre hazırlanmış altılı ve beşli ganyan kupon önerileri
 • Yurt dışı koşu programları
-• AI'ya sor (Premium): koşu hakkında sorunu yaz, cevabı modelimizin verisinden alsın
+• AI'ya sor (Premium): koşu hakkında sorunuzu yazın, cevabı modelimizin verisinden alın
 • Türkçe ve İngilizce arayüz
 
 Two Horse bir bahis sitesi değildir; bahis almaz ve ödeme yapmaz. Sunulan analizler bilgilendirme amaçlıdır ve kazanç garantisi vermez. Uygulama 18 yaş ve üzeri kullanıcılar içindir. Lütfen sorumlu oynayın.
