@@ -65,6 +65,32 @@ class TwoHorseRepository(
             result.user
         }
 
+    suspend fun register(
+        email: String,
+        password: String,
+        displayName: String?
+    ): Result<MembershipUser> =
+        runCatching {
+            val result =
+                api.authRegister(
+                    email,
+                    password,
+                    displayName
+                )
+
+            sessionStore.saveToken(
+                result.token
+            )
+
+            result.user
+        }
+
+    suspend fun deleteAccount(): Result<Unit> =
+        runCatching {
+            api.deleteAccount()
+            sessionStore.clear()
+        }
+
     suspend fun me():
         Result<MembershipUser> =
         runCatching {

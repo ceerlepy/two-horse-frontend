@@ -1,8 +1,11 @@
 package com.twohorse.app.ui.account
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,17 +14,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.Config
 import com.twohorse.app.billing.BillingManager
 import com.twohorse.app.data.repository.TwoHorseRepository
@@ -40,6 +49,9 @@ import java.util.Locale
 private sealed interface AccountMessage {
     data class PurchaseActivated(val tier: String) : AccountMessage
     data object PurchaseVerifyFailed : AccountMessage
+    data object PurchaseOtherAccount : AccountMessage
+    data object DeleteFailed : AccountMessage
+    data object RestoreNone : AccountMessage
 }
 
 private fun formatIsoDate(
@@ -98,6 +110,92 @@ fun AccountScreen(
     var message by
         remember { mutableStateOf<AccountMessage?>(null) }
 
+    var ownedSubscriptions by
+        remember { mutableStateOf<List<Purchase>>(emptyList()) }
+
+    var confirmDelete by
+        remember { mutableStateOf(false) }
+
+    var deleting by
+        remember { mutableStateOf(false) }
+
+    /*
+     * Sends a Play purchase to the backend, the only place that can
+     * grant a tier. [silent] is used for purchases found again on
+     * screen open, where a failure shouldn't show an error banner.
+     */
+    suspend fun verifyAndApply(
+        purchase: Purchase,
+        silent: Boolean
+    ) {
+        val productId =
+            purchase.products.firstOrNull()
+                ?: return
+
+        purchaseInFlight = true
+
+        if (!silent) {
+            message = null
+        }
+
+        repository
+            .verifyPurchase(
+                productId,
+                purchase.purchaseToken
+            )
+            .onSuccess { updated ->
+                user = updated
+                onUserUpdated(updated)
+
+                if (!purchase.isAcknowledged) {
+                    billingManager.acknowledge(
+                        purchase.purchaseToken
+                    )
+                }
+
+                if (!silent) {
+                    message =
+                        AccountMessage.PurchaseActivated(updated.tier)
+                }
+            }
+            .onFailure { throwable ->
+                if (!silent) {
+                    message =
+                        if (
+                            (throwable as? ApiException)?.apiCode ==
+                            "PURCHASE_BELONGS_TO_ANOTHER_ACCOUNT"
+                        )
+                            AccountMessage.PurchaseOtherAccount
+                        else
+                            AccountMessage.PurchaseVerifyFailed
+                }
+            }
+
+        purchaseInFlight = false
+    }
+
+    /*
+     * Gold <-> Premium is a plan switch on the existing subscription,
+     * not a second subscription running in parallel.
+     */
+    fun launchPurchase(
+        product: ProductDetails
+    ) {
+        val oldToken =
+            ownedSubscriptions
+                .firstOrNull { owned ->
+                    owned.products.none { it == product.productId }
+                }
+                ?.purchaseToken
+
+        billingManager.launchPurchaseFlow(
+            context as Activity,
+            product,
+            accountId = user?.id,
+            oldPurchaseToken = oldToken
+        )
+    }
+
     LaunchedEffect(Unit) {
         repository.me()
             .onSuccess { fresh -> user = fresh; onUserUpdated(fresh) }
@@ -123,48 +221,82 @@ fun AccountScreen(
                 products.firstOrNull {
                     it.productId == Config.PRODUCT_ID_PREMIUM_MONTHLY
                 }
+
+            ownedSubscriptions =
+                billingManager
+                    .queryActiveSubscriptions()
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
+                    }
+
+            // A purchase whose verification never reached the backend
+            // (app killed, no network) must still be verified and
+            // acknowledged, or Google refunds it after three days.
+            ownedSubscriptions
+                .filter {
+                    !it.isAcknowledged ||
+                        user?.tierSource != "play_subscription"
+                }
+                .forEach {
+                    verifyAndApply(
+                        it,
+                        silent = true
+                    )
+                }
         }
     }
 
     LaunchedEffect(Unit) {
         billingManager.purchases.collect { purchase ->
-            val productId =
-                purchase.products.firstOrNull()
-                    ?: return@collect
+            verifyAndApply(
+                purchase,
+                silent = false
+            )
 
-            purchaseInFlight = true
-            message = null
-
-            repository
-                .verifyPurchase(
-                    productId,
-                    purchase.purchaseToken
-                )
-                .onSuccess { updated ->
-                    user = updated
-                    onUserUpdated(updated)
-
-                    if (!purchase.isAcknowledged) {
-                        billingManager.acknowledge(
-                            purchase.purchaseToken
-                        )
+            ownedSubscriptions =
+                billingManager
+                    .queryActiveSubscriptions()
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
                     }
-
-                    message =
-                        AccountMessage.PurchaseActivated(updated.tier)
-                }
-                .onFailure {
-                    message =
-                        AccountMessage.PurchaseVerifyFailed
-                }
-
-            purchaseInFlight = false
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
             billingManager.disconnect()
+        }
+    }
+
+    fun restorePurchases() {
+        if (purchaseInFlight) return
+
+        scope.launch {
+            message = null
+
+            val owned =
+                billingManager
+                    .queryActiveSubscriptions()
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
+                    }
+
+            ownedSubscriptions = owned
+
+            if (owned.isEmpty()) {
+                message = AccountMessage.RestoreNone
+                return@launch
+            }
+
+            owned.forEach {
+                verifyAndApply(
+                    it,
+                    silent = false
+                )
+            }
         }
     }
 
@@ -216,6 +348,9 @@ fun AccountScreen(
                 }
 
                 message?.let { msg ->
+                    val isError =
+                        msg !is AccountMessage.PurchaseActivated
+
                     val messageText =
                         when (msg) {
                             is AccountMessage.PurchaseActivated ->
@@ -225,20 +360,30 @@ fun AccountScreen(
 
                             AccountMessage.PurchaseVerifyFailed ->
                                 strings.accountPurchaseVerifyFailed
+
+                            AccountMessage.PurchaseOtherAccount ->
+                                strings.accountPurchaseOtherAccount
+
+                            AccountMessage.DeleteFailed ->
+                                strings.accountDeleteFailed
+
+                            AccountMessage.RestoreNone ->
+                                strings.accountRestoreNone
                         }
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
                             CardDefaults.cardColors(
-                                containerColor = PaleGreen
+                                containerColor =
+                                    if (isError) PaleRed else PaleGreen
                             ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             text = messageText,
                             modifier = Modifier.padding(12.dp),
-                            color = Green,
+                            color = if (isError) Red else Green,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -247,61 +392,87 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (activeUser?.tier != "gold" && activeUser?.tier != "premium") {
-                    UpgradeCard(
+                // Trial users already have Gold features but still need
+                // to be able to buy before the trial runs out.
+                val onTrial =
+                    activeUser?.tierSource == "trial"
+
+                val paidTier =
+                    if (onTrial) "free" else activeUser?.tier ?: "free"
+
+                if (paidTier != "premium") {
+                    Text(
+                        text = strings.accountChoosePlan,
+                        color = Ink,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    PlanComparisonTable(
+                        currentTier = activeUser?.tier ?: "free"
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
+
+                if (paidTier != "gold" && paidTier != "premium") {
+                    PlanCard(
                         title = strings.accountTierTitle("gold"),
                         description = strings.accountGoldDescription,
-                        price =
-                            goldProduct
-                                ?.subscriptionOfferDetails
-                                ?.firstOrNull()
-                                ?.pricingPhases
-                                ?.pricingPhaseList
-                                ?.firstOrNull()
-                                ?.formattedPrice,
+                        price = goldProduct.monthlyPrice(),
+                        highlighted = true,
+                        badge = strings.accountBadgePopular,
+                        accent = Gold,
                         enabled = goldProduct != null && !purchaseInFlight,
                         onClick = {
-                            val product = goldProduct
-                            if (product != null) {
-                                billingManager.launchPurchaseFlow(
-                                    context as Activity,
-                                    product
-                                )
-                            }
+                            goldProduct?.let { launchPurchase(it) }
                         }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                if (activeUser?.tier != "premium") {
-                    UpgradeCard(
+                if (paidTier != "premium") {
+                    PlanCard(
                         title = strings.accountTierTitle("premium"),
                         description = strings.accountPremiumDescription,
-                        price =
-                            premiumProduct
-                                ?.subscriptionOfferDetails
-                                ?.firstOrNull()
-                                ?.pricingPhases
-                                ?.pricingPhaseList
-                                ?.firstOrNull()
-                                ?.formattedPrice,
+                        price = premiumProduct.monthlyPrice(),
+                        highlighted = false,
+                        badge = null,
+                        accent = Green,
                         enabled = premiumProduct != null && !purchaseInFlight,
                         onClick = {
-                            val product = premiumProduct
-                            if (product != null) {
-                                billingManager.launchPurchaseFlow(
-                                    context as Activity,
-                                    product
-                                )
-                            }
+                            premiumProduct?.let { launchPurchase(it) }
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                if (activeUser?.tier == "premium") {
+                    // Play policy: subscription terms must be clear before purchase.
+                    Text(
+                        text = strings.accountRenewalTerms,
+                        color = Muted,
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp
+                    )
+
+                    TextButton(
+                        onClick = { restorePurchases() },
+                        enabled = !purchaseInFlight,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = strings.accountRestorePurchases,
+                            color = Green,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                } else {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
@@ -334,14 +505,50 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (activeUser?.tierSource == "play_subscription") {
+                    OutlinedButton(
+                        onClick = {
+                            val productId =
+                                activeUser.subscriptionProductId()
+
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(
+                                        "https://play.google.com/store/account/subscriptions" +
+                                            "?package=${context.packageName}" +
+                                            (productId?.let { "&sku=$it" } ?: "")
+                                    )
+                                )
+                            )
+                        },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, Border)
+                    ) {
+                        Text(
+                            text = strings.accountManageSubscription,
+                            color = Ink,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
                 OutlinedButton(
                     onClick = {
                         repository.logout()
                         onLoggedOut()
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    shape = RoundedCornerShape(14.dp),
                     colors =
                         ButtonDefaults.outlinedButtonColors(
                             contentColor = Red
@@ -355,13 +562,110 @@ fun AccountScreen(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(strings.accountLogout)
+                    Text(
+                        text = strings.accountLogout,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Required by Google Play for apps that let users create accounts.
+                if (activeUser?.tierSource != "manual") {
+                    TextButton(
+                        onClick = { confirmDelete = true },
+                        enabled = !deleting,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = strings.accountDeleteButton,
+                            color = Muted,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
+
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!deleting) confirmDelete = false
+            },
+            title = { Text(strings.accountDeleteTitle) },
+            text = { Text(strings.accountDeleteMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleting = true
+
+                        scope.launch {
+                            repository
+                                .deleteAccount()
+                                .onSuccess {
+                                    deleting = false
+                                    confirmDelete = false
+                                    onLoggedOut()
+                                }
+                                .onFailure {
+                                    deleting = false
+                                    confirmDelete = false
+                                    message = AccountMessage.DeleteFailed
+                                }
+                        }
+                    },
+                    enabled = !deleting
+                ) {
+                    Text(
+                        text = strings.accountDeleteConfirm,
+                        color = Red
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { confirmDelete = false },
+                    enabled = !deleting
+                ) {
+                    Text(strings.accountDeleteCancel)
+                }
+            }
+        )
+    }
+}
+
+private fun MembershipUser.subscriptionProductId(): String? =
+    when (tier) {
+        "gold" -> Config.PRODUCT_ID_GOLD_MONTHLY
+        "premium" -> Config.PRODUCT_ID_PREMIUM_MONTHLY
+        else -> null
+    }
+
+private fun ProductDetails?.monthlyPrice(): String? =
+    this
+        ?.subscriptionOfferDetails
+        ?.firstOrNull()
+        ?.pricingPhases
+        ?.pricingPhaseList
+        ?.lastOrNull()
+        ?.formattedPrice
+
+private fun daysLeft(
+    isoEnd: String?
+): Int? {
+    val end =
+        isoEnd
+            ?.let { runCatching { Instant.parse(it) }.getOrNull() }
+            ?: return null
+
+    val millis =
+        end.toEpochMilli() - System.currentTimeMillis()
+
+    return if (millis <= 0) 0
+    else ((millis + 86_399_999L) / 86_400_000L).toInt()
 }
 
 @Composable
@@ -371,41 +675,77 @@ private fun CurrentTierCard(
     val strings = LocalStrings.current
     val language = currentLanguage()
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors =
-            CardDefaults.cardColors(
-                containerColor = PaleGold
-            ),
-        shape = RoundedCornerShape(18.dp)
+    val onTrial =
+        user.tierSource == "trial"
+
+    val gradient =
+        when (user.tier) {
+            "premium" ->
+                listOf(Ink, Green)
+
+            "gold" ->
+                listOf(Color(0xFF8A5A12), Gold)
+
+            else ->
+                listOf(Color(0xFF3B4641), Muted)
+        }
+
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(
+                    Brush.linearGradient(gradient)
+                )
+                .padding(18.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Default.Stars,
                     contentDescription = null,
-                    tint = Gold
+                    tint = Color.White
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     text = strings.accountTierTitle(user.tier),
-                    color = Ink,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Surface(
+                    color = Color.White.copy(alpha = 0.18f),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Text(
+                        text =
+                            if (onTrial) strings.accountTrialBadge
+                            else strings.accountCurrentPlan,
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 10.dp,
+                                vertical = 4.dp
+                            ),
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = user.email,
-                color = Muted,
+                text = user.displayName ?: user.email,
+                color = Color.White.copy(alpha = 0.85f),
                 fontSize = 12.sp
             )
 
@@ -415,26 +755,56 @@ private fun CurrentTierCard(
             val subscriptionEnds =
                 formatIsoDate(user.subscriptionExpiresAt, language)
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             when {
-                user.tierSource == "trial" && trialEnds != null ->
+                onTrial && trialEnds != null -> {
+                    val left =
+                        daysLeft(user.trialEndsAt) ?: 0
+
+                    Text(
+                        text = strings.accountDaysLeft(left),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    LinearProgressIndicator(
+                        progress = {
+                            (left / 7f).coerceIn(0f, 1f)
+                        },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(50)),
+                        color = Color.White,
+                        trackColor = Color.White.copy(alpha = 0.25f)
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
                     Text(
                         text = strings.accountTrialEndsAt(trialEnds),
-                        color = Muted,
+                        color = Color.White.copy(alpha = 0.85f),
                         fontSize = 11.sp
                     )
+                }
 
                 user.tierSource == "play_subscription" && subscriptionEnds != null ->
                     Text(
                         text = strings.accountSubscriptionRenewsAt(subscriptionEnds),
-                        color = Muted,
-                        fontSize = 11.sp
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontSize = 12.sp
                     )
 
                 user.tierSource == "manual" ->
                     Text(
                         text = strings.accountUnlimited,
-                        color = Muted,
-                        fontSize = 11.sp
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontSize = 12.sp
                     )
 
                 else -> {}
@@ -443,15 +813,38 @@ private fun CurrentTierCard(
     }
 }
 
+private sealed interface PlanCell {
+    data object Yes : PlanCell
+    data object No : PlanCell
+    data class Label(val text: String) : PlanCell
+}
+
 @Composable
-private fun UpgradeCard(
-    title: String,
-    description: String,
-    price: String?,
-    enabled: Boolean,
-    onClick: () -> Unit
+private fun PlanComparisonTable(
+    currentTier: String
 ) {
     val strings = LocalStrings.current
+
+    val rows: List<Pair<String, List<PlanCell>>> =
+        listOf(
+            strings.accountFeatureProgram to
+                listOf(PlanCell.Yes, PlanCell.Yes, PlanCell.Yes),
+            strings.accountFeatureTraining to
+                listOf(PlanCell.Yes, PlanCell.Yes, PlanCell.Yes),
+            strings.accountFeatureSignals to
+                listOf(PlanCell.No, PlanCell.Yes, PlanCell.Yes),
+            strings.accountFeatureCoupons to
+                listOf(
+                    PlanCell.No,
+                    PlanCell.Label(strings.accountCouponLimitGold),
+                    PlanCell.Label(strings.accountCouponUnlimited)
+                ),
+            strings.accountFeatureVideos to
+                listOf(PlanCell.No, PlanCell.No, PlanCell.Yes)
+        )
+
+    val tiers =
+        listOf("free", "gold", "premium")
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -463,39 +856,188 @@ private fun UpgradeCard(
         shape = RoundedCornerShape(18.dp)
     ) {
         Column(
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            Row(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 14.dp,
+                        vertical = 6.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1.6f))
+
+                tiers.forEach { tier ->
+                    Text(
+                        text = strings.accountTierTitle(tier),
+                        modifier = Modifier.weight(1f),
+                        color =
+                            when (tier) {
+                                "gold" -> Gold
+                                "premium" -> Green
+                                else -> Muted
+                            },
+                        fontSize = 12.sp,
+                        fontWeight =
+                            if (tier == currentTier) FontWeight.Black
+                            else FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            rows.forEachIndexed { index, (feature, cells) ->
+                if (index > 0) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 14.dp),
+                        color = Border
+                    )
+                }
+
+                Row(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 14.dp,
+                            vertical = 10.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = feature,
+                        modifier = Modifier.weight(1.6f),
+                        color = Ink,
+                        fontSize = 12.sp
+                    )
+
+                    cells.forEach { cell ->
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            when (cell) {
+                                PlanCell.Yes ->
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = Green,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+
+                                PlanCell.No ->
+                                    Icon(
+                                        imageVector = Icons.Default.Remove,
+                                        contentDescription = null,
+                                        tint = Border,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+
+                                is PlanCell.Label ->
+                                    Text(
+                                        text = cell.text,
+                                        color = Ink,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlanCard(
+    title: String,
+    description: String,
+    price: String?,
+    highlighted: Boolean,
+    badge: String?,
+    accent: Color,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (highlighted) PaleGold else Surface
+            ),
+        border =
+            BorderStroke(
+                if (highlighted) 2.dp else 1.dp,
+                if (highlighted) accent else Border
+            ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = title,
-                        color = Ink,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
+                Text(
+                    text = title,
+                    color = Ink,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black
+                )
 
-                    Text(
-                        text = description,
-                        color = Muted,
-                        fontSize = 11.sp
-                    )
+                if (badge != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Surface(
+                        color = accent,
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            text = badge,
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = 8.dp,
+                                    vertical = 3.dp
+                                ),
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 if (price != null) {
                     Text(
                         text = price,
-                        color = Green,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 13.sp
+                        color = Ink,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 17.sp
+                    )
+
+                    Text(
+                        text = strings.accountPerMonth,
+                        color = Muted,
+                        fontSize = 12.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = description,
+                color = Muted,
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = onClick,
@@ -503,11 +1045,12 @@ private fun UpgradeCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(46.dp),
-                shape = RoundedCornerShape(12.dp),
+                        .height(48.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = Green
+                        containerColor =
+                            if (highlighted) Ink else Green
                     )
             ) {
                 Text(

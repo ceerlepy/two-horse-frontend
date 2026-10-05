@@ -45,7 +45,21 @@ interface Strings {
     @get:Composable
     val loginErrorGoogleIncomplete: String
     @Composable
-    fun loginErrorGoogleFailed(code: Int): String
+    fun loginErrorGoogleFailed(code: String): String
+    @get:Composable
+    val loginNameLabel: String
+    @get:Composable
+    val loginRegisterButton: String
+    @get:Composable
+    val loginPasswordHint: String
+    @get:Composable
+    val loginLegalNotice: String
+    @get:Composable
+    val loginErrorEmailTaken: String
+    @get:Composable
+    val loginErrorInvalidEmail: String
+    @get:Composable
+    val loginErrorWeakPassword: String
 
     // ---- Account screen ----
     @get:Composable
@@ -74,6 +88,64 @@ interface Strings {
     fun accountPurchaseActivated(tierTitle: String): String
     @get:Composable
     val accountPurchaseVerifyFailed: String
+    @get:Composable
+    val accountManageSubscription: String
+    @get:Composable
+    val accountDeleteButton: String
+    @get:Composable
+    val accountDeleteTitle: String
+    @get:Composable
+    val accountDeleteMessage: String
+    @get:Composable
+    val accountDeleteConfirm: String
+    @get:Composable
+    val accountDeleteCancel: String
+    @get:Composable
+    val accountDeleteFailed: String
+    @get:Composable
+    val accountPurchaseOtherAccount: String
+    @get:Composable
+    val loginShowPassword: String
+    @get:Composable
+    val loginHidePassword: String
+    @get:Composable
+    val loginBenefitTrial: String
+    @get:Composable
+    val loginBenefitSignals: String
+    @get:Composable
+    val loginBenefitCancel: String
+    @get:Composable
+    val accountChoosePlan: String
+    @get:Composable
+    val accountBadgePopular: String
+    @get:Composable
+    val accountPerMonth: String
+    @get:Composable
+    val accountRenewalTerms: String
+    @get:Composable
+    val accountRestorePurchases: String
+    @get:Composable
+    val accountRestoreNone: String
+    @get:Composable
+    val accountTrialBadge: String
+    @get:Composable
+    val accountCurrentPlan: String
+    @get:Composable
+    val accountFeatureProgram: String
+    @get:Composable
+    val accountFeatureTraining: String
+    @get:Composable
+    val accountFeatureSignals: String
+    @get:Composable
+    val accountFeatureCoupons: String
+    @get:Composable
+    val accountFeatureVideos: String
+    @get:Composable
+    val accountCouponLimitGold: String
+    @get:Composable
+    val accountCouponUnlimited: String
+    @Composable
+    fun accountDaysLeft(days: Int): String
 
     // ---- Coupon errors ----
     @get:Composable
