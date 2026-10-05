@@ -1130,6 +1130,15 @@ object ResourceStrings : Strings {
     override val couponHistoryBudget: String
         @Composable get() = stringResource(R.string.coupon_history_budget)
 
+    override val homeDayOverTitle: String
+        @Composable get() = stringResource(R.string.home_day_over_title)
+
+    override val homeDayOverBody: String
+        @Composable get() = stringResource(R.string.home_day_over_body)
+
+    override val homeDayOverButton: String
+        @Composable get() = stringResource(R.string.home_day_over_button)
+
     override val myCouponsButton: String
         @Composable get() = stringResource(R.string.my_coupons_button)
 

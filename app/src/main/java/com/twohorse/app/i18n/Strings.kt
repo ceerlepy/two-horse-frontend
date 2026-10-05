@@ -716,6 +716,12 @@ interface Strings {
     @get:Composable
     val couponHistoryBudget: String
     @get:Composable
+    val homeDayOverTitle: String
+    @get:Composable
+    val homeDayOverBody: String
+    @get:Composable
+    val homeDayOverButton: String
+    @get:Composable
     val myCouponsButton: String
     @get:Composable
     val myCouponsTitle: String

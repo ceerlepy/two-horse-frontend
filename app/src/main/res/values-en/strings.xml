@@ -391,4 +391,7 @@
     <string name="my_coupons_delete">Delete coupon</string>
     <string name="my_coupons_load_failed">Couldn\'t load your coupons. Try again shortly.</string>
     <string name="my_coupons_winner">Winner: %1$d</string>
+    <string name="home_day_over_title">Today\'s races are over</string>
+    <string name="home_day_over_body">Results and our model\'s ranking for today are in Past Races. Tomorrow\'s card appears here once TJK publishes it.</string>
+    <string name="home_day_over_button">See results</string>
 </resources>
