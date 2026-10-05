@@ -12,8 +12,51 @@ android {
         applicationId = "com.twohorse.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        // CI passes its run number so every Play upload gets a higher
+        // versionCode, which Play requires. Local builds stay at 1.
+        versionCode =
+            System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
         versionName = "1.0.0"
+
+        // The OAuth "Web application" client ID is not a secret; it comes
+        // from the GOOGLE_WEB_CLIENT_ID GitHub Actions variable so it can
+        // be set without a code change.
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"${System.getenv("GOOGLE_WEB_CLIENT_ID")?.trim().orEmpty()}\""
+        )
+    }
+
+    /*
+     * Upload key for Google Play (Play App Signing re-signs with Google's
+     * own key). The keystore and passwords only exist as GitHub secrets
+     * in the release workflow; without them the release build stays
+     * unsigned and the workflow fails before uploading anything.
+     */
+    val uploadKeystore =
+        System.getenv("UPLOAD_KEYSTORE_PATH")
+
+    signingConfigs {
+        if (uploadKeystore != null) {
+            create("upload") {
+                storeFile = file(uploadKeystore)
+                storePassword = System.getenv("UPLOAD_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("UPLOAD_KEY_ALIAS")
+                keyPassword = System.getenv("UPLOAD_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+
+            if (uploadKeystore != null) {
+                signingConfig =
+                    signingConfigs.getByName("upload")
+            }
+        }
     }
 
     compileOptions {
@@ -26,6 +69,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {

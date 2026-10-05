@@ -27,6 +27,8 @@ jobs:
         run: bash scripts/check-api-contract.sh
 
       - name: Build debug APK
+        env:
+          GOOGLE_WEB_CLIENT_ID: ${{ vars.GOOGLE_WEB_CLIENT_ID }}
         run: gradle :app:assembleDebug
 
       - name: Upload APK

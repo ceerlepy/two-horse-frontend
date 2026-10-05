@@ -13,9 +13,10 @@ object Config {
      * Console (NOT the Android client ID) -- Google Sign-In on
      * Android requests an ID token audienced to the Web client, and
      * the backend's GOOGLE_CLIENT_ID secret must match this exactly.
+     * Set at build time from the GOOGLE_WEB_CLIENT_ID GitHub variable.
      */
-    const val GOOGLE_WEB_CLIENT_ID =
-        "REPLACE_WITH_GOOGLE_CLOUD_WEB_CLIENT_ID.apps.googleusercontent.com"
+    val GOOGLE_WEB_CLIENT_ID: String =
+        BuildConfig.GOOGLE_WEB_CLIENT_ID
 
     /*
      * Play Console subscription product IDs. Must match the backend's
