@@ -394,4 +394,9 @@
     <string name="home_day_over_title">Bugünün yarışları bitti</string>
     <string name="home_day_over_body">Sonuçlar ve modelimizin bugünkü sıralaması Geçmiş Yarışlar\'da. Yarının programı TJK\'da yayınlanınca burada görünecek.</string>
     <string name="home_day_over_button">Sonuçlara bak</string>
+    <string name="home_next_day_title">Yarının programı · %1$s</string>
+    <string name="home_next_day_note">Puanlar ve AGF yarış günü sabah gelir</string>
+    <string name="home_next_day_runner_weight">%1$s kg</string>
+    <string name="home_next_day_runner_form">Son 6: %1$s</string>
+    <string name="home_next_day_runner_count">%1$d at</string>
 </resources>

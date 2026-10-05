@@ -118,6 +118,14 @@ data class Meeting(
 
 data class TodayData(
     val date: String,
+    val meetings: List<Meeting>,
+    /* Tomorrow's TJK card; sent only once today's races are over. */
+    val nextDay: NextDayProgram? = null
+)
+
+/* Read-only next-day program: schedule and runners, no scores or AGF. */
+data class NextDayProgram(
+    val date: String,
     val meetings: List<Meeting>
 )
 

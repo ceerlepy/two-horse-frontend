@@ -107,9 +107,47 @@ class TwoHorseApi(
                     }
                 }
 
+            val nextDay =
+                json.optJSONObject(
+                    "nextDay"
+                )?.let { next ->
+                    val nextDate =
+                        next.optString(
+                            "date"
+                        )
+
+                    val nextMeetingsArray =
+                        next.optJSONArray(
+                            "meetings"
+                        )
+
+                    val nextMeetings =
+                        buildList {
+                            if (nextMeetingsArray != null) {
+                                for (i in 0 until nextMeetingsArray.length()) {
+                                    add(
+                                        parseMeeting(
+                                            nextMeetingsArray.getJSONObject(i),
+                                            nextDate
+                                        )
+                                    )
+                                }
+                            }
+                        }.filter { it.races.isNotEmpty() }
+
+                    NextDayProgram(
+                        date = nextDate,
+                        meetings = nextMeetings
+                    ).takeIf {
+                        nextDate.isNotBlank() &&
+                            nextMeetings.isNotEmpty()
+                    }
+                }
+
             TodayData(
                 date = date,
-                meetings = meetings
+                meetings = meetings,
+                nextDay = nextDay
             )
         }
 
