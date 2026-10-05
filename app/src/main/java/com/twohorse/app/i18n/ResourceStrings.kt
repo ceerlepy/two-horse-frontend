@@ -59,8 +59,38 @@ object ResourceStrings : Strings {
         @Composable get() = stringResource(R.string.login_error_google_incomplete)
 
     @Composable
-    override fun loginErrorGoogleFailed(code: Int): String =
+    override fun loginErrorGoogleFailed(code: String): String =
         stringResource(R.string.login_error_google_failed, code)
+
+    override val loginNameLabel: String
+        @Composable get() = stringResource(R.string.login_name_label)
+
+    override val loginRegisterButton: String
+        @Composable get() = stringResource(R.string.login_register_button)
+
+    override val loginSwitchToRegister: String
+        @Composable get() = stringResource(R.string.login_switch_to_register)
+
+    override val loginSwitchToLogin: String
+        @Composable get() = stringResource(R.string.login_switch_to_login)
+
+    override val loginPasswordHint: String
+        @Composable get() = stringResource(R.string.login_password_hint)
+
+    override val loginTrialNote: String
+        @Composable get() = stringResource(R.string.login_trial_note)
+
+    override val loginLegalNotice: String
+        @Composable get() = stringResource(R.string.login_legal_notice)
+
+    override val loginErrorEmailTaken: String
+        @Composable get() = stringResource(R.string.login_error_email_taken)
+
+    override val loginErrorInvalidEmail: String
+        @Composable get() = stringResource(R.string.login_error_invalid_email)
+
+    override val loginErrorWeakPassword: String
+        @Composable get() = stringResource(R.string.login_error_weak_password)
 
     override val accountTitle: String
         @Composable get() = stringResource(R.string.account_title)
@@ -101,6 +131,30 @@ object ResourceStrings : Strings {
 
     override val accountPurchaseVerifyFailed: String
         @Composable get() = stringResource(R.string.account_purchase_verify_failed)
+
+    override val accountManageSubscription: String
+        @Composable get() = stringResource(R.string.account_manage_subscription)
+
+    override val accountDeleteButton: String
+        @Composable get() = stringResource(R.string.account_delete_button)
+
+    override val accountDeleteTitle: String
+        @Composable get() = stringResource(R.string.account_delete_title)
+
+    override val accountDeleteMessage: String
+        @Composable get() = stringResource(R.string.account_delete_message)
+
+    override val accountDeleteConfirm: String
+        @Composable get() = stringResource(R.string.account_delete_confirm)
+
+    override val accountDeleteCancel: String
+        @Composable get() = stringResource(R.string.account_delete_cancel)
+
+    override val accountDeleteFailed: String
+        @Composable get() = stringResource(R.string.account_delete_failed)
+
+    override val accountPurchaseOtherAccount: String
+        @Composable get() = stringResource(R.string.account_purchase_other_account)
 
     override val couponErrorCityRequired: String
         @Composable get() = stringResource(R.string.coupon_error_city_required)

@@ -11,6 +11,7 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.BillingFlowParams
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -52,9 +53,16 @@ class BillingManager(
                 BillingClient.BillingResponseCode.OK &&
                 purchases != null
             ) {
-                purchases.forEach {
-                    _purchases.tryEmit(it)
-                }
+                // PENDING purchases (e.g. cash payment not made yet)
+                // arrive again as PURCHASED once paid.
+                purchases
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
+                    }
+                    .forEach {
+                        _purchases.tryEmit(it)
+                    }
             }
         }
 
@@ -65,8 +73,10 @@ class BillingManager(
                     .setListener(purchasesUpdatedListener)
                     .enablePendingPurchases(
                         PendingPurchasesParams.newBuilder()
+                            .enableOneTimeProducts()
                             .build()
                     )
+                    .enableAutoServiceReconnection()
                     .build()
 
             billingClient = client
@@ -117,16 +127,60 @@ class BillingManager(
             client.queryProductDetailsAsync(params) { _, result ->
                 if (cont.isActive) {
                     cont.resume(
-                        result
+                        result.productDetailsList
                     )
                 }
             }
         }
     }
 
+    /*
+     * Subscriptions the signed-in Play account currently owns. Used
+     * on screen open to re-send purchases whose verification never
+     * reached the backend (app killed, no network) and to find the
+     * old token when switching Gold <-> Premium.
+     */
+    suspend fun queryActiveSubscriptions(): List<Purchase> {
+        val client =
+            billingClient
+                ?: return emptyList()
+
+        val params =
+            QueryPurchasesParams.newBuilder()
+                .setProductType(
+                    BillingClient.ProductType.SUBS
+                )
+                .build()
+
+        return suspendCancellableCoroutine { cont ->
+            client.queryPurchasesAsync(params) { result, purchases ->
+                if (cont.isActive) {
+                    cont.resume(
+                        if (
+                            result.responseCode ==
+                            BillingClient.BillingResponseCode.OK
+                        )
+                            purchases
+                        else
+                            emptyList()
+                    )
+                }
+            }
+        }
+    }
+
+    /*
+     * [accountId] is our backend user id; Play stores it on the
+     * purchase (obfuscatedExternalAccountId) and the backend refuses
+     * to credit the purchase to any other account. [oldPurchaseToken]
+     * turns the purchase into a plan switch instead of a second,
+     * parallel subscription.
+     */
     fun launchPurchaseFlow(
         activity: Activity,
-        productDetails: ProductDetails
+        productDetails: ProductDetails,
+        accountId: String?,
+        oldPurchaseToken: String? = null
     ): Boolean {
         val client =
             billingClient
@@ -139,7 +193,7 @@ class BillingManager(
                 ?.offerToken
                 ?: return false
 
-        val flowParams =
+        val flowBuilder =
             BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(
                     listOf(
@@ -154,7 +208,31 @@ class BillingManager(
                             .build()
                     )
                 )
-                .build()
+
+        if (!accountId.isNullOrBlank()) {
+            flowBuilder.setObfuscatedAccountId(
+                accountId
+            )
+        }
+
+        if (!oldPurchaseToken.isNullOrBlank()) {
+            flowBuilder.setSubscriptionUpdateParams(
+                BillingFlowParams.SubscriptionUpdateParams
+                    .newBuilder()
+                    .setOldPurchaseToken(
+                        oldPurchaseToken
+                    )
+                    .setSubscriptionReplacementMode(
+                        BillingFlowParams.SubscriptionUpdateParams
+                            .ReplacementMode
+                            .WITH_TIME_PRORATION
+                    )
+                    .build()
+            )
+        }
+
+        val flowParams =
+            flowBuilder.build()
 
         val result =
             client.launchBillingFlow(

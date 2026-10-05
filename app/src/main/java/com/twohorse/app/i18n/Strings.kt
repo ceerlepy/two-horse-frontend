@@ -45,7 +45,27 @@ interface Strings {
     @get:Composable
     val loginErrorGoogleIncomplete: String
     @Composable
-    fun loginErrorGoogleFailed(code: Int): String
+    fun loginErrorGoogleFailed(code: String): String
+    @get:Composable
+    val loginNameLabel: String
+    @get:Composable
+    val loginRegisterButton: String
+    @get:Composable
+    val loginSwitchToRegister: String
+    @get:Composable
+    val loginSwitchToLogin: String
+    @get:Composable
+    val loginPasswordHint: String
+    @get:Composable
+    val loginTrialNote: String
+    @get:Composable
+    val loginLegalNotice: String
+    @get:Composable
+    val loginErrorEmailTaken: String
+    @get:Composable
+    val loginErrorInvalidEmail: String
+    @get:Composable
+    val loginErrorWeakPassword: String
 
     // ---- Account screen ----
     @get:Composable
@@ -74,6 +94,22 @@ interface Strings {
     fun accountPurchaseActivated(tierTitle: String): String
     @get:Composable
     val accountPurchaseVerifyFailed: String
+    @get:Composable
+    val accountManageSubscription: String
+    @get:Composable
+    val accountDeleteButton: String
+    @get:Composable
+    val accountDeleteTitle: String
+    @get:Composable
+    val accountDeleteMessage: String
+    @get:Composable
+    val accountDeleteConfirm: String
+    @get:Composable
+    val accountDeleteCancel: String
+    @get:Composable
+    val accountDeleteFailed: String
+    @get:Composable
+    val accountPurchaseOtherAccount: String
 
     // ---- Coupon errors ----
     @get:Composable

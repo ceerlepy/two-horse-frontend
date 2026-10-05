@@ -1,13 +1,12 @@
 package com.twohorse.app.ui.auth
 
-import android.app.Activity.RESULT_OK
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -20,13 +19,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.twohorse.app.Config
 import com.twohorse.app.data.api.ApiException as TwoHorseApiException
 import com.twohorse.app.data.repository.TwoHorseRepository
@@ -46,8 +51,13 @@ private sealed interface LoginError {
     data object NotConfigured : LoginError
     data object Generic : LoginError
     data object GoogleIncomplete : LoginError
-    data class GoogleFailed(val code: Int) : LoginError
+    data class GoogleFailed(val code: String) : LoginError
+    data object EmailTaken : LoginError
+    data object InvalidEmail : LoginError
+    data object WeakPassword : LoginError
 }
+
+private const val PASSWORD_MIN_LENGTH = 8
 
 @Composable
 private fun loginErrorText(
@@ -75,6 +85,15 @@ private fun loginErrorText(
 
         is LoginError.GoogleFailed ->
             strings.loginErrorGoogleFailed(error.code)
+
+        LoginError.EmailTaken ->
+            strings.loginErrorEmailTaken
+
+        LoginError.InvalidEmail ->
+            strings.loginErrorInvalidEmail
+
+        LoginError.WeakPassword ->
+            strings.loginErrorWeakPassword
     }
 
 private fun loginErrorFromThrowable(
@@ -91,6 +110,15 @@ private fun loginErrorFromThrowable(
 
         "GOOGLE_EMAIL_NOT_VERIFIED" ->
             LoginError.EmailNotVerified
+
+        "EMAIL_ALREADY_REGISTERED" ->
+            LoginError.EmailTaken
+
+        "INVALID_EMAIL" ->
+            LoginError.InvalidEmail
+
+        "WEAK_PASSWORD" ->
+            LoginError.WeakPassword
 
         "GOOGLE_CLIENT_ID_NOT_CONFIGURED",
         "SESSION_JWT_SECRET_NOT_CONFIGURED" ->
@@ -115,80 +143,106 @@ fun LoginScreen(
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<LoginError?>(null) }
 
-    val googleSignInClient =
+    var registerMode by remember { mutableStateOf(false) }
+    var displayName by remember { mutableStateOf("") }
+
+    val credentialManager =
         remember {
-            GoogleSignIn.getClient(
-                context,
-                GoogleSignInOptions
-                    .Builder(
-                        GoogleSignInOptions.DEFAULT_SIGN_IN
+            CredentialManager.create(context)
+        }
+
+    fun handleAuthResult(
+        result: Result<MembershipUser>
+    ) {
+        loading = false
+
+        result
+            .onSuccess { user ->
+                onLoginSuccess(user)
+            }
+            .onFailure { throwable ->
+                error =
+                    loginErrorFromThrowable(
+                        throwable
                     )
-                    .requestIdToken(
-                        Config.GOOGLE_WEB_CLIENT_ID
-                    )
-                    .requestEmail()
-                    .build()
+            }
+    }
+
+    /*
+     * Sign in with Google through Credential Manager (the current
+     * Android standard; the old GoogleSignIn API is deprecated). The
+     * ID token is audienced to the Web client ID, which the backend
+     * verifies against its GOOGLE_CLIENT_ID.
+     */
+    fun startGoogleSignIn() {
+        if (loading) return
+
+        error = null
+        loading = true
+
+        scope.launch {
+            val idToken =
+                try {
+                    val request =
+                        GetCredentialRequest.Builder()
+                            .addCredentialOption(
+                                GetSignInWithGoogleOption
+                                    .Builder(
+                                        Config.GOOGLE_WEB_CLIENT_ID
+                                    )
+                                    .build()
+                            )
+                            .build()
+
+                    val credential =
+                        credentialManager
+                            .getCredential(
+                                context,
+                                request
+                            )
+                            .credential
+
+                    if (
+                        credential is CustomCredential &&
+                        credential.type ==
+                        GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                    ) {
+                        GoogleIdTokenCredential
+                            .createFrom(
+                                credential.data
+                            )
+                            .idToken
+                    } else {
+                        error = LoginError.GoogleIncomplete
+                        null
+                    }
+                } catch (e: GetCredentialCancellationException) {
+                    null
+                } catch (e: GetCredentialException) {
+                    error =
+                        LoginError.GoogleFailed(
+                            e.type.substringAfterLast('.')
+                        )
+                    null
+                } catch (e: GoogleIdTokenParsingException) {
+                    error = LoginError.GoogleIncomplete
+                    null
+                }
+
+            if (idToken == null) {
+                loading = false
+                return@launch
+            }
+
+            handleAuthResult(
+                repository.loginWithGoogle(
+                    idToken
+                )
             )
         }
+    }
 
-    val googleLauncher =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode != RESULT_OK) {
-                return@rememberLauncherForActivityResult
-            }
-
-            val task =
-                GoogleSignIn.getSignedInAccountFromIntent(
-                    result.data
-                )
-
-            try {
-                val account =
-                    task.getResult(
-                        ApiException::class.java
-                    )
-
-                val idToken =
-                    account?.idToken
-
-                if (idToken == null) {
-                    error =
-                        LoginError.GoogleIncomplete
-
-                    return@rememberLauncherForActivityResult
-                }
-
-                loading = true
-                error = null
-
-                scope.launch {
-                    repository
-                        .loginWithGoogle(
-                            idToken
-                        )
-                        .onSuccess { user ->
-                            loading = false
-                            onLoginSuccess(user)
-                        }
-                        .onFailure { throwable ->
-                            loading = false
-                            error =
-                                loginErrorFromThrowable(
-                                    throwable
-                                )
-                        }
-                }
-            } catch (e: ApiException) {
-                error =
-                    LoginError.GoogleFailed(
-                        e.statusCode
-                    )
-            }
-        }
-
-    fun submitPasswordLogin() {
+    fun submitEmailForm() {
         if (loading) return
 
         if (
@@ -201,26 +255,33 @@ fun LoginScreen(
             return
         }
 
+        if (
+            registerMode &&
+            password.length < PASSWORD_MIN_LENGTH
+        ) {
+            error =
+                LoginError.WeakPassword
+
+            return
+        }
+
         loading = true
         error = null
 
         scope.launch {
-            repository
-                .loginWithPassword(
-                    email.trim(),
-                    password
-                )
-                .onSuccess { user ->
-                    loading = false
-                    onLoginSuccess(user)
-                }
-                .onFailure { throwable ->
-                    loading = false
-                    error =
-                        loginErrorFromThrowable(
-                            throwable
-                        )
-                }
+            handleAuthResult(
+                if (registerMode)
+                    repository.register(
+                        email.trim(),
+                        password,
+                        displayName.trim().ifBlank { null }
+                    )
+                else
+                    repository.loginWithPassword(
+                        email.trim(),
+                        password
+                    )
+            )
         }
     }
 
@@ -244,6 +305,7 @@ fun LoginScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                         .padding(24.dp),
                 verticalArrangement =
                     Arrangement.Center
@@ -278,12 +340,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(28.dp))
 
                 Button(
-                    onClick = {
-                        error = null
-                        googleLauncher.launch(
-                            googleSignInClient.signInIntent
-                        )
-                    },
+                    onClick = { startGoogleSignIn() },
                     enabled = !loading,
                     modifier =
                         Modifier
@@ -325,6 +382,18 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                if (registerMode) {
+                    OutlinedTextField(
+                        value = displayName,
+                        onValueChange = { displayName = it },
+                        label = { Text(strings.loginNameLabel) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -343,6 +412,10 @@ fun LoginScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text(strings.loginPasswordLabel) },
+                    supportingText =
+                        if (registerMode) {
+                            { Text(strings.loginPasswordHint) }
+                        } else null,
                     singleLine = true,
                     visualTransformation =
                         PasswordVisualTransformation(),
@@ -377,7 +450,7 @@ fun LoginScreen(
                 }
 
                 Button(
-                    onClick = { submitPasswordLogin() },
+                    onClick = { submitEmailForm() },
                     enabled = !loading,
                     modifier =
                         Modifier
@@ -397,11 +470,57 @@ fun LoginScreen(
                         )
                     } else {
                         Text(
-                            text = strings.loginSubmitButton,
+                            text =
+                                if (registerMode)
+                                    strings.loginRegisterButton
+                                else
+                                    strings.loginSubmitButton,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
+
+                if (registerMode) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = strings.loginTrialNote,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Green,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+                        registerMode = !registerMode
+                        error = null
+                    },
+                    enabled = !loading,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text =
+                            if (registerMode)
+                                strings.loginSwitchToLogin
+                            else
+                                strings.loginSwitchToRegister,
+                        color = Ink,
+                        fontSize = 13.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = strings.loginLegalNotice,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Muted,
+                    fontSize = 11.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

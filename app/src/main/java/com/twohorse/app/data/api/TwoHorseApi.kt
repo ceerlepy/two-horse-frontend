@@ -976,6 +976,78 @@ class TwoHorseApi(
             )
         }
 
+    suspend fun authRegister(
+        email: String,
+        password: String,
+        displayName: String?
+    ): AuthResult =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val body =
+                JSONObject()
+                    .put(
+                        "email",
+                        email
+                    )
+                    .put(
+                        "password",
+                        password
+                    )
+
+            if (!displayName.isNullOrBlank()) {
+                body.put(
+                    "displayName",
+                    displayName
+                )
+            }
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/auth/register"
+                        )
+                        .post(
+                            body
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            AuthResult(
+                token =
+                    json.getString(
+                        "token"
+                    ),
+
+                user =
+                    parseMembershipUser(
+                        json.getJSONObject(
+                            "user"
+                        )
+                    )
+            )
+        }
+
+    suspend fun deleteAccount() {
+        withContext(
+            Dispatchers.IO
+        ) {
+            execute(
+                Request.Builder()
+                    .url(
+                        "$baseUrl/api/auth/account"
+                    )
+                    .delete()
+                    .build()
+            )
+        }
+    }
+
     suspend fun authMe(): MembershipUser =
         withContext(
             Dispatchers.IO

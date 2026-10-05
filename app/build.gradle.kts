@@ -81,7 +81,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("com.android.billingclient:billing-ktx:7.1.1")
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.android.billingclient:billing-ktx:8.0.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
 }

@@ -1,6 +1,8 @@
 package com.twohorse.app.ui.account
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -22,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.Config
 import com.twohorse.app.billing.BillingManager
 import com.twohorse.app.data.repository.TwoHorseRepository
@@ -40,6 +44,8 @@ import java.util.Locale
 private sealed interface AccountMessage {
     data class PurchaseActivated(val tier: String) : AccountMessage
     data object PurchaseVerifyFailed : AccountMessage
+    data object PurchaseOtherAccount : AccountMessage
+    data object DeleteFailed : AccountMessage
 }
 
 private fun formatIsoDate(
@@ -98,6 +104,92 @@ fun AccountScreen(
     var message by
         remember { mutableStateOf<AccountMessage?>(null) }
 
+    var ownedSubscriptions by
+        remember { mutableStateOf<List<Purchase>>(emptyList()) }
+
+    var confirmDelete by
+        remember { mutableStateOf(false) }
+
+    var deleting by
+        remember { mutableStateOf(false) }
+
+    /*
+     * Sends a Play purchase to the backend, the only place that can
+     * grant a tier. [silent] is used for purchases found again on
+     * screen open, where a failure shouldn't show an error banner.
+     */
+    suspend fun verifyAndApply(
+        purchase: Purchase,
+        silent: Boolean
+    ) {
+        val productId =
+            purchase.products.firstOrNull()
+                ?: return
+
+        purchaseInFlight = true
+
+        if (!silent) {
+            message = null
+        }
+
+        repository
+            .verifyPurchase(
+                productId,
+                purchase.purchaseToken
+            )
+            .onSuccess { updated ->
+                user = updated
+                onUserUpdated(updated)
+
+                if (!purchase.isAcknowledged) {
+                    billingManager.acknowledge(
+                        purchase.purchaseToken
+                    )
+                }
+
+                if (!silent) {
+                    message =
+                        AccountMessage.PurchaseActivated(updated.tier)
+                }
+            }
+            .onFailure { throwable ->
+                if (!silent) {
+                    message =
+                        if (
+                            (throwable as? ApiException)?.apiCode ==
+                            "PURCHASE_BELONGS_TO_ANOTHER_ACCOUNT"
+                        )
+                            AccountMessage.PurchaseOtherAccount
+                        else
+                            AccountMessage.PurchaseVerifyFailed
+                }
+            }
+
+        purchaseInFlight = false
+    }
+
+    /*
+     * Gold <-> Premium is a plan switch on the existing subscription,
+     * not a second subscription running in parallel.
+     */
+    fun launchPurchase(
+        product: ProductDetails
+    ) {
+        val oldToken =
+            ownedSubscriptions
+                .firstOrNull { owned ->
+                    owned.products.none { it == product.productId }
+                }
+                ?.purchaseToken
+
+        billingManager.launchPurchaseFlow(
+            context as Activity,
+            product,
+            accountId = user?.id,
+            oldPurchaseToken = oldToken
+        )
+    }
+
     LaunchedEffect(Unit) {
         repository.me()
             .onSuccess { fresh -> user = fresh; onUserUpdated(fresh) }
@@ -123,42 +215,46 @@ fun AccountScreen(
                 products.firstOrNull {
                     it.productId == Config.PRODUCT_ID_PREMIUM_MONTHLY
                 }
+
+            ownedSubscriptions =
+                billingManager
+                    .queryActiveSubscriptions()
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
+                    }
+
+            // A purchase whose verification never reached the backend
+            // (app killed, no network) must still be verified and
+            // acknowledged, or Google refunds it after three days.
+            ownedSubscriptions
+                .filter {
+                    !it.isAcknowledged ||
+                        user?.tierSource != "play_subscription"
+                }
+                .forEach {
+                    verifyAndApply(
+                        it,
+                        silent = true
+                    )
+                }
         }
     }
 
     LaunchedEffect(Unit) {
         billingManager.purchases.collect { purchase ->
-            val productId =
-                purchase.products.firstOrNull()
-                    ?: return@collect
+            verifyAndApply(
+                purchase,
+                silent = false
+            )
 
-            purchaseInFlight = true
-            message = null
-
-            repository
-                .verifyPurchase(
-                    productId,
-                    purchase.purchaseToken
-                )
-                .onSuccess { updated ->
-                    user = updated
-                    onUserUpdated(updated)
-
-                    if (!purchase.isAcknowledged) {
-                        billingManager.acknowledge(
-                            purchase.purchaseToken
-                        )
+            ownedSubscriptions =
+                billingManager
+                    .queryActiveSubscriptions()
+                    .filter {
+                        it.purchaseState ==
+                            Purchase.PurchaseState.PURCHASED
                     }
-
-                    message =
-                        AccountMessage.PurchaseActivated(updated.tier)
-                }
-                .onFailure {
-                    message =
-                        AccountMessage.PurchaseVerifyFailed
-                }
-
-            purchaseInFlight = false
         }
     }
 
@@ -225,6 +321,12 @@ fun AccountScreen(
 
                             AccountMessage.PurchaseVerifyFailed ->
                                 strings.accountPurchaseVerifyFailed
+
+                            AccountMessage.PurchaseOtherAccount ->
+                                strings.accountPurchaseOtherAccount
+
+                            AccountMessage.DeleteFailed ->
+                                strings.accountDeleteFailed
                         }
 
                     Card(
@@ -247,7 +349,12 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (activeUser?.tier != "gold" && activeUser?.tier != "premium") {
+                // Trial users already have Gold features but still need
+                // to be able to buy before the trial runs out.
+                val onTrial =
+                    activeUser?.tierSource == "trial"
+
+                if (onTrial || (activeUser?.tier != "gold" && activeUser?.tier != "premium")) {
                     UpgradeCard(
                         title = strings.accountTierTitle("gold"),
                         description = strings.accountGoldDescription,
@@ -261,20 +368,14 @@ fun AccountScreen(
                                 ?.formattedPrice,
                         enabled = goldProduct != null && !purchaseInFlight,
                         onClick = {
-                            val product = goldProduct
-                            if (product != null) {
-                                billingManager.launchPurchaseFlow(
-                                    context as Activity,
-                                    product
-                                )
-                            }
+                            goldProduct?.let { launchPurchase(it) }
                         }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                if (activeUser?.tier != "premium") {
+                if (onTrial || activeUser?.tier != "premium") {
                     UpgradeCard(
                         title = strings.accountTierTitle("premium"),
                         description = strings.accountPremiumDescription,
@@ -288,20 +389,14 @@ fun AccountScreen(
                                 ?.formattedPrice,
                         enabled = premiumProduct != null && !purchaseInFlight,
                         onClick = {
-                            val product = premiumProduct
-                            if (product != null) {
-                                billingManager.launchPurchaseFlow(
-                                    context as Activity,
-                                    product
-                                )
-                            }
+                            premiumProduct?.let { launchPurchase(it) }
                         }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                if (activeUser?.tier == "premium") {
+                if (activeUser?.tier == "premium" && !onTrial) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors =
@@ -334,6 +429,31 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
+                if (activeUser?.tierSource == "play_subscription") {
+                    OutlinedButton(
+                        onClick = {
+                            val productId =
+                                activeUser.subscriptionProductId()
+
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(
+                                        "https://play.google.com/store/account/subscriptions" +
+                                            "?package=${context.packageName}" +
+                                            (productId?.let { "&sku=$it" } ?: "")
+                                    )
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(strings.accountManageSubscription)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
@@ -358,11 +478,81 @@ fun AccountScreen(
                     Text(strings.accountLogout)
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Required by Google Play for apps that let users create accounts.
+                if (activeUser?.tierSource != "manual") {
+                    TextButton(
+                        onClick = { confirmDelete = true },
+                        enabled = !deleting,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = strings.accountDeleteButton,
+                            color = Red,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
+
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!deleting) confirmDelete = false
+            },
+            title = { Text(strings.accountDeleteTitle) },
+            text = { Text(strings.accountDeleteMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleting = true
+
+                        scope.launch {
+                            repository
+                                .deleteAccount()
+                                .onSuccess {
+                                    deleting = false
+                                    confirmDelete = false
+                                    onLoggedOut()
+                                }
+                                .onFailure {
+                                    deleting = false
+                                    confirmDelete = false
+                                    message = AccountMessage.DeleteFailed
+                                }
+                        }
+                    },
+                    enabled = !deleting
+                ) {
+                    Text(
+                        text = strings.accountDeleteConfirm,
+                        color = Red
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { confirmDelete = false },
+                    enabled = !deleting
+                ) {
+                    Text(strings.accountDeleteCancel)
+                }
+            }
+        )
+    }
 }
+
+private fun MembershipUser.subscriptionProductId(): String? =
+    when (tier) {
+        "gold" -> Config.PRODUCT_ID_GOLD_MONTHLY
+        "premium" -> Config.PRODUCT_ID_PREMIUM_MONTHLY
+        else -> null
+    }
 
 @Composable
 private fun CurrentTierCard(
