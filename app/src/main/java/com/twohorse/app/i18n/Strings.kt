@@ -765,6 +765,8 @@ interface Strings {
     val accountFeatureAskAi: String
     @get:Composable
     val accountAskAiPremium: String
+    @get:Composable
+    val accountFeatureMyCoupons: String
 
     // ---- AI'ya sor ----
     @get:Composable
