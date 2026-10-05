@@ -310,6 +310,20 @@ interface Strings {
     @Composable
     fun raceTrainingJockey(name: String): String
     @get:Composable
+    val raceFormTitle: String
+    @get:Composable
+    val raceFormSubtitle: String
+    @get:Composable
+    val raceFormOpen: String
+    @get:Composable
+    val raceFormClose: String
+    @get:Composable
+    val raceFormEmpty: String
+    @get:Composable
+    val raceFormNoRuns: String
+    @Composable
+    fun raceFormOdds(odds: String): String
+    @get:Composable
     val raceCloseModelDetail: String
     @get:Composable
     val raceOpenModelDetail: String

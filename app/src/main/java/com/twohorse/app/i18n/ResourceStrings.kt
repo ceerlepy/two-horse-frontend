@@ -474,6 +474,28 @@ object ResourceStrings : Strings {
     override fun raceTrainingJockey(name: String): String =
         stringResource(R.string.race_training_jockey, name)
 
+    override val raceFormTitle: String
+        @Composable get() = stringResource(R.string.race_form_title)
+
+    override val raceFormSubtitle: String
+        @Composable get() = stringResource(R.string.race_form_subtitle)
+
+    override val raceFormOpen: String
+        @Composable get() = stringResource(R.string.race_form_open)
+
+    override val raceFormClose: String
+        @Composable get() = stringResource(R.string.race_form_close)
+
+    override val raceFormEmpty: String
+        @Composable get() = stringResource(R.string.race_form_empty)
+
+    override val raceFormNoRuns: String
+        @Composable get() = stringResource(R.string.race_form_no_runs)
+
+    @Composable
+    override fun raceFormOdds(odds: String): String =
+        stringResource(R.string.race_form_odds, odds)
+
     override val raceCloseModelDetail: String
         @Composable get() = stringResource(R.string.race_close_model_detail)
 

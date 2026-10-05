@@ -8,6 +8,7 @@ import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.MembershipUser
+import com.twohorse.app.domain.model.RaceForm
 import com.twohorse.app.domain.model.RaceTraining
 import com.twohorse.app.domain.model.TodayData
 
@@ -123,6 +124,19 @@ class TwoHorseRepository(
         Result<List<ForeignMeeting>> =
         runCatching {
             api.getForeignMeetings()
+        }
+
+    suspend fun raceForm(
+        raceDate: String,
+        city: String,
+        raceNumber: Int
+    ): Result<RaceForm> =
+        runCatching {
+            api.getRaceForm(
+                raceDate = raceDate,
+                city = city,
+                raceNumber = raceNumber
+            )
         }
 
     suspend fun raceTraining(

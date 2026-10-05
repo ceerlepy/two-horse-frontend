@@ -140,6 +140,13 @@
     <string name="race_training_retry">Tekrar dene</string>
     <string name="race_training_video">İdman videosu</string>
     <string name="race_training_jockey">İdman jokeyi: %1$s</string>
+    <string name="race_form_title">Son Yarışları</string>
+    <string name="race_form_subtitle">Atların TJK\'daki son 6 koşusu</string>
+    <string name="race_form_open">Son yarışları aç</string>
+    <string name="race_form_close">Son yarışları kapat</string>
+    <string name="race_form_empty">Bu koşunun atları için geçmiş henüz toplanmadı. Biraz sonra tekrar bakın.</string>
+    <string name="race_form_no_runs">İlk koşusu</string>
+    <string name="race_form_odds">Gny %1$s</string>
     <string name="race_close_model_detail">Model detayını kapat</string>
     <string name="race_open_model_detail">Model detayını aç</string>
     <string name="race_score_components">Skor bileşenleri</string>

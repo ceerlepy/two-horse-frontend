@@ -334,6 +334,22 @@ fun RaceDetailScreen(
                         horizontal = 18.dp
                     )
             ) {
+                RaceFormSection(
+                    raceDate = currentRace.raceDate,
+                    city = currentRace.city,
+                    raceNumber = currentRace.number,
+                    repository = repository
+                )
+            }
+        }
+
+        item {
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
                 ExpandableAnalysisHeader(
                     expanded =
                         deepExpanded,
@@ -1129,6 +1145,231 @@ private fun TrainingRow(
                 Text(
                     text = strings.raceTrainingVideo,
                     fontSize = 11.sp
+                )
+            }
+        }
+    }
+}
+
+private sealed interface FormLoadState {
+    data object Idle : FormLoadState
+    data object Loading : FormLoadState
+    data class Loaded(val form: RaceForm) : FormLoadState
+    data object Failed : FormLoadState
+}
+
+/* 59.5 -> "59,5", 62.0 -> "62" */
+private fun compactNumber(value: Double): String =
+    if (value % 1.0 == 0.0) value.toInt().toString()
+    else value.toString().replace('.', ',')
+
+@Composable
+private fun RaceFormSection(
+    raceDate: String?,
+    city: String,
+    raceNumber: Int,
+    repository: TwoHorseRepository
+) {
+    val strings = LocalStrings.current
+    val scope = rememberCoroutineScope()
+
+    var expanded by
+        remember(city, raceNumber) {
+            mutableStateOf(false)
+        }
+
+    var state by
+        remember(city, raceNumber) {
+            mutableStateOf<FormLoadState>(FormLoadState.Idle)
+        }
+
+    fun load() {
+        state = FormLoadState.Loading
+        scope.launch {
+            state =
+                repository
+                    .raceForm(
+                        raceDate = raceDate ?: "",
+                        city = city,
+                        raceNumber = raceNumber
+                    )
+                    .fold(
+                        onSuccess = { FormLoadState.Loaded(it) },
+                        onFailure = { FormLoadState.Failed }
+                    )
+        }
+    }
+
+    Card(
+        modifier =
+            Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Surface
+            ),
+        border =
+            CardDefaults
+                .outlinedCardBorder(),
+        shape =
+            RoundedCornerShape(18.dp)
+    ) {
+        Column {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            expanded = !expanded
+                            if (
+                                expanded &&
+                                state == FormLoadState.Idle
+                            ) {
+                                load()
+                            }
+                        }
+                        .padding(15.dp),
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = strings.raceFormTitle,
+                        color = Ink,
+                        fontWeight = FontWeight.Black
+                    )
+
+                    Text(
+                        text = strings.raceFormSubtitle,
+                        color = Muted,
+                        fontSize = 10.sp
+                    )
+                }
+
+                Icon(
+                    if (expanded)
+                        Icons.Default.KeyboardArrowUp
+                    else
+                        Icons.Default.KeyboardArrowDown,
+                    contentDescription =
+                        if (expanded)
+                            strings.raceFormClose
+                        else
+                            strings.raceFormOpen
+                )
+            }
+
+            if (expanded) {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            start = 15.dp,
+                            end = 15.dp,
+                            bottom = 15.dp
+                        ),
+                    verticalArrangement =
+                        Arrangement.spacedBy(12.dp)
+                ) {
+                    when (val current = state) {
+                        FormLoadState.Idle,
+                        FormLoadState.Loading ->
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = Green
+                            )
+
+                        FormLoadState.Failed -> {
+                            Text(
+                                text = strings.raceTrainingUnavailable,
+                                color = Muted,
+                                fontSize = 12.sp
+                            )
+                            TextButton(
+                                onClick = { load() }
+                            ) {
+                                Text(strings.raceTrainingRetry)
+                            }
+                        }
+
+                        is FormLoadState.Loaded -> {
+                            if (current.form.horses.all { it.runs.isEmpty() }) {
+                                Text(
+                                    text = strings.raceFormEmpty,
+                                    color = Muted,
+                                    fontSize = 12.sp
+                                )
+                            } else {
+                                current.form.horses.forEach { horse ->
+                                    HorseFormRow(horse = horse)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HorseFormRow(
+    horse: HorseForm
+) {
+    val strings = LocalStrings.current
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = "${horse.horseNumber}. ${horse.horseName}",
+            color = Ink,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        if (horse.runs.isEmpty()) {
+            Text(
+                text = strings.raceFormNoRuns,
+                color = Muted,
+                fontSize = 11.sp
+            )
+        }
+
+        horse.runs.forEach { run ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = run.finishPosition?.let { "$it." } ?: "-",
+                    modifier = Modifier.width(28.dp),
+                    color = if (run.finishPosition == 1) Green else Ink,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Black
+                )
+
+                Text(
+                    text =
+                        listOfNotNull(
+                            shortTrainingDate(run.raceDate),
+                            listOfNotNull(
+                                run.city,
+                                run.distanceMeters?.toString(),
+                                run.track
+                            ).joinToString(" ").takeIf { it.isNotBlank() },
+                            run.finishTime,
+                            run.jockey,
+                            run.weight?.let { compactNumber(it) },
+                            run.odds?.let { strings.raceFormOdds(compactNumber(it)) }
+                        ).joinToString(" · "),
+                    modifier = Modifier.weight(1f),
+                    color = Muted,
+                    fontSize = 11.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
