@@ -17,7 +17,7 @@ enum class Language(
 }
 
 private const val PREFS_NAME = "two_horse_prefs"
-private const val KEY_LOCALE_INITIALIZED = "locale_initialized"
+private const val KEY_LOCALE_INITIALIZED = "locale_initialized_v2"
 
 val LocalStrings =
     staticCompositionLocalOf<Strings> {

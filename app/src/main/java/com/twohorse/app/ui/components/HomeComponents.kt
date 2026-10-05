@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -90,33 +91,49 @@ fun TwoHorseHeader(
                 Modifier.width(12.dp)
             )
 
-            Column(
+            BoxWithConstraints(
                 modifier =
                     Modifier.weight(1f)
             ) {
-                Text(
-                    text = "Two Horse",
-                    color = Ink,
-                    fontSize =
-                        if (compact)
-                            23.sp
-                        else
-                            27.sp,
-                    fontWeight =
-                        FontWeight.Black,
-                    maxLines = 1
-                )
+                /*
+                 * The name must stay on one line whatever the phone's font
+                 * size: shrink it to the space left beside the icons
+                 * ("Two Horse" in Black weight is about 5.8 em wide).
+                 */
+                val fittedTitleSize =
+                    with(LocalDensity.current) {
+                        (maxWidth / 5.8f).toSp()
+                    }
 
-                Text(
-                    text =
-                        if (refreshing)
-                            strings.homeLiveUpdating
-                        else
-                            strings.homeTagline,
-                    color = Muted,
-                    fontSize = 12.sp,
-                    maxLines = 1
-                )
+                val titleSize =
+                    if (compact)
+                        minOf(23f, fittedTitleSize.value).sp
+                    else
+                        minOf(27f, fittedTitleSize.value).sp
+
+                Column {
+                    Text(
+                        text = "Two Horse",
+                        color = Ink,
+                        fontSize = titleSize,
+                        fontWeight =
+                            FontWeight.Black,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+
+                    Text(
+                        text =
+                            if (refreshing)
+                                strings.homeLiveUpdating
+                            else
+                                strings.homeTagline,
+                        color = Muted,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             IconButton(
