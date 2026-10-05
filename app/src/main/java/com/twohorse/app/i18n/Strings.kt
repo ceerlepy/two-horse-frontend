@@ -735,6 +735,8 @@ interface Strings {
     fun homeNextDayRunnerForm(form: String): String
     @Composable
     fun homeNextDayRunnerCount(n: Int): String
+    @Composable
+    fun homeNextDayExpertCount(n: Int): String
     @get:Composable
     val myCouponsButton: String
     @get:Composable

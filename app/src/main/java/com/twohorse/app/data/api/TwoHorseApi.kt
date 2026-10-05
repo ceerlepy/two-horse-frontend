@@ -2117,7 +2117,19 @@ class TwoHorseApi(
                 json.firstInt(
                     "finishPosition",
                     "finish_position"
-                )
+                ),
+
+            expertPickCount =
+                json.optInt(
+                    "expertPickCount",
+                    0
+                ).coerceAtLeast(0),
+
+            expertSummary =
+                json.optString(
+                    "expertSummary",
+                    ""
+                ).takeUnless { it == "null" }.orEmpty()
         )
     }
 
