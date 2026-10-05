@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +34,9 @@ import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.NextDayProgram
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.i18n.Language
 import com.twohorse.app.i18n.currentLanguage
+import com.twohorse.app.ui.components.AnalyticsChip
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.coupons.CouponCardHeader
 import com.twohorse.app.ui.theme.Border
@@ -53,7 +56,9 @@ import java.util.Locale
  * Tomorrow's TJK card, shown in place of the "day over" card once
  * every race of today has started and the backend has tomorrow's
  * program (`nextDay` on /api/today). Read-only: schedule and runners,
- * no scores or AGF -- those arrive on race-day morning.
+ * no scores or AGF -- those arrive on race-day morning. Early expert
+ * picks show as a count pill ("N uzman") when the backend has them
+ * (paid tiers only); never which sources.
  */
 
 private val TurkeyZone: ZoneId = ZoneId.of("Europe/Istanbul")
@@ -343,6 +348,35 @@ private fun NextDayRunnerRow(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+
+            /*
+             * The backend's consensus sentence is Turkish (built from
+             * counts only); English users get the count pill alone.
+             */
+            if (
+                horse.expertPickCount > 0 &&
+                horse.expertSummary.isNotBlank() &&
+                currentLanguage() == Language.TR
+            ) {
+                Text(
+                    text = horse.expertSummary,
+                    color = Muted,
+                    fontSize = 10.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        if (horse.expertPickCount > 0) {
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
+            AnalyticsChip(
+                text = strings.homeNextDayExpertCount(horse.expertPickCount),
+                strong = true
+            )
         }
     }
 }

@@ -1165,6 +1165,10 @@ object ResourceStrings : Strings {
     override fun homeNextDayRunnerCount(n: Int): String =
         stringResource(R.string.home_next_day_runner_count, n)
 
+    @Composable
+    override fun homeNextDayExpertCount(n: Int): String =
+        pluralStringResource(R.plurals.home_next_day_expert_count, n, n)
+
     override val myCouponsButton: String
         @Composable get() = stringResource(R.string.my_coupons_button)
 

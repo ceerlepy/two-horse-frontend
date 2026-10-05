@@ -94,7 +94,16 @@ data class Horse(
     val fieldSignal: FieldSignal? = null,
     val valueModel: ValueModelOpinion? = null,
 
-    val finishPosition: Int? = null
+    val finishPosition: Int? = null,
+
+    /*
+     * Tomorrow's card only (`nextDay` runners): how many expert
+     * sources already pick this horse, and the backend's counts-only
+     * Turkish consensus sentence. Never a source name. 0 / "" when
+     * absent (today's runners, free tier, nothing published yet).
+     */
+    val expertPickCount: Int = 0,
+    val expertSummary: String = ""
 )
 
 data class Race(

@@ -397,7 +397,11 @@
     <string name="home_day_over_body">Results and our model\'s ranking for today are in Past Races. Tomorrow\'s card appears here once TJK publishes it.</string>
     <string name="home_day_over_button">See results</string>
     <string name="home_next_day_title">Tomorrow\'s card · %1$s</string>
-    <string name="home_next_day_note">Scores and AGF arrive on race-day morning</string>
+    <string name="home_next_day_note">Scores and AGF arrive on race-day morning; early expert picks are shown when available</string>
+    <plurals name="home_next_day_expert_count">
+        <item quantity="one">%1$d expert</item>
+        <item quantity="other">%1$d experts</item>
+    </plurals>
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Last 6: %1$s</string>
     <string name="home_next_day_runner_count">%1$d runners</string>
