@@ -1,7 +1,6 @@
 package com.twohorse.app.ui.home
 
 import androidx.compose.foundation.background
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -25,8 +29,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,17 +49,18 @@ import com.twohorse.app.ui.components.ForeignEntryCard
 import com.twohorse.app.ui.components.NextRaceHero
 import com.twohorse.app.ui.components.RaceCard
 import com.twohorse.app.ui.components.RemainingRacesToggle
-import com.twohorse.app.ui.components.SixFoldEntryCard
 import com.twohorse.app.ui.components.ShimmerBlock
+import com.twohorse.app.ui.components.SixFoldEntryCard
 import com.twohorse.app.ui.components.TwoHorseHeader
 import com.twohorse.app.ui.components.UpcomingRaceCard
+import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
-import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.OffsetDateTime
 import kotlin.math.max
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -302,6 +308,29 @@ fun HomeScreen(
         futureRaces
             .firstOrNull()
 
+    /*
+     * Cities that still have a race to run today. Once a meeting is
+     * over its chip goes away; when every meeting is over the home
+     * screen says so instead of showing empty city filters.
+     */
+    val upcomingCities =
+        allRaces
+            .filter {
+                val time =
+                    raceTimeMillis(
+                        it
+                    )
+
+                time == null ||
+                time >=
+                    nowMillis -
+                    60_000L
+            }
+            .map {
+                it.city
+            }
+            .distinct()
+
     LazyColumn(
         modifier =
             Modifier.fillMaxSize(),
@@ -346,7 +375,7 @@ fun HomeScreen(
         }
 
         if (
-            cities.isNotEmpty()
+            upcomingCities.isNotEmpty()
         ) {
             item {
                 LazyRow(
@@ -373,7 +402,7 @@ fun HomeScreen(
                     }
 
                     items(
-                        cities
+                        upcomingCities
                     ) { city ->
                         CityChip(
                             city =
@@ -445,6 +474,23 @@ fun HomeScreen(
                 )
             }
         } else {
+            if (
+                upcomingCities.isEmpty()
+            ) {
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        DayOverCard(
+                            onResultsClick = onHistoryClick
+                        )
+                    }
+                }
+            }
+
             if (
                 nextRace != null
             ) {
@@ -790,5 +836,77 @@ private fun HomeLoadingSkeleton() {
             color = Muted,
             fontSize = 11.sp
         )
+    }
+}
+
+/* Shown once every meeting of the day has run. */
+@Composable
+private fun DayOverCard(
+    onResultsClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0xFF0A3F2B),
+                            Green
+                        )
+                    ),
+                    RoundedCornerShape(22.dp)
+                )
+                .padding(20.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.NightsStay,
+            contentDescription = null,
+            tint = Gold,
+            modifier = Modifier.size(30.dp)
+        )
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
+
+        Text(
+            text = strings.homeDayOverTitle,
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(
+            modifier = Modifier.height(4.dp)
+        )
+
+        Text(
+            text = strings.homeDayOverBody,
+            color = Color(0xFFCFE9DC),
+            fontSize = 13.sp,
+            lineHeight = 18.sp
+        )
+
+        Spacer(
+            modifier = Modifier.height(14.dp)
+        )
+
+        Button(
+            onClick = onResultsClick,
+            shape = RoundedCornerShape(12.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Green
+                )
+        ) {
+            Text(
+                text = strings.homeDayOverButton,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }

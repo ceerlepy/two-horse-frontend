@@ -391,4 +391,7 @@
     <string name="my_coupons_delete">Kuponu sil</string>
     <string name="my_coupons_load_failed">Kuponların yüklenemedi. Biraz sonra tekrar dene.</string>
     <string name="my_coupons_winner">Kazanan: %1$d</string>
+    <string name="home_day_over_title">Bugünün yarışları bitti</string>
+    <string name="home_day_over_body">Sonuçlar ve modelimizin bugünkü sıralaması Geçmiş Yarışlar\'da. Yarının programı TJK\'da yayınlanınca burada görünecek.</string>
+    <string name="home_day_over_button">Sonuçlara bak</string>
 </resources>

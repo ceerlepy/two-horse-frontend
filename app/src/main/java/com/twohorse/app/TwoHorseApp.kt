@@ -3,7 +3,7 @@ package com.twohorse.app
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -168,17 +168,18 @@ fun TwoHorseApp() {
             Bg
     ) {
         /*
-         * targetSdk 35 draws the app edge to edge: the system
-         * navigation bar (gesture handle or back/home/menu buttons)
-         * sits over the bottom of the window. Pad every screen above
-         * it so bottom buttons stay tappable; the status bar is
-         * handled per screen header.
+         * targetSdk 35 draws the app edge to edge: the status bar
+         * (clock, battery) sits over the top of the window and the
+         * navigation bar (back/home/menu) over the bottom. Pad every
+         * screen inside both so headers stay readable and bottom
+         * buttons stay tappable. This consumes the insets, so the
+         * screens' own statusBarsPadding() calls become no-ops.
          */
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .navigationBarsPadding()
+                    .systemBarsPadding()
         ) {
             when (
                 val current =

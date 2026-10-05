@@ -1,10 +1,12 @@
 package com.twohorse.app.ui.foreign
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,6 +28,8 @@ import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
+import com.twohorse.app.ui.coupons.CouponCardHeader
+import com.twohorse.app.ui.coupons.CouponPill
 import com.twohorse.app.ui.theme.*
 
 private sealed interface ForeignLoadState {
@@ -197,6 +203,7 @@ private fun ForeignNotice(text: String) {
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ForeignRaceCard(race: ForeignRace) {
     val strings = LocalStrings.current
@@ -208,40 +215,37 @@ private fun ForeignRaceCard(race: ForeignRace) {
             }.thenBy { it.number }
         )
 
+    /* Same look as the domestic coupon cards: green header, white body. */
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = CardDefaults.outlinedCardBorder(),
-        shape = RoundedCornerShape(18.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
+        CouponCardHeader(
+            title = strings.foreignRaceTitle(race.raceNumber.toString()),
+            subtitle =
+                listOfNotNull(
+                    race.distanceMeters?.let { "${it}m" },
+                    race.track
+                ).joinToString(" · "),
+            trailing = {
+                race.time?.let {
+                    CouponPill(text = it)
+                }
+            }
+        )
+
         Column(
             modifier = Modifier.padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = strings.foreignRaceTitle(race.raceNumber.toString()),
-                    modifier = Modifier.weight(1f),
-                    color = Ink,
-                    fontWeight = FontWeight.Black
-                )
-                Text(
-                    text =
-                        listOfNotNull(
-                            race.time,
-                            race.distanceMeters?.let { "${it}m" },
-                            race.track
-                        ).joinToString(" · "),
-                    color = Muted,
-                    fontSize = 11.sp
-                )
-            }
-
             race.aiPick?.let { pick ->
                 val top = pick.ranked.firstOrNull()
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     top?.let {
                         LavenderLabel(strings.foreignAiTop("${it.number}-${it.name}"))
@@ -251,25 +255,41 @@ private fun ForeignRaceCard(race: ForeignRace) {
                         LavenderLabel(strings.foreignAiSelection(pick.selection.joinToString("-")))
                     }
                 }
-
             }
 
             ordered.forEachIndexed { index, runner ->
+                val leading = index < 3
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${runner.number}",
-                        modifier = Modifier.width(26.dp),
-                        color = if (index < 3) Green else Muted,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 13.sp
-                    )
-                    Column(Modifier.weight(1f)) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(28.dp)
+                                .background(
+                                    if (leading) Green else PaleGreen,
+                                    CircleShape
+                                ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${runner.number}",
+                            color = if (leading) Color.White else Green,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
+                    ) {
                         Text(
                             text = runner.name,
                             color = Ink,
                             fontSize = 13.sp,
                             fontWeight =
-                                if (index < 3) FontWeight.Bold else FontWeight.Normal,
+                                if (leading) FontWeight.ExtraBold else FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -290,12 +310,18 @@ private fun ForeignRaceCard(race: ForeignRace) {
                         }
                     }
                     runner.agfPercent?.let {
-                        Text(
-                            text = "%${"%.0f".format(it)}",
-                            color = if (index < 3) Green else Muted,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
+                        Surface(
+                            color = if (leading) PaleGreen else Bg,
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Text(
+                                text = "%${"%.0f".format(it)}",
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                color = if (leading) Green else Muted,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
                 }
             }
@@ -311,8 +337,8 @@ private fun LavenderLabel(text: String) {
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
-            color = Lavender,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            color = Color.White,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -321,54 +347,96 @@ private fun LavenderLabel(text: String) {
     }
 }
 
+/* Gold title on deep lavender, white bold picks, gold total pill. */
+private val ForeignAiTitle = Color(0xFFF5C451)
+
+private val ForeignAiBrush =
+    Brush.linearGradient(
+        listOf(
+            Color(0xFF2A2338),
+            LavenderSurface,
+            Color(0xFF4A3D66)
+        )
+    )
+
 @Composable
 private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
     val strings = LocalStrings.current
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = LavenderSurface),
-        shape = RoundedCornerShape(18.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
-            modifier = Modifier.padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(ForeignAiBrush)
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = strings.foreignAiCouponTitle(coupon.altili),
                     modifier = Modifier.weight(1f),
-                    color = Lavender,
+                    color = ForeignAiTitle,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.Black
                 )
                 coupon.startTime?.let {
                     Text(
                         text = strings.foreignAiCouponStart(it),
                         color = Lavender,
-                        fontSize = 11.sp
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
             coupon.legs.forEach { leg ->
-                Text(
-                    text = strings.foreignAiLeg(leg.raceNumber, leg.selection.joinToString("-")),
-                    color = Lavender,
-                    fontSize = 12.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = Color.White.copy(alpha = 0.10f),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "${leg.raceNumber}.K",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            color = Lavender,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Text(
+                        text = leg.selection.joinToString(" - "),
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
 
             if (coupon.combinations != null && coupon.amountTl != null) {
-                Text(
-                    text =
-                        strings.foreignAiCouponTotal(
-                            coupon.combinations,
-                            "%.0f".format(coupon.amountTl)
-                        ),
-                    color = Lavender,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Surface(
+                    color = ForeignAiTitle,
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Text(
+                        text =
+                            strings.foreignAiCouponTotal(
+                                coupon.combinations,
+                                "%.0f".format(coupon.amountTl)
+                            ),
+                        modifier = Modifier.padding(horizontal = 11.dp, vertical = 5.dp),
+                        color = Color(0xFF2B1D03),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
         }
     }
