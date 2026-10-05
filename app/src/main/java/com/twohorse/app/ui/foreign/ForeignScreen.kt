@@ -252,15 +252,6 @@ private fun ForeignRaceCard(race: ForeignRace) {
                     }
                 }
 
-                if (pick.comment.isNotBlank()) {
-                    Text(
-                        text = pick.comment,
-                        color = Muted,
-                        fontSize = 11.sp,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
             }
 
             ordered.forEachIndexed { index, runner ->

@@ -2053,7 +2053,7 @@ private fun ExpertConsensusSection(
         )
 
         Text(
-            text = value.summary,
+            text = consensusSummary(value),
             color = Muted,
             fontSize = 11.sp
         )
@@ -2485,5 +2485,64 @@ private fun DeepAnalysisCard(
                     )
                 }
         }
+    }
+}
+
+
+/*
+ * The consensus sentence in the app's language, built from the same
+ * counts and rules as the backend's Turkish summary (experts/aggregator.ts
+ * buildSummary), so English users don't see Turkish server text.
+ */
+@Composable
+private fun consensusSummary(
+    value: ExpertConsensusSummary
+): String {
+    val strings = LocalStrings.current
+
+    if (value.sourceCount <= 0) {
+        return value.summary
+    }
+
+    val positive =
+        listOf(
+            Triple(value.bankoCount, value.bankoScore, strings.raceCategoryBanko),
+            Triple(value.favoriteCount, value.favoriteScore, strings.raceCategoryFavorite),
+            Triple(value.strongCount, value.strongScore, strings.raceCategoryStrong),
+            Triple(value.starCount, value.starScore, strings.raceCategoryStar),
+            Triple(value.surpriseCount, value.surpriseScore, strings.raceCategorySurprise),
+            Triple(value.rivalCount, value.rivalScore, strings.raceCategoryRival)
+        )
+            .filter { it.first > 0 }
+            .sortedByDescending { it.first }
+            .firstOrNull()
+
+    return when {
+        value.avoidCount > 0 && value.avoidCount >= (positive?.first ?: 0) ->
+            strings.raceConsensusAvoid(
+                value.sourceCount,
+                value.avoidCount,
+                value.avoidScore.roundToInt()
+            )
+
+        positive != null && value.avoidCount > 0 ->
+            strings.raceConsensusPositiveWithAvoid(
+                value.sourceCount,
+                positive.first,
+                positive.third,
+                positive.second.roundToInt(),
+                value.avoidCount
+            )
+
+        positive != null ->
+            strings.raceConsensusPositive(
+                value.sourceCount,
+                positive.first,
+                positive.third,
+                positive.second.roundToInt()
+            )
+
+        else ->
+            strings.raceConsensusNoDirection(value.sourceCount)
     }
 }

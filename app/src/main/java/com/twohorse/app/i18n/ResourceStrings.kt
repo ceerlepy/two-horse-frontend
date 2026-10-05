@@ -666,6 +666,40 @@ object ResourceStrings : Strings {
     override fun raceAvoidTag(n: Int, pct: Int): String =
         stringResource(R.string.race_avoid_tag, n, pct)
 
+    @Composable
+    override fun raceConsensusAvoid(sources: Int, avoid: Int, pct: Int): String =
+        stringResource(R.string.race_consensus_avoid, sources, avoid, pct)
+
+    @Composable
+    override fun raceConsensusPositive(sources: Int, n: Int, category: String, pct: Int): String =
+        stringResource(R.string.race_consensus_positive, sources, n, category, pct)
+
+    @Composable
+    override fun raceConsensusPositiveWithAvoid(sources: Int, n: Int, category: String, pct: Int, avoid: Int): String =
+        stringResource(R.string.race_consensus_positive_with_avoid, sources, n, category, pct, avoid)
+
+    @Composable
+    override fun raceConsensusNoDirection(sources: Int): String =
+        stringResource(R.string.race_consensus_no_direction, sources)
+
+    override val raceCategoryBanko: String
+        @Composable get() = stringResource(R.string.race_category_banko)
+
+    override val raceCategoryFavorite: String
+        @Composable get() = stringResource(R.string.race_category_favorite)
+
+    override val raceCategoryStrong: String
+        @Composable get() = stringResource(R.string.race_category_strong)
+
+    override val raceCategoryStar: String
+        @Composable get() = stringResource(R.string.race_category_star)
+
+    override val raceCategorySurprise: String
+        @Composable get() = stringResource(R.string.race_category_surprise)
+
+    override val raceCategoryRival: String
+        @Composable get() = stringResource(R.string.race_category_rival)
+
     override val raceValueModelTitle: String
         @Composable get() = stringResource(R.string.race_value_model_title)
 
