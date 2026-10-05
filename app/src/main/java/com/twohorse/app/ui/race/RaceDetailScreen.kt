@@ -2291,28 +2291,23 @@ private fun ValueModelSection(
 
     val pct = { p: Double -> "%.1f".format(p * 100) }
 
-    val tag: (@Composable () -> Unit)? =
-        when (value.label) {
-            "underrated" -> @Composable {
-                AnalyticsChip(
-                    strings.raceValueUnderrated,
-                    accent = true
-                )
-            }
-
-            "overrated" -> @Composable {
-                AnalyticsChip(
-                    strings.raceValueOverrated,
-                    danger = true
-                )
-            }
-
-            else -> null
-        }
-
     InsetBox(
         title = strings.raceValueModelTitle,
-        trailing = tag
+        trailing = {
+            when (value.label) {
+                "underrated" ->
+                    AnalyticsChip(
+                        strings.raceValueUnderrated,
+                        accent = true
+                    )
+
+                "overrated" ->
+                    AnalyticsChip(
+                        strings.raceValueOverrated,
+                        danger = true
+                    )
+            }
+        }
     ) {
         Text(
             text =
