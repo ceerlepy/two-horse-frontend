@@ -60,6 +60,7 @@ import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
 import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import kotlin.math.max
 import kotlinx.coroutines.delay
 
@@ -783,8 +784,12 @@ private fun displayRaceTime(
             ?: return "--:--"
 
     return runCatching {
+        // starts_at is UTC ("...Z"); races are shown in Turkey time.
         OffsetDateTime
             .parse(value)
+            .atZoneSameInstant(
+                ZoneId.of("Europe/Istanbul")
+            )
             .toLocalTime()
             .toString()
             .take(5)
