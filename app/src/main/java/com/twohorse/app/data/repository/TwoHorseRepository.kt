@@ -3,6 +3,7 @@ package com.twohorse.app.data.repository
 import android.content.Context
 import com.twohorse.app.data.api.TwoHorseApi
 import com.twohorse.app.data.auth.SessionStore
+import com.twohorse.app.domain.model.CouponHistoryEntry
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.HistoryRace
@@ -144,6 +145,13 @@ class TwoHorseRepository(
                 horseNumber =
                     horseNumber
             )
+        }
+
+    suspend fun couponHistory(
+        days: Int = 30
+    ): Result<List<CouponHistoryEntry>> =
+        runCatching {
+            api.getCouponHistory(days)
         }
 
     suspend fun foreignMeetings():

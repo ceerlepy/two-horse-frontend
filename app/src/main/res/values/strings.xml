@@ -20,8 +20,8 @@
     <string name="account_trial_ends_at">Deneme süresi %1$s tarihine kadar</string>
     <string name="account_subscription_renews_at">Abonelik %1$s tarihinde yenilenir</string>
     <string name="account_unlimited">Süresiz</string>
-    <string name="account_gold_description">Tüm model sinyalleri açık · 1500 TL\'ye kadar kupon üretimi</string>
-    <string name="account_premium_description">Gold\'un hepsi + at videosu arşivi + sınırsız kupon bütçesi</string>
+    <string name="account_gold_description">Tüm model sinyalleri ve uzman konsensusu · günde 10 kupon, 1.500 TL\'ye kadar</string>
+    <string name="account_premium_description">Gold\'un hepsi + \"AGF\'nin hafife aldığı at\" etiketi + sınırsız kupon + kupon geçmişi</string>
     <string name="account_upgrade_to">%1$s\'a Yükselt</string>
     <string name="account_loading_ellipsis">Yükleniyor…</string>
     <string name="account_already_premium">Zaten Premium\'sun, her şey açık.</string>
@@ -52,7 +52,7 @@
     <string name="account_choose_plan">Planını seç</string>
     <string name="account_badge_popular">En popüler</string>
     <string name="account_per_month">/ay</string>
-    <string name="account_renewal_terms">Abonelik her ay otomatik yenilenir ve ödeme Google Play hesabından alınır. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin; iptal edersen dönem sonuna kadar kullanmaya devam edersin.</string>
+    <string name="account_renewal_terms">Abonelik seçtiğin döneme göre her ay ya da her yıl otomatik yenilenir ve ödeme Google Play hesabından alınır. Google Play › Abonelikler bölümünden istediğin zaman iptal edebilirsin; iptal edersen dönem sonuna kadar kullanmaya devam edersin.</string>
     <string name="account_restore_purchases">Satın alımları geri yükle</string>
     <string name="account_restore_none">Bu Google hesabında geri yüklenecek bir abonelik bulunamadı.</string>
     <string name="account_trial_badge">Deneme</string>
@@ -336,4 +336,24 @@
     <string name="history_city_and_race">%1$s · %2$s. Koşu</string>
     <string name="history_date_and_time">%1$s · %2$s</string>
     <string name="history_race_number_abbrev">%1$s. K</string>
+    <string name="coupon_history_button">Geçmiş</string>
+    <string name="coupon_history_title">Kupon geçmişi</string>
+    <string name="coupon_history_subtitle">Son 30 gün · yarış başlamadan önce kaydedilen kuponlar</string>
+    <string name="coupon_history_empty">Henüz kayıtlı kupon yok. Kuponlar her altılı ve beşli başlamadan önce otomatik kaydedilir.</string>
+    <string name="coupon_history_pending">Sonuç bekleniyor</string>
+    <string name="coupon_history_all_hit">Tüm ayaklar tuttu</string>
+    <string name="coupon_history_legs_hit">%1$d/%2$d ayak tuttu</string>
+    <string name="coupon_history_cost">%1$s TL · %2$d kombinasyon</string>
+    <string name="coupon_history_leg">%1$d. ayak (%2$d. koşu): %3$s</string>
+    <string name="coupon_error_daily_limit">Bugünkü kupon hakkın doldu. Gold\'da günde 10 farklı kupon oluşturabilirsin; sınırsız kupon Premium\'da.</string>
+    <string name="account_feature_value_model">\"AGF\'nin hafife aldığı at\" etiketi</string>
+    <string name="account_feature_coupon_history">Kupon geçmişi ve sonuçları</string>
+    <string name="account_feature_daily_coupons">Günlük kupon</string>
+    <string name="account_daily_coupons_gold">10</string>
+    <string name="account_period_monthly">Aylık</string>
+    <string name="account_period_yearly">Yıllık</string>
+    <string name="account_yearly_saving">2 ay bedava</string>
+    <string name="account_per_year">/yıl</string>
+    <string name="coupon_history_window_sixfold">%1$d. Altılı</string>
+    <string name="coupon_history_window_fivefold">%1$d. Beşli</string>
 </resources>

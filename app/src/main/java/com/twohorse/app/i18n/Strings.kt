@@ -699,4 +699,44 @@ interface Strings {
     fun historyDateAndTime(date: String, time: String): String
     @Composable
     fun historyRaceNumberAbbrev(n: Int): String
+
+    // ---- Premium package / coupon history ----
+    @get:Composable
+    val couponHistoryButton: String
+    @get:Composable
+    val couponHistoryTitle: String
+    @get:Composable
+    val couponHistorySubtitle: String
+    @get:Composable
+    val couponHistoryEmpty: String
+    @get:Composable
+    val couponHistoryPending: String
+    @get:Composable
+    val couponHistoryAllHit: String
+    @Composable
+    fun couponHistoryLegsHit(hit: Int, total: Int): String
+    @Composable
+    fun couponHistoryCost(totalTl: String, combinations: Int): String
+    @Composable
+    fun couponHistoryLeg(leg: Int, raceNumber: Int, horses: String): String
+    @get:Composable
+    val couponErrorDailyLimit: String
+    @get:Composable
+    val accountFeatureValueModel: String
+    @get:Composable
+    val accountFeatureCouponHistory: String
+    @get:Composable
+    val accountFeatureDailyCoupons: String
+    @get:Composable
+    val accountDailyCouponsGold: String
+    @get:Composable
+    val accountPeriodMonthly: String
+    @get:Composable
+    val accountPeriodYearly: String
+    @get:Composable
+    val accountYearlySaving: String
+    @get:Composable
+    val accountPerYear: String
+    @Composable
+    fun couponHistoryWindow(pool: String, windowNumber: Int): String
 }

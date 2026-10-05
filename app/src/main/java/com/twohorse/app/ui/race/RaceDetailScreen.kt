@@ -49,8 +49,8 @@ fun RaceDetailScreen(
 
     val strings = LocalStrings.current
 
-    val canViewVideos =
-        currentUser?.tier == "premium"
+    // Videos are links to TJK's own public pages, open to every plan.
+    val canViewVideos = true
 
     val screenContext =
         LocalContext.current

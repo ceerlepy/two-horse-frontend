@@ -19,10 +19,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 /*
- * Thin wrapper around Play Billing Library for the two monthly
- * subscription products (gold_monthly / premium_monthly). Product
- * IDs must match Play Console exactly and the backend's
- * PRODUCT_TIER_MAP (src/membership/tier.ts).
+ * Thin wrapper around Play Billing Library for the two subscription
+ * products (gold_monthly / premium_monthly), each with a "monthly"
+ * and a "yearly" base plan. Product IDs must match Play Console
+ * exactly and the backend's PRODUCT_TIER_MAP (src/membership/tier.ts);
+ * the base plan is not the backend's concern, since both grant the
+ * same tier.
  *
  * This class never decides a purchase is valid on its own -- it
  * only surfaces raw purchases via [purchases]; the caller is
@@ -180,6 +182,7 @@ class BillingManager(
         activity: Activity,
         productDetails: ProductDetails,
         accountId: String?,
+        basePlanId: String,
         oldPurchaseToken: String? = null
     ): Boolean {
         val client =
@@ -188,8 +191,7 @@ class BillingManager(
 
         val offerToken =
             productDetails
-                .subscriptionOfferDetails
-                ?.firstOrNull()
+                .offerFor(basePlanId)
                 ?.offerToken
                 ?: return false
 
@@ -271,3 +273,41 @@ class BillingManager(
         billingClient = null
     }
 }
+
+/*
+ * The offer to buy for one base plan: the plain base-plan offer
+ * (no offerId) when there is one, otherwise any offer on that plan.
+ * A product set up before base plan IDs were fixed may only have a
+ * single base plan under another ID; monthly then falls back to it
+ * so existing setups keep working.
+ */
+fun ProductDetails.offerFor(
+    basePlanId: String
+): ProductDetails.SubscriptionOfferDetails? {
+    val offers =
+        subscriptionOfferDetails
+            .orEmpty()
+
+    val onPlan =
+        offers.filter { it.basePlanId == basePlanId }
+
+    return onPlan.firstOrNull { it.offerId == null }
+        ?: onPlan.firstOrNull()
+        ?: offers
+            .takeIf { basePlanId == BASE_PLAN_MONTHLY && offers.none { it.basePlanId == BASE_PLAN_YEARLY } }
+            ?.firstOrNull()
+}
+
+/* Recurring price of one base plan, e.g. "₺349,00". */
+fun ProductDetails?.priceFor(
+    basePlanId: String
+): String? =
+    this
+        ?.offerFor(basePlanId)
+        ?.pricingPhases
+        ?.pricingPhaseList
+        ?.lastOrNull()
+        ?.formattedPrice
+
+const val BASE_PLAN_MONTHLY = "monthly"
+const val BASE_PLAN_YEARLY = "yearly"
