@@ -1173,6 +1173,11 @@ object ResourceStrings : Strings {
         else
             stringResource(R.string.coupon_history_window_sixfold, windowNumber)
 
+    override val accountFeatureAskAi: String
+        @Composable get() = stringResource(R.string.account_feature_ask_ai)
+
+    override val accountAskAiPremium: String
+        @Composable get() = stringResource(R.string.account_ask_ai_premium)
 
     override val askAiTitle: String
         @Composable get() = stringResource(R.string.ask_ai_title)
