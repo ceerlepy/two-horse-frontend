@@ -358,4 +358,25 @@
     <string name="coupon_history_window_fivefold">Pick 5 #%1$d</string>
     <string name="account_feature_ask_ai">Ask the AI</string>
     <string name="account_ask_ai_premium">20/day</string>
+
+    <!-- AI'ya sor -->
+    <string name="ask_ai_title">🤖 Ask the AI</string>
+    <string name="ask_ai_subtitle">Ask about this race. Answers use only this race\'s data.</string>
+    <string name="ask_ai_placeholder">Type your question…</string>
+    <string name="ask_ai_send">Ask</string>
+    <string name="ask_ai_suggestion_favorite">Why is the favourite on top?</string>
+    <string name="ask_ai_suggestion_upset">Could there be an upset?</string>
+    <string name="ask_ai_suggestion_agf">Which horse does AGF underrate?</string>
+    <string name="ask_ai_disclaimer">AI-generated answer; it can be wrong. Not betting advice.</string>
+    <string name="ask_ai_you">You</string>
+    <string name="ask_ai_locked_title">🤖 Ask the AI · Premium</string>
+    <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data. Premium members get 20 questions a day.</string>
+    <string name="ask_ai_upgrade">Go Premium</string>
+    <string name="ask_ai_error_busy">Too busy right now, please try again shortly.</string>
+    <string name="ask_ai_error_failed">Couldn\'t get an answer, please try again.</string>
+    <string name="ask_ai_error_invalid">The question must be 3 to 300 characters.</string>
+    <string name="ask_ai_error_race_not_found">This race is not in today\'s programme.</string>
+    <string name="ask_ai_error_upgrade">Ask the AI is for Premium members.</string>
+    <string name="ask_ai_remaining">Questions left today: %1$d/%2$d</string>
+    <string name="ask_ai_error_daily_limit">You\'ve used all %1$d questions for today. They reset tomorrow.</string>
 </resources>

@@ -1178,4 +1178,63 @@ object ResourceStrings : Strings {
 
     override val accountAskAiPremium: String
         @Composable get() = stringResource(R.string.account_ask_ai_premium)
+
+    override val askAiTitle: String
+        @Composable get() = stringResource(R.string.ask_ai_title)
+
+    override val askAiSubtitle: String
+        @Composable get() = stringResource(R.string.ask_ai_subtitle)
+
+    override val askAiPlaceholder: String
+        @Composable get() = stringResource(R.string.ask_ai_placeholder)
+
+    override val askAiSend: String
+        @Composable get() = stringResource(R.string.ask_ai_send)
+
+    override val askAiSuggestionFavorite: String
+        @Composable get() = stringResource(R.string.ask_ai_suggestion_favorite)
+
+    override val askAiSuggestionUpset: String
+        @Composable get() = stringResource(R.string.ask_ai_suggestion_upset)
+
+    override val askAiSuggestionAgf: String
+        @Composable get() = stringResource(R.string.ask_ai_suggestion_agf)
+
+    override val askAiDisclaimer: String
+        @Composable get() = stringResource(R.string.ask_ai_disclaimer)
+
+    override val askAiYou: String
+        @Composable get() = stringResource(R.string.ask_ai_you)
+
+    override val askAiLockedTitle: String
+        @Composable get() = stringResource(R.string.ask_ai_locked_title)
+
+    override val askAiLockedBody: String
+        @Composable get() = stringResource(R.string.ask_ai_locked_body)
+
+    override val askAiUpgrade: String
+        @Composable get() = stringResource(R.string.ask_ai_upgrade)
+
+    override val askAiErrorBusy: String
+        @Composable get() = stringResource(R.string.ask_ai_error_busy)
+
+    override val askAiErrorFailed: String
+        @Composable get() = stringResource(R.string.ask_ai_error_failed)
+
+    override val askAiErrorInvalid: String
+        @Composable get() = stringResource(R.string.ask_ai_error_invalid)
+
+    override val askAiErrorRaceNotFound: String
+        @Composable get() = stringResource(R.string.ask_ai_error_race_not_found)
+
+    override val askAiErrorUpgrade: String
+        @Composable get() = stringResource(R.string.ask_ai_error_upgrade)
+
+    @Composable
+    override fun askAiRemaining(remaining: Int, limit: Int): String =
+        stringResource(R.string.ask_ai_remaining, remaining, limit)
+
+    @Composable
+    override fun askAiErrorDailyLimit(limit: Int): String =
+        stringResource(R.string.ask_ai_error_daily_limit, limit)
 }

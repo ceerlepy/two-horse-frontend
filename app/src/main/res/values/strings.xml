@@ -358,4 +358,25 @@
     <string name="coupon_history_window_fivefold">%1$d. Beşli</string>
     <string name="account_feature_ask_ai">AI\'ya sor</string>
     <string name="account_ask_ai_premium">20/gün</string>
+
+    <!-- AI'ya sor -->
+    <string name="ask_ai_title">🤖 AI\'ya sor</string>
+    <string name="ask_ai_subtitle">Bu koşu hakkında sor. Cevap yalnızca bu koşunun verisinden yazılır.</string>
+    <string name="ask_ai_placeholder">Sorunu yaz…</string>
+    <string name="ask_ai_send">Sor</string>
+    <string name="ask_ai_suggestion_favorite">Favori neden önde?</string>
+    <string name="ask_ai_suggestion_upset">Sürpriz çıkabilecek at var mı?</string>
+    <string name="ask_ai_suggestion_agf">AGF\'nin hafife aldığı at hangisi?</string>
+    <string name="ask_ai_disclaimer">Yapay zeka cevabıdır, hata yapabilir. Bahis tavsiyesi değildir.</string>
+    <string name="ask_ai_you">Sen</string>
+    <string name="ask_ai_locked_title">🤖 AI\'ya sor · Premium</string>
+    <string name="ask_ai_locked_body">Bu koşu hakkında yapay zekaya soru sor, cevabını bizim verimizden alsın. Premium üyelere günde 20 soru.</string>
+    <string name="ask_ai_upgrade">Premium\'a geç</string>
+    <string name="ask_ai_error_busy">Şu an çok yoğun, biraz sonra tekrar dene.</string>
+    <string name="ask_ai_error_failed">Cevap alınamadı, tekrar dene.</string>
+    <string name="ask_ai_error_invalid">Soru 3 ile 300 karakter arasında olmalı.</string>
+    <string name="ask_ai_error_race_not_found">Bu koşu bugünkü programda bulunamadı.</string>
+    <string name="ask_ai_error_upgrade">AI\'ya sor Premium üyelere özel.</string>
+    <string name="ask_ai_remaining">Bugün kalan soru hakkın: %1$d/%2$d</string>
+    <string name="ask_ai_error_daily_limit">Bugünkü %1$d soru hakkın doldu, yarın yenilenir.</string>
 </resources>
