@@ -405,4 +405,9 @@
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Last 6: %1$s</string>
     <string name="home_next_day_runner_count">%1$d runners</string>
+    <string name="ask_ai_open">Ask AI</string>
+    <string name="ask_ai_close">Close</string>
+    <string name="ask_ai_clear">Clear chat</string>
+    <string name="ask_ai_thinking">Writing the answer…</string>
+    <string name="race_rank_label">Rank %1$d</string>
 </resources>

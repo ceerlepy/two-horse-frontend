@@ -31,6 +31,16 @@ val PaleRed = Color(0xFFFFECE8)
 
 val Border = Color(0xFFE1E7E3)
 
+/*
+ * Warm, low-contrast card tones for the race screen: the card itself
+ * is a light sand, each section inside it sits in a slightly deeper
+ * inset box, so areas separate without loud borders.
+ */
+val CardTone = Color(0xFFF8F5EF)
+val CardToneBorder = Color(0xFFE7E0D3)
+val InsetTone = Color(0xFFF0EBE1)
+val InsetToneBorder = Color(0xFFE4DCCD)
+
 /* Accent for "surprise"-type labels: lavender text on dark plum. */
 val Lavender = Color(0xFFB297F8)
 val LavenderSurface = Color(0xFF393346)

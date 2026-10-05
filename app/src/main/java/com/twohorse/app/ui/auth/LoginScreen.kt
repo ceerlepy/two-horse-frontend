@@ -348,20 +348,15 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Surface(
-                    color = Color.White,
-                    shape = RoundedCornerShape(20.dp),
-                    shadowElevation = 6.dp
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.two_horse_logo),
-                        contentDescription = null,
-                        modifier =
-                            Modifier
-                                .padding(8.dp)
-                                .size(56.dp)
-                    )
-                }
+                // The logo has its own dark background: no frame around it.
+                Image(
+                    painter = painterResource(R.drawable.two_horse_logo),
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                )
 
                 Spacer(modifier = Modifier.height(14.dp))
 

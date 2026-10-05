@@ -1,27 +1,40 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+
 package com.twohorse.app.ui.race
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.data.repository.TwoHorseRepository
+import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.i18n.currentLanguage
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 
 /* Must match the server's ASK_AI_CONFIG.maxQuestionChars. */
 private const val MAX_QUESTION_CHARS = 300
@@ -51,87 +64,243 @@ private fun askError(error: Throwable): AskError =
     }
 
 /*
- * "AI'ya sor": a Premium member asks a free-text question about this
- * race; the server answers from our own data for it. Other plans see
- * a locked card that leads to the membership screen.
+ * Chat history per race, kept on the phone so closing the chat (or the
+ * app) doesn't lose it. Bounded so it can't grow: the last
+ * MAX_EXCHANGES questions per race, the MAX_RACES most recently used
+ * races, nothing older than MAX_AGE_MILLIS. At most ~10 x 20 short
+ * answers, i.e. a few hundred KB in the worst case.
  */
+private object AskAiHistory {
+    private const val PREFS = "ask_ai_history"
+    private const val KEY = "chats"
+    private const val MAX_EXCHANGES = 20
+    private const val MAX_RACES = 10
+    private const val MAX_AGE_MILLIS = 3L * 24 * 60 * 60 * 1000
+
+    fun raceKey(race: Race): String =
+        "${race.raceDate.orEmpty()}|${race.city}|${race.number}"
+
+    private fun read(context: Context): JSONObject =
+        runCatching {
+            JSONObject(
+                context
+                    .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(KEY, null)
+                    ?: "{}"
+            )
+        }.getOrElse { JSONObject() }
+
+    fun load(context: Context, key: String): List<AskExchange> {
+        val items =
+            read(context)
+                .optJSONObject(key)
+                ?.optJSONArray("x")
+                ?: return emptyList()
+
+        return (0 until items.length()).mapNotNull { i ->
+            items.optJSONArray(i)?.let {
+                AskExchange(it.optString(0), it.optString(1))
+            }
+        }
+    }
+
+    fun save(context: Context, key: String, exchanges: List<AskExchange>) {
+        val now = System.currentTimeMillis()
+        val all = read(context)
+
+        if (exchanges.isEmpty()) {
+            all.remove(key)
+        } else {
+            all.put(
+                key,
+                JSONObject()
+                    .put("t", now)
+                    .put(
+                        "x",
+                        JSONArray().apply {
+                            exchanges.takeLast(MAX_EXCHANGES).forEach {
+                                put(JSONArray().put(it.question).put(it.answer))
+                            }
+                        }
+                    )
+            )
+        }
+
+        val kept =
+            all.keys().asSequence().toList()
+                .map { it to all.optJSONObject(it)?.optLong("t") }
+                .filter { (_, t) -> t != null && now - t <= MAX_AGE_MILLIS }
+                .sortedByDescending { it.second }
+                .take(MAX_RACES)
+                .map { it.first }
+                .toSet()
+
+        val trimmed = JSONObject()
+        kept.forEach { trimmed.put(it, all.get(it)) }
+
+        context
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY, trimmed.toString())
+            .apply()
+    }
+}
+
+/* Round "AI'ya sor" button that sits at the bottom right of the race screen. */
 @Composable
-fun AskAiSection(
-    city: String,
-    raceNumber: Int,
-    isPremium: Boolean,
-    repository: TwoHorseRepository,
-    onUpgradeClick: () -> Unit
+fun AskAiFab(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     val strings = LocalStrings.current
 
-    Card(
-        colors =
-            CardDefaults.cardColors(
-                containerColor = Surface
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = modifier.size(60.dp),
+        shape = CircleShape,
+        containerColor = Green,
+        contentColor = Color.White
+    ) {
+        Icon(
+            Icons.AutoMirrored.Filled.Chat,
+            contentDescription = strings.askAiOpen,
+            modifier = Modifier.size(26.dp)
+        )
+    }
+}
+
+/*
+ * "AI'ya sor" chat for one race, in a sheet over the race screen.
+ * Premium members ask free-text questions answered from our own data;
+ * other plans see what it is and a way to the membership screen.
+ */
+@Composable
+fun AskAiSheet(
+    race: Race,
+    isPremium: Boolean,
+    repository: TwoHorseRepository,
+    onUpgradeClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState =
+            rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
             ),
-        border =
-            BorderStroke(
-                1.dp,
-                Border
-            ),
-        shape =
-            RoundedCornerShape(18.dp)
+        containerColor = CardTone
     ) {
         Column(
-            Modifier.padding(15.dp),
-            verticalArrangement =
-                Arrangement.spacedBy(9.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.92f)
+                    .imePadding()
+                    .padding(horizontal = 16.dp)
         ) {
-            if (!isPremium) {
-                Text(
-                    text = strings.askAiLockedTitle,
-                    color = Ink,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black
-                )
-
-                Text(
-                    text = strings.askAiLockedBody,
-                    color = Muted,
-                    fontSize = 12.sp
-                )
-
-                OutlinedButton(
-                    onClick = onUpgradeClick,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
                     Text(
-                        text = strings.askAiUpgrade,
-                        color = Green,
-                        fontWeight = FontWeight.Bold
+                        text = strings.askAiTitle,
+                        color = Ink,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Black
+                    )
+
+                    Text(
+                        text = strings.raceCityAndNumber(race.city, race.number),
+                        color = Muted,
+                        fontSize = 12.sp
                     )
                 }
-            } else {
+
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = strings.askAiClose,
+                        tint = Ink
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            ToneDivider()
+
+            if (isPremium) {
                 AskAiChat(
-                    city = city,
-                    raceNumber = raceNumber,
+                    race = race,
                     repository = repository
                 )
+            } else {
+                Column(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = strings.askAiLockedTitle,
+                        color = Ink,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Black
+                    )
+
+                    Text(
+                        text = strings.askAiLockedBody,
+                        color = Muted,
+                        fontSize = 13.sp
+                    )
+
+                    Button(
+                        onClick = onUpgradeClick,
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Green
+                            ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = strings.askAiUpgrade,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun AskAiChat(
-    city: String,
-    raceNumber: Int,
+private fun ColumnScope.AskAiChat(
+    race: Race,
     repository: TwoHorseRepository
 ) {
     val strings = LocalStrings.current
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val key = AskAiHistory.raceKey(race)
 
-    var question by remember(city, raceNumber) { mutableStateOf("") }
-    var loading by remember(city, raceNumber) { mutableStateOf(false) }
-    var error by remember(city, raceNumber) { mutableStateOf<AskError?>(null) }
-    var allowance by remember(city, raceNumber) { mutableStateOf<Pair<Int, Int>?>(null) }
-    val exchanges = remember(city, raceNumber) { mutableStateListOf<AskExchange>() }
+    var question by remember(key) { mutableStateOf("") }
+    var loading by remember(key) { mutableStateOf(false) }
+    var error by remember(key) { mutableStateOf<AskError?>(null) }
+    var allowance by remember(key) { mutableStateOf<Pair<Int, Int>?>(null) }
+    val exchanges =
+        remember(key) {
+            mutableStateListOf<AskExchange>().apply {
+                addAll(AskAiHistory.load(context, key))
+            }
+        }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(exchanges.size, loading) {
+        val last = exchanges.size + (if (loading) 1 else 0)
+        if (last > 0) {
+            listState.animateScrollToItem(last - 1)
+        }
+    }
 
     fun send(text: String) {
         val trimmed = text.trim()
@@ -142,101 +311,127 @@ private fun AskAiChat(
 
         loading = true
         error = null
+        question = ""
 
         scope.launch {
             repository
-                .ask(city, raceNumber, trimmed, currentLanguage().code)
+                .ask(race.city, race.number, trimmed, currentLanguage().code)
                 .onSuccess {
                     exchanges.add(AskExchange(trimmed, it.answer))
+                    AskAiHistory.save(context, key, exchanges)
                     allowance = it.used to it.limit
-                    question = ""
                 }
                 .onFailure {
                     error = askError(it)
+                    question = trimmed
                 }
 
             loading = false
         }
     }
 
-    Text(
-        text = strings.askAiTitle,
-        color = Ink,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Black
-    )
+    LazyColumn(
+        state = listState,
+        modifier =
+            Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        if (exchanges.isEmpty() && !loading) {
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = strings.askAiSubtitle,
+                        color = Muted,
+                        fontSize = 13.sp
+                    )
 
-    Text(
-        text = strings.askAiSubtitle,
-        color = Muted,
-        fontSize = 12.sp
-    )
-
-    exchanges.forEach { exchange ->
-        Column(
-            verticalArrangement =
-                Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "${strings.askAiYou}: ${exchange.question}",
-                color = Ink,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = exchange.answer,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            PaleGreen,
-                            RoundedCornerShape(12.dp)
-                        )
-                        .padding(10.dp),
-                color = Ink,
-                fontSize = 13.sp,
-                lineHeight = 18.sp
-            )
-        }
-    }
-
-    if (exchanges.isEmpty()) {
-        Row(
-            modifier =
-                Modifier.horizontalScroll(
-                    rememberScrollState()
-                ),
-            horizontalArrangement =
-                Arrangement.spacedBy(6.dp)
-        ) {
-            listOf(
-                strings.askAiSuggestionFavorite,
-                strings.askAiSuggestionUpset,
-                strings.askAiSuggestionAgf
-            ).forEach { suggestion ->
-                AssistChip(
-                    onClick = {
-                        question = suggestion
-                        send(suggestion)
-                    },
-                    enabled = !loading,
-                    label = {
-                        Text(
-                            text = suggestion,
-                            fontSize = 11.sp
-                        )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(
+                            strings.askAiSuggestionFavorite,
+                            strings.askAiSuggestionUpset,
+                            strings.askAiSuggestionAgf
+                        ).forEach { suggestion ->
+                            SuggestionChip(
+                                onClick = { send(suggestion) },
+                                label = {
+                                    Text(
+                                        text = suggestion,
+                                        fontSize = 12.sp
+                                    )
+                                },
+                                colors =
+                                    SuggestionChipDefaults.suggestionChipColors(
+                                        containerColor = InsetTone,
+                                        labelColor = Ink
+                                    ),
+                                border = BorderStroke(1.dp, InsetToneBorder)
+                            )
+                        }
                     }
-                )
+                }
+            }
+        }
+
+        items(exchanges) { exchange ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                ChatBubble(text = exchange.question, mine = true)
+                ChatBubble(text = exchange.answer, mine = false)
+            }
+        }
+
+        if (loading) {
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = Green
+                    )
+
+                    Spacer(Modifier.width(8.dp))
+
+                    Text(
+                        text = strings.askAiThinking,
+                        color = Muted,
+                        fontSize = 12.sp
+                    )
+                }
             }
         }
     }
 
+    error?.let {
+        Text(
+            text =
+                when (it) {
+                    AskError.Upgrade -> strings.askAiErrorUpgrade
+                    is AskError.DailyLimit -> strings.askAiErrorDailyLimit(allowance?.second ?: it.limit)
+                    AskError.Busy -> strings.askAiErrorBusy
+                    AskError.Invalid -> strings.askAiErrorInvalid
+                    AskError.RaceNotFound -> strings.askAiErrorRaceNotFound
+                    AskError.Failed -> strings.askAiErrorFailed
+                },
+            modifier = Modifier.padding(bottom = 6.dp),
+            color = Red,
+            fontSize = 12.sp
+        )
+    }
+
     Row(
-        verticalAlignment =
-            Alignment.CenterVertically,
-        horizontalArrangement =
-            Arrangement.spacedBy(8.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedTextField(
             value = question,
@@ -255,8 +450,16 @@ private fun AskAiChat(
                 LocalTextStyle.current.copy(
                     fontSize = 13.sp
                 ),
-            maxLines = 3,
-            shape = RoundedCornerShape(12.dp),
+            maxLines = 4,
+            shape = RoundedCornerShape(22.dp),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
+                    focusedBorderColor = Green,
+                    unfocusedBorderColor = InsetToneBorder
+                ),
             keyboardOptions =
                 KeyboardOptions(
                     imeAction = ImeAction.Send
@@ -269,61 +472,97 @@ private fun AskAiChat(
                 )
         )
 
-        Button(
+        FilledIconButton(
             onClick = {
                 send(question)
             },
             enabled =
                 !loading &&
                 question.trim().length >= 3,
+            modifier = Modifier.size(48.dp),
             colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = Green
-                ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = Surface,
-                    strokeWidth = 2.dp
+                IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Green,
+                    contentColor = Color.White
                 )
-            } else {
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.Send,
+                contentDescription = strings.askAiSend
+            )
+        }
+    }
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 6.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text =
+                listOfNotNull(
+                    allowance?.let { (used, limit) ->
+                        strings.askAiRemaining((limit - used).coerceAtLeast(0), limit)
+                    },
+                    strings.askAiDisclaimer
+                ).joinToString("\n"),
+            modifier = Modifier.weight(1f),
+            color = Muted,
+            fontSize = 10.sp
+        )
+
+        if (exchanges.isNotEmpty() && !loading) {
+            TextButton(
+                onClick = {
+                    exchanges.clear()
+                    AskAiHistory.save(context, key, exchanges)
+                }
+            ) {
                 Text(
-                    text = strings.askAiSend,
-                    fontWeight = FontWeight.Black
+                    text = strings.askAiClear,
+                    color = Muted,
+                    fontSize = 11.sp
                 )
             }
         }
     }
+}
 
-    error?.let {
-        Text(
-            text =
-                when (it) {
-                    AskError.Upgrade -> strings.askAiErrorUpgrade
-                    is AskError.DailyLimit -> strings.askAiErrorDailyLimit(allowance?.second ?: it.limit)
-                    AskError.Busy -> strings.askAiErrorBusy
-                    AskError.Invalid -> strings.askAiErrorInvalid
-                    AskError.RaceNotFound -> strings.askAiErrorRaceNotFound
-                    AskError.Failed -> strings.askAiErrorFailed
-                },
-            color = Red,
-            fontSize = 12.sp
-        )
+@Composable
+private fun ChatBubble(
+    text: String,
+    mine: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement =
+            if (mine) Arrangement.End else Arrangement.Start
+    ) {
+        Surface(
+            modifier = Modifier.widthIn(max = 300.dp),
+            color = if (mine) Green else Color.White,
+            border = if (mine) null else BorderStroke(1.dp, InsetToneBorder),
+            shape =
+                RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 16.dp,
+                    bottomStart = if (mine) 16.dp else 4.dp,
+                    bottomEnd = if (mine) 4.dp else 16.dp
+                )
+        ) {
+            Text(
+                text = text,
+                modifier =
+                    Modifier.padding(
+                        horizontal = 12.dp,
+                        vertical = 9.dp
+                    ),
+                color = if (mine) Color.White else Ink,
+                fontSize = 13.sp,
+                lineHeight = 18.sp
+            )
+        }
     }
-
-    allowance?.let { (used, limit) ->
-        Text(
-            text = strings.askAiRemaining((limit - used).coerceAtLeast(0), limit),
-            color = Muted,
-            fontSize = 11.sp
-        )
-    }
-
-    Text(
-        text = strings.askAiDisclaimer,
-        color = Muted,
-        fontSize = 10.sp
-    )
 }

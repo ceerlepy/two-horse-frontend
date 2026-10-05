@@ -1313,4 +1313,20 @@ object ResourceStrings : Strings {
     @Composable
     override fun askAiErrorDailyLimit(limit: Int): String =
         stringResource(R.string.ask_ai_error_daily_limit, limit)
+
+    override val askAiOpen: String
+        @Composable get() = stringResource(R.string.ask_ai_open)
+
+    override val askAiClose: String
+        @Composable get() = stringResource(R.string.ask_ai_close)
+
+    override val askAiClear: String
+        @Composable get() = stringResource(R.string.ask_ai_clear)
+
+    override val askAiThinking: String
+        @Composable get() = stringResource(R.string.ask_ai_thinking)
+
+    @Composable
+    override fun raceRankLabel(rank: Int): String =
+        stringResource(R.string.race_rank_label, rank)
 }
