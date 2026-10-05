@@ -427,6 +427,26 @@ interface Strings {
     fun raceSurpriseTag(n: Int, pct: Int): String
     @Composable
     fun raceAvoidTag(n: Int, pct: Int): String
+    @Composable
+    fun raceConsensusAvoid(sources: Int, avoid: Int, pct: Int): String
+    @Composable
+    fun raceConsensusPositive(sources: Int, n: Int, category: String, pct: Int): String
+    @Composable
+    fun raceConsensusPositiveWithAvoid(sources: Int, n: Int, category: String, pct: Int, avoid: Int): String
+    @Composable
+    fun raceConsensusNoDirection(sources: Int): String
+    @get:Composable
+    val raceCategoryBanko: String
+    @get:Composable
+    val raceCategoryFavorite: String
+    @get:Composable
+    val raceCategoryStrong: String
+    @get:Composable
+    val raceCategoryStar: String
+    @get:Composable
+    val raceCategorySurprise: String
+    @get:Composable
+    val raceCategoryRival: String
     @get:Composable
     val raceValueModelTitle: String
     @get:Composable

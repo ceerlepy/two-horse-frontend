@@ -203,6 +203,16 @@
     <string name="race_rival_tag">%1$s rival (%%%2$s)</string>
     <string name="race_surprise_tag">%1$s surprise (%%%2$s)</string>
     <string name="race_avoid_tag">%1$s negative (%%%2$s)</string>
+    <string name="race_consensus_avoid">%2$s of %1$s sources advise avoiding this horse (%%%3$s support).</string>
+    <string name="race_consensus_positive">%2$s of %1$s sources list this horse as %3$s (%%%4$s support).</string>
+    <string name="race_consensus_positive_with_avoid">%2$s of %1$s sources list this horse as %3$s (%%%4$s support), while %5$s advise avoiding it.</string>
+    <string name="race_consensus_no_direction">%1$s sources commented on this horse but gave no clear direction.</string>
+    <string name="race_category_banko">a banker</string>
+    <string name="race_category_favorite">the favourite</string>
+    <string name="race_category_strong">a strong contender</string>
+    <string name="race_category_star">a star pick</string>
+    <string name="race_category_surprise">a surprise pick</string>
+    <string name="race_category_rival">a rival</string>
     <string name="race_value_model_title">🔎 Value model</string>
     <string name="race_value_underrated">Underrated by AGF</string>
     <string name="race_value_overrated">Overrated by AGF</string>

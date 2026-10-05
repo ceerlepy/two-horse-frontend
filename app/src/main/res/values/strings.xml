@@ -203,6 +203,16 @@
     <string name="race_rival_tag">%1$s rakip (%%%2$s)</string>
     <string name="race_surprise_tag">%1$s sürpriz (%%%2$s)</string>
     <string name="race_avoid_tag">%1$s olumsuz (%%%2$s)</string>
+    <string name="race_consensus_avoid">%1$s kaynaktan %2$s tanesi bu attan kaçınılmasını öneriyor (%%%3$s destek).</string>
+    <string name="race_consensus_positive">%1$s kaynaktan %2$s tanesi bu atı %3$s olarak gösteriyor (%%%4$s destek).</string>
+    <string name="race_consensus_positive_with_avoid">%1$s kaynaktan %2$s tanesi bu atı %3$s olarak gösteriyor (%%%4$s destek), %5$s kaynak ise kaçının diyor.</string>
+    <string name="race_consensus_no_direction">%1$s kaynak bu at hakkında görüş bildirdi ancak net bir yön belirtmedi.</string>
+    <string name="race_category_banko">banko</string>
+    <string name="race_category_favorite">favori</string>
+    <string name="race_category_strong">güçlü aday</string>
+    <string name="race_category_star">yıldız aday</string>
+    <string name="race_category_surprise">sürpriz aday</string>
+    <string name="race_category_rival">rakip aday</string>
     <string name="race_value_model_title">🔎 Değer modeli</string>
     <string name="race_value_underrated">AGF\'nin hafife aldığı at</string>
     <string name="race_value_overrated">AGF\'nin abarttığı at</string>
