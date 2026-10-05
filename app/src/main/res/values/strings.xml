@@ -128,9 +128,15 @@
     <string name="foreign_subtitle">TJK programı ve AGF sırası</string>
     <string name="foreign_empty">Bugün TJK programında yurt dışı koşu yok.</string>
     <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
-    <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Yurt dışı koşular için yapay zeka tahmini henüz yok.</string>
+    <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler bir yapay zeka tahmin sitesinin seçimleri.</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
+    <string name="foreign_ai_top">Yapay zeka: %1$s</string>
+    <string name="foreign_ai_selection">Kupon: %1$s</string>
+    <string name="foreign_ai_coupon_title">Yapay zeka altılısı %1$d</string>
+    <string name="foreign_ai_coupon_start">Başlangıç %1$s</string>
+    <string name="foreign_ai_coupon_total">%1$d kombinasyon · %2$s TL</string>
+    <string name="foreign_ai_leg">%1$d. Koşu: %2$s</string>
     <string name="race_training_title">İdman Bilgileri</string>
     <string name="race_training_subtitle">Atların TJK\'daki son idman galopları</string>
     <string name="race_training_open">İdman bilgilerini aç</string>

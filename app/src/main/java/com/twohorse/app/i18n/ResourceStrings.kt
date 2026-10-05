@@ -443,6 +443,30 @@ object ResourceStrings : Strings {
     override fun foreignRaceTitle(number: String): String =
         stringResource(R.string.foreign_race_title, number)
 
+    @Composable
+    override fun foreignAiTop(horse: String): String =
+        stringResource(R.string.foreign_ai_top, horse)
+
+    @Composable
+    override fun foreignAiSelection(numbers: String): String =
+        stringResource(R.string.foreign_ai_selection, numbers)
+
+    @Composable
+    override fun foreignAiCouponTitle(number: Int): String =
+        stringResource(R.string.foreign_ai_coupon_title, number)
+
+    @Composable
+    override fun foreignAiCouponStart(time: String): String =
+        stringResource(R.string.foreign_ai_coupon_start, time)
+
+    @Composable
+    override fun foreignAiCouponTotal(combinations: Int, amount: String): String =
+        stringResource(R.string.foreign_ai_coupon_total, combinations, amount)
+
+    @Composable
+    override fun foreignAiLeg(raceNumber: Int, numbers: String): String =
+        stringResource(R.string.foreign_ai_leg, raceNumber, numbers)
+
     override val foreignBack: String
         @Composable get() = stringResource(R.string.foreign_back)
 
