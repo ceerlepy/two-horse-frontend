@@ -20,8 +20,8 @@
     <string name="account_trial_ends_at">Trial ends on %1$s</string>
     <string name="account_subscription_renews_at">Subscription renews on %1$s</string>
     <string name="account_unlimited">Unlimited</string>
-    <string name="account_gold_description">All model signals unlocked · coupon generation up to 1,500 TL</string>
-    <string name="account_premium_description">Everything in Gold + horse video archive + unlimited coupon budget</string>
+    <string name="account_gold_description">All model signals and expert consensus · 10 coupons a day, up to 1,500 TL</string>
+    <string name="account_premium_description">Everything in Gold + \"Underrated by AGF\" label + unlimited coupons + coupon history</string>
     <string name="account_upgrade_to">Upgrade to %1$s</string>
     <string name="account_loading_ellipsis">Loading…</string>
     <string name="account_already_premium">You\'re already Premium — everything is unlocked.</string>
@@ -52,7 +52,7 @@
     <string name="account_choose_plan">Choose your plan</string>
     <string name="account_badge_popular">Most popular</string>
     <string name="account_per_month">/mo</string>
-    <string name="account_renewal_terms">Subscriptions renew automatically every month and are charged to your Google Play account. Cancel anytime in Google Play › Subscriptions; you keep access until the end of the period.</string>
+    <string name="account_renewal_terms">Subscriptions renew automatically every month or every year, depending on the plan you choose, and are charged to your Google Play account. Cancel anytime in Google Play › Subscriptions; you keep access until the end of the period.</string>
     <string name="account_restore_purchases">Restore purchases</string>
     <string name="account_restore_none">No subscription to restore was found on this Google account.</string>
     <string name="account_trial_badge">Trial</string>
@@ -336,4 +336,24 @@
     <string name="history_city_and_race">%1$s · Race %2$s</string>
     <string name="history_date_and_time">%1$s · %2$s</string>
     <string name="history_race_number_abbrev">R%1$s</string>
+    <string name="coupon_history_button">History</string>
+    <string name="coupon_history_title">Coupon history</string>
+    <string name="coupon_history_subtitle">Last 30 days · coupons saved before the races started</string>
+    <string name="coupon_history_empty">No saved coupons yet. Coupons are saved automatically before each Pick 6 and Pick 5 starts.</string>
+    <string name="coupon_history_pending">Awaiting results</string>
+    <string name="coupon_history_all_hit">All legs hit</string>
+    <string name="coupon_history_legs_hit">%1$d/%2$d legs hit</string>
+    <string name="coupon_history_cost">%1$s TL · %2$d combinations</string>
+    <string name="coupon_history_leg">Leg %1$d (race %2$d): %3$s</string>
+    <string name="coupon_error_daily_limit">You have used today\'s coupons. Gold includes 10 different coupons a day; Premium is unlimited.</string>
+    <string name="account_feature_value_model">\"Underrated by AGF\" label</string>
+    <string name="account_feature_coupon_history">Coupon history and results</string>
+    <string name="account_feature_daily_coupons">Coupons per day</string>
+    <string name="account_daily_coupons_gold">10</string>
+    <string name="account_period_monthly">Monthly</string>
+    <string name="account_period_yearly">Yearly</string>
+    <string name="account_yearly_saving">2 months free</string>
+    <string name="account_per_year">/yr</string>
+    <string name="coupon_history_window_sixfold">Pick 6 #%1$d</string>
+    <string name="coupon_history_window_fivefold">Pick 5 #%1$d</string>
 </resources>

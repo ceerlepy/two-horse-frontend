@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -64,7 +66,8 @@ fun CouponScreen(
     initialCity: String?,
     currentUser: MembershipUser?,
     onBack: () -> Unit,
-    onUpgradeClick: () -> Unit = {}
+    onUpgradeClick: () -> Unit = {},
+    onOpenHistory: () -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
@@ -456,7 +459,11 @@ fun CouponScreen(
         ) {
         item {
             CouponHeader(
-                onBack = onBack
+                onBack = onBack,
+                historyUnlocked = tier == "premium",
+                onOpenHistory = {
+                    if (tier == "premium") onOpenHistory() else onUpgradeClick()
+                }
             )
         }
 
@@ -822,7 +829,9 @@ fun CouponScreen(
 
 @Composable
 private fun CouponHeader(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    historyUnlocked: Boolean,
+    onOpenHistory: () -> Unit
 ) {
     val strings = LocalStrings.current
 
@@ -868,6 +877,34 @@ private fun CouponHeader(
                     Muted,
                 fontSize =
                     11.sp
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.weight(1f)
+        )
+
+        TextButton(
+            onClick = onOpenHistory
+        ) {
+            Icon(
+                imageVector =
+                    if (historyUnlocked) Icons.Default.History
+                    else Icons.Default.Lock,
+                contentDescription = null,
+                tint = if (historyUnlocked) Green else Muted,
+                modifier = Modifier.size(16.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.width(4.dp)
+            )
+
+            Text(
+                text = strings.couponHistoryButton,
+                color = if (historyUnlocked) Green else Muted,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

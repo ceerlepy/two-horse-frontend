@@ -656,6 +656,60 @@ class TwoHorseApi(
             }
         }
 
+    /* Premium only; the backend answers 403 TIER_UPGRADE_REQUIRED otherwise. */
+    suspend fun getCouponHistory(
+        days: Int = 30
+    ): List<CouponHistoryEntry> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                getJson(
+                    "/api/coupons/history?days=$days"
+                )
+
+            val array =
+                json.optJSONArray("coupons")
+                    ?: JSONArray()
+
+            buildList {
+                for (i in 0 until array.length()) {
+                    val item = array.getJSONObject(i)
+                    val legsArray = item.optJSONArray("legs") ?: JSONArray()
+
+                    add(
+                        CouponHistoryEntry(
+                            pool = item.optString("pool", "sixfold"),
+                            raceDate = item.optString("raceDate"),
+                            city = item.optString("city"),
+                            windowNumber = item.optInt("windowNumber", 1),
+                            budgetTl = item.optDouble("budgetTl", 0.0),
+                            totalTl = item.optDouble("totalTl", 0.0),
+                            combinations = item.optInt("combinations", 0),
+                            evaluated = item.optBoolean("evaluated", false),
+                            legCount = item.optInt("legCount", legsArray.length()),
+                            hitLegs = item.optNullableInt("hitLegs"),
+                            allLegsHit =
+                                if (item.isNull("allLegsHit")) null
+                                else item.optBoolean("allLegsHit"),
+                            legs =
+                                buildList {
+                                    for (j in 0 until legsArray.length()) {
+                                        val leg = legsArray.getJSONObject(j)
+                                        add(
+                                            CouponHistoryLeg(
+                                                raceNumber = leg.optInt("raceNumber"),
+                                                horseNumbers = intList(leg.optJSONArray("horseNumbers"))
+                                            )
+                                        )
+                                    }
+                                }
+                        )
+                    )
+                }
+            }
+        }
+
     private fun intList(array: JSONArray?): List<Int> =
         buildList {
             if (array != null) {

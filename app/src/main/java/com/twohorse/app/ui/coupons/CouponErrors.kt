@@ -12,6 +12,7 @@ sealed interface CouponError {
     data object NoRunners : CouponError
     data object TierUpgradeRequired : CouponError
     data object BudgetCapExceeded : CouponError
+    data object DailyLimitReached : CouponError
     data object AuthRequired : CouponError
     data object NotFound : CouponError
     data object BadRequest : CouponError
@@ -50,6 +51,9 @@ fun couponErrorText(
 
         CouponError.BudgetCapExceeded ->
             strings.couponErrorBudgetCapExceeded
+
+        CouponError.DailyLimitReached ->
+            strings.couponErrorDailyLimit
 
         CouponError.AuthRequired ->
             strings.couponErrorAuthRequired
@@ -110,6 +114,9 @@ fun couponErrorFromThrowable(throwable: Throwable): CouponError {
 
         "TIER_BUDGET_CAP_EXCEEDED" ->
             CouponError.BudgetCapExceeded
+
+        "COUPON_DAILY_LIMIT_REACHED" ->
+            CouponError.DailyLimitReached
 
         "AUTH_REQUIRED" ->
             CouponError.AuthRequired

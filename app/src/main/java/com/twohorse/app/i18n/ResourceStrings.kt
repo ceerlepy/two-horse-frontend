@@ -1108,4 +1108,68 @@ object ResourceStrings : Strings {
             "premium" -> "Premium"
             else -> stringResource(R.string.account_tier_free)
         }
+
+    override val couponHistoryButton: String
+        @Composable get() = stringResource(R.string.coupon_history_button)
+
+    override val couponHistoryTitle: String
+        @Composable get() = stringResource(R.string.coupon_history_title)
+
+    override val couponHistorySubtitle: String
+        @Composable get() = stringResource(R.string.coupon_history_subtitle)
+
+    override val couponHistoryEmpty: String
+        @Composable get() = stringResource(R.string.coupon_history_empty)
+
+    override val couponHistoryPending: String
+        @Composable get() = stringResource(R.string.coupon_history_pending)
+
+    override val couponHistoryAllHit: String
+        @Composable get() = stringResource(R.string.coupon_history_all_hit)
+
+    @Composable
+    override fun couponHistoryLegsHit(hit: Int, total: Int): String =
+        stringResource(R.string.coupon_history_legs_hit, hit, total)
+
+    @Composable
+    override fun couponHistoryCost(totalTl: String, combinations: Int): String =
+        stringResource(R.string.coupon_history_cost, totalTl, combinations)
+
+    @Composable
+    override fun couponHistoryLeg(leg: Int, raceNumber: Int, horses: String): String =
+        stringResource(R.string.coupon_history_leg, leg, raceNumber, horses)
+
+    override val couponErrorDailyLimit: String
+        @Composable get() = stringResource(R.string.coupon_error_daily_limit)
+
+    override val accountFeatureValueModel: String
+        @Composable get() = stringResource(R.string.account_feature_value_model)
+
+    override val accountFeatureCouponHistory: String
+        @Composable get() = stringResource(R.string.account_feature_coupon_history)
+
+    override val accountFeatureDailyCoupons: String
+        @Composable get() = stringResource(R.string.account_feature_daily_coupons)
+
+    override val accountDailyCouponsGold: String
+        @Composable get() = stringResource(R.string.account_daily_coupons_gold)
+
+    override val accountPeriodMonthly: String
+        @Composable get() = stringResource(R.string.account_period_monthly)
+
+    override val accountPeriodYearly: String
+        @Composable get() = stringResource(R.string.account_period_yearly)
+
+    override val accountYearlySaving: String
+        @Composable get() = stringResource(R.string.account_yearly_saving)
+
+    override val accountPerYear: String
+        @Composable get() = stringResource(R.string.account_per_year)
+
+    @Composable
+    override fun couponHistoryWindow(pool: String, windowNumber: Int): String =
+        if (pool == "fivefold")
+            stringResource(R.string.coupon_history_window_fivefold, windowNumber)
+        else
+            stringResource(R.string.coupon_history_window_sixfold, windowNumber)
 }

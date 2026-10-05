@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +33,11 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.Config
+import com.twohorse.app.billing.BASE_PLAN_MONTHLY
+import com.twohorse.app.billing.BASE_PLAN_YEARLY
 import com.twohorse.app.billing.BillingManager
+import com.twohorse.app.billing.offerFor
+import com.twohorse.app.billing.priceFor
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.Language
@@ -119,6 +124,9 @@ fun AccountScreen(
     var deleting by
         remember { mutableStateOf(false) }
 
+    var billingPeriod by
+        remember { mutableStateOf(BASE_PLAN_MONTHLY) }
+
     /*
      * Sends a Play purchase to the backend, the only place that can
      * grant a tier. [silent] is used for purchases found again on
@@ -179,7 +187,8 @@ fun AccountScreen(
      * not a second subscription running in parallel.
      */
     fun launchPurchase(
-        product: ProductDetails
+        product: ProductDetails,
+        basePlanId: String
     ) {
         val oldToken =
             ownedSubscriptions
@@ -192,6 +201,7 @@ fun AccountScreen(
             context as Activity,
             product,
             accountId = user?.id,
+            basePlanId = basePlanId,
             oldPurchaseToken = oldToken
         )
     }
@@ -417,17 +427,29 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(14.dp))
                 }
 
+                if (paidTier != "premium") {
+                    BillingPeriodToggle(
+                        selected = billingPeriod,
+                        onSelect = { billingPeriod = it }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
                 if (paidTier != "gold" && paidTier != "premium") {
                     PlanCard(
                         title = strings.accountTierTitle("gold"),
                         description = strings.accountGoldDescription,
-                        price = goldProduct.monthlyPrice(),
+                        price = goldProduct.priceFor(billingPeriod),
+                        yearly = billingPeriod == BASE_PLAN_YEARLY,
                         highlighted = true,
                         badge = strings.accountBadgePopular,
                         accent = Gold,
-                        enabled = goldProduct != null && !purchaseInFlight,
+                        enabled =
+                            goldProduct?.offerFor(billingPeriod) != null &&
+                                !purchaseInFlight,
                         onClick = {
-                            goldProduct?.let { launchPurchase(it) }
+                            goldProduct?.let { launchPurchase(it, billingPeriod) }
                         }
                     )
 
@@ -438,13 +460,16 @@ fun AccountScreen(
                     PlanCard(
                         title = strings.accountTierTitle("premium"),
                         description = strings.accountPremiumDescription,
-                        price = premiumProduct.monthlyPrice(),
+                        price = premiumProduct.priceFor(billingPeriod),
+                        yearly = billingPeriod == BASE_PLAN_YEARLY,
                         highlighted = false,
                         badge = null,
                         accent = Green,
-                        enabled = premiumProduct != null && !purchaseInFlight,
+                        enabled =
+                            premiumProduct?.offerFor(billingPeriod) != null &&
+                                !purchaseInFlight,
                         onClick = {
-                            premiumProduct?.let { launchPurchase(it) }
+                            premiumProduct?.let { launchPurchase(it, billingPeriod) }
                         }
                     )
 
@@ -644,14 +669,56 @@ private fun MembershipUser.subscriptionProductId(): String? =
         else -> null
     }
 
-private fun ProductDetails?.monthlyPrice(): String? =
-    this
-        ?.subscriptionOfferDetails
-        ?.firstOrNull()
-        ?.pricingPhases
-        ?.pricingPhaseList
-        ?.lastOrNull()
-        ?.formattedPrice
+@Composable
+private fun BillingPeriodToggle(
+    selected: String,
+    onSelect: (String) -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Surface)
+                .padding(4.dp)
+    ) {
+        listOf(
+            BASE_PLAN_MONTHLY to strings.accountPeriodMonthly,
+            BASE_PLAN_YEARLY to strings.accountPeriodYearly
+        ).forEach { (period, label) ->
+            val active = period == selected
+
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (active) Ink else Color.Transparent)
+                        .clickable { onSelect(period) }
+                        .padding(vertical = 9.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = label,
+                    color = if (active) Color.White else Ink,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (period == BASE_PLAN_YEARLY) {
+                    Text(
+                        text = strings.accountYearlySaving,
+                        color = if (active) Gold else Green,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
 
 private fun daysLeft(
     isoEnd: String?
@@ -839,8 +906,18 @@ private fun PlanComparisonTable(
                     PlanCell.Label(strings.accountCouponLimitGold),
                     PlanCell.Label(strings.accountCouponUnlimited)
                 ),
+            strings.accountFeatureDailyCoupons to
+                listOf(
+                    PlanCell.No,
+                    PlanCell.Label(strings.accountDailyCouponsGold),
+                    PlanCell.Label(strings.accountCouponUnlimited)
+                ),
+            strings.accountFeatureValueModel to
+                listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
+            strings.accountFeatureCouponHistory to
+                listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
             strings.accountFeatureVideos to
-                listOf(PlanCell.No, PlanCell.No, PlanCell.Yes)
+                listOf(PlanCell.Yes, PlanCell.Yes, PlanCell.Yes)
         )
 
     val tiers =
@@ -954,6 +1031,7 @@ private fun PlanCard(
     title: String,
     description: String,
     price: String?,
+    yearly: Boolean,
     highlighted: Boolean,
     badge: String?,
     accent: Color,
@@ -1021,7 +1099,9 @@ private fun PlanCard(
                     )
 
                     Text(
-                        text = strings.accountPerMonth,
+                        text =
+                            if (yearly) strings.accountPerYear
+                            else strings.accountPerMonth,
                         color = Muted,
                         fontSize = 12.sp
                     )

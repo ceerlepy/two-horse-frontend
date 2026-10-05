@@ -15,6 +15,7 @@ import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.ui.account.AccountScreen
 import com.twohorse.app.ui.auth.LoginScreen
+import com.twohorse.app.ui.coupons.CouponHistoryScreen
 import com.twohorse.app.ui.coupons.CouponScreen
 import com.twohorse.app.ui.history.HistoryDetailScreen
 import com.twohorse.app.ui.history.HistoryScreen
@@ -50,6 +51,11 @@ private sealed interface AppScreen {
         AppScreen
 
     data object History :
+        AppScreen
+
+    data class CouponHistory(
+        val returnTo: Coupons
+    ) :
         AppScreen
 
     data object Foreign :
@@ -127,6 +133,9 @@ fun TwoHorseApp() {
             ) {
                 is AppScreen.HistoryDetail ->
                     AppScreen.History
+
+                is AppScreen.CouponHistory ->
+                    current.returnTo
 
                 is AppScreen.Coupons ->
                     current.returnRace
@@ -291,6 +300,18 @@ fun TwoHorseApp() {
 
                     onUpgradeClick = {
                         screen = AppScreen.Account
+                    },
+
+                    onOpenHistory = {
+                        screen = AppScreen.CouponHistory(current)
+                    }
+                )
+            }
+
+            is AppScreen.CouponHistory -> {
+                CouponHistoryScreen(
+                    onBack = {
+                        screen = current.returnTo
                     }
                 )
             }

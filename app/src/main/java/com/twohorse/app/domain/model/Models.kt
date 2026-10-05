@@ -286,3 +286,23 @@ data class MembershipUser(
     val isGold: Boolean get() = tier == "gold"
     val isPremium: Boolean get() = tier == "premium"
 }
+
+data class CouponHistoryLeg(
+    val raceNumber: Int,
+    val horseNumbers: List<Int>
+)
+
+data class CouponHistoryEntry(
+    val pool: String,
+    val raceDate: String,
+    val city: String,
+    val windowNumber: Int,
+    val budgetTl: Double,
+    val totalTl: Double,
+    val combinations: Int,
+    val evaluated: Boolean,
+    val legCount: Int,
+    val hitLegs: Int?,
+    val allLegsHit: Boolean?,
+    val legs: List<CouponHistoryLeg>
+)
