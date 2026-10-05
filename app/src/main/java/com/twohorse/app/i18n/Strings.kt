@@ -359,6 +359,10 @@ interface Strings {
     val foreignLoadFailed: String
     @get:Composable
     val foreignAgfNote: String
+    @get:Composable
+    val foreignWinProbNote: String
+    @Composable
+    fun foreignWinProb(percent: String): String
     @Composable
     fun foreignRaceTitle(number: String): String
     @Composable

@@ -549,6 +549,13 @@ object ResourceStrings : Strings {
     override val foreignAgfNote: String
         @Composable get() = stringResource(R.string.foreign_agf_note)
 
+    override val foreignWinProbNote: String
+        @Composable get() = stringResource(R.string.foreign_win_prob_note)
+
+    @Composable
+    override fun foreignWinProb(percent: String): String =
+        stringResource(R.string.foreign_win_prob, percent)
+
     @Composable
     override fun foreignRaceTitle(number: String): String =
         stringResource(R.string.foreign_race_title, number)

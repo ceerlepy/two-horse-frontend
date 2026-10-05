@@ -237,7 +237,9 @@ data class ForeignRunner(
     val jockey: String?,
     val weight: Double?,
     val agfPercent: Double?,
-    val recentForm: String?
+    val recentForm: String?,
+    /* Calibrated AGF win probability (0..1); Gold+ only, null otherwise. */
+    val winProb: Double? = null
 )
 
 data class ForeignRankedHorse(

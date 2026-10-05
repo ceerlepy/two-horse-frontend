@@ -163,6 +163,18 @@ fun ForeignScreen(
                         )
                     }
 
+                    /* winProb is a Gold+ signal; free members never see the note. */
+                    if (selected.races.any { race -> race.runners.any { it.winProb != null } }) {
+                        item {
+                            Text(
+                                text = strings.foreignWinProbNote,
+                                modifier = Modifier.padding(horizontal = 18.dp),
+                                color = Muted,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
                     items(
                         selected.aiCoupons,
                         key = { "${selected.city}-ai-${it.altili}" }
@@ -309,6 +321,21 @@ private fun ForeignRaceCard(race: ForeignRace) {
                             )
                         }
                     }
+                    runner.winProb?.let {
+                        Surface(
+                            color = PaleGold,
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Text(
+                                text = strings.foreignWinProb(winProbLabel(it)),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                color = Gold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+                        Spacer(Modifier.width(6.dp))
+                    }
                     runner.agfPercent?.let {
                         Surface(
                             color = if (leading) PaleGreen else Bg,
@@ -327,6 +354,12 @@ private fun ForeignRaceCard(race: ForeignRace) {
             }
         }
     }
+}
+
+/* Whole percent; below 1% shows as "<1". */
+private fun winProbLabel(prob: Double): String {
+    val percent = prob * 100
+    return if (percent < 1.0) "<1" else "%.0f".format(percent)
 }
 
 @Composable

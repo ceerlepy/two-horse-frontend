@@ -169,6 +169,8 @@
     <string name="foreign_empty">Bugün TJK programında yurt dışı koşu yok.</string>
     <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
     <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler bir yapay zeka tahmin sitesinin seçimleri.</string>
+    <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
+    <string name="foreign_win_prob">Kazanma %%%1$s</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
     <string name="foreign_ai_top">Yapay zeka: %1$s</string>

@@ -638,6 +638,10 @@ class TwoHorseApi(
                                                     recentForm =
                                                         runner.optionalString(
                                                             "recentForm"
+                                                        ),
+                                                    winProb =
+                                                        runner.optionalDouble(
+                                                            "winProb"
                                                         )
                                                 )
                                             )
