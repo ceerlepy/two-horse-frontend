@@ -1,11 +1,14 @@
 Two Horse (iki at), Türkiye at yarışları için gerçek zamanlı yapay zeka destekli bir analiz uygulamasıdır: TJK programı, canlı AGF ve altılı ganyan kuponları tek yerde.
 
+Uygulamadaki analizlerin çoğu, kendi verilerimizle eğitilmiş yapay zeka destekli modellerimiz tarafından üretilir.
+
 Neler sunar:
 • Günün TJK programı, canlı AGF ve AGF hareketleri
 • Birçok uzman kaynağın görüşünden oluşan ortak değerlendirme
 • Her at için skor, son yarışları, idman ve galop bilgileri
 • Bütçenize göre hazırlanmış altılı ve beşli ganyan kupon önerileri
 • Yurt dışı koşu programları
+• AI'ya sor (Premium): koşu hakkında sorunu yaz, cevabı modelimizin verisinden alsın
 • Türkçe ve İngilizce arayüz
 
 Two Horse bir bahis sitesi değildir; bahis almaz ve ödeme yapmaz. Sunulan analizler bilgilendirme amaçlıdır ve kazanç garantisi vermez. Uygulama 18 yaş ve üzeri kullanıcılar içindir. Lütfen sorumlu oynayın.

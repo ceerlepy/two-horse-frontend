@@ -1,11 +1,14 @@
 Two Horse is a real-time, AI-powered analysis app for Turkish horse racing.
 
+Most of the analysis in the app is produced by our own AI-powered models, trained on our own data.
+
 What it offers:
 • Today's TJK race card, live AGF and AGF movements
 • A combined view built from many expert sources
 • A score for every horse, plus recent runs, training and gallop data
 • Budget-based sixfold (altılı) and fivefold (beşli) coupon suggestions
 • Foreign race cards
+• Ask the AI (Premium): ask about a race and get an answer built from our model's data
 • Turkish and English interface
 
 Two Horse is not a betting site; it does not take bets or pay out. The analysis is for information only and does not guarantee any winnings. The app is for users aged 18 and over. Please play responsibly.
