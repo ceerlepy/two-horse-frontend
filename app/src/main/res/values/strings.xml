@@ -21,7 +21,7 @@
     <string name="account_subscription_renews_at">Abonelik %1$s tarihinde yenilenir</string>
     <string name="account_unlimited">Süresiz</string>
     <string name="account_gold_description">Tüm model sinyalleri ve uzman konsensusu · günde 10 kupon, 1.500 TL\'ye kadar</string>
-    <string name="account_premium_description">Gold\'un hepsi + \"AGF\'nin hafife aldığı at\" etiketi + AI\'ya sor (günde 20 soru) + sınırsız kupon + kupon geçmişi</string>
+    <string name="account_premium_description">Gold\'un hepsi + \"AGF\'nin hafife aldığı at\" etiketi + AI\'ya sor (günde 20 soru) + sınırsız kupon</string>
     <string name="account_upgrade_to">%1$s\'a Yükselt</string>
     <string name="account_loading_ellipsis">Yükleniyor…</string>
     <string name="account_already_premium">Zaten Premium\'sun, her şey açık.</string>

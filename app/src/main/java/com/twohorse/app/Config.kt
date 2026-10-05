@@ -24,4 +24,11 @@ object Config {
      */
     const val PRODUCT_ID_GOLD_MONTHLY = "gold_monthly"
     const val PRODUCT_ID_PREMIUM_MONTHLY = "premium_monthly"
+
+    /*
+     * The coupon history screen stays hidden until a few weeks of
+     * graded coupons show how the model actually does. The server
+     * keeps saving and grading coupons either way.
+     */
+    const val SHOW_COUPON_HISTORY = false
 }

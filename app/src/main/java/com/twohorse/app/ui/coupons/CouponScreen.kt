@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twohorse.app.Config
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Coupon
 import com.twohorse.app.domain.model.CouponLeg
@@ -884,28 +885,30 @@ private fun CouponHeader(
             modifier = Modifier.weight(1f)
         )
 
-        TextButton(
-            onClick = onOpenHistory
-        ) {
-            Icon(
-                imageVector =
-                    if (historyUnlocked) Icons.Default.History
-                    else Icons.Default.Lock,
-                contentDescription = null,
-                tint = if (historyUnlocked) Green else Muted,
-                modifier = Modifier.size(16.dp)
-            )
+        if (Config.SHOW_COUPON_HISTORY) {
+            TextButton(
+                onClick = onOpenHistory
+            ) {
+                Icon(
+                    imageVector =
+                        if (historyUnlocked) Icons.Default.History
+                        else Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = if (historyUnlocked) Green else Muted,
+                    modifier = Modifier.size(16.dp)
+                )
 
-            Spacer(
-                modifier = Modifier.width(4.dp)
-            )
+                Spacer(
+                    modifier = Modifier.width(4.dp)
+                )
 
-            Text(
-                text = strings.couponHistoryButton,
-                color = if (historyUnlocked) Green else Muted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
+                Text(
+                    text = strings.couponHistoryButton,
+                    color = if (historyUnlocked) Green else Muted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
