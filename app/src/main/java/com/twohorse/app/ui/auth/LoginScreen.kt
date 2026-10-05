@@ -191,6 +191,12 @@ fun LoginScreen(
     fun startGoogleSignIn() {
         if (loading) return
 
+        // No Web client ID baked into this build (GitHub variable unset).
+        if (Config.GOOGLE_WEB_CLIENT_ID.isBlank()) {
+            error = LoginError.NotConfigured
+            return
+        }
+
         error = null
         loading = true
 
