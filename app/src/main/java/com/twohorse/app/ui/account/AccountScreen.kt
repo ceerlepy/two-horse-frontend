@@ -927,8 +927,6 @@ private fun PlanComparisonTable(
                 ),
             strings.accountFeatureValueModel to
                 listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
-            strings.accountFeatureCouponHistory to
-                listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
             strings.accountFeatureAskAi to
                 listOf(
                     PlanCell.No,
