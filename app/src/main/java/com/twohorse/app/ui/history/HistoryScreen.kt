@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twohorse.app.Config
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.i18n.LocalStrings
@@ -238,18 +239,20 @@ fun HistoryScreen(
             }
 
             else -> {
-                item {
-                    Column(
-                        modifier =
-                            Modifier.padding(
-                                horizontal =
-                                    18.dp
+                if (Config.SHOW_MODEL_PERFORMANCE) {
+                    item {
+                        Column(
+                            modifier =
+                                Modifier.padding(
+                                    horizontal =
+                                        18.dp
+                                )
+                        ) {
+                            HistoryStats(
+                                history =
+                                    history
                             )
-                    ) {
-                        HistoryStats(
-                            history =
-                                history
-                        )
+                        }
                     }
                 }
 
