@@ -1,4 +1,4 @@
-Two Horse, Türkiye at yarışları için gerçek zamanlı yapay zeka destekli bir analiz uygulamasıdır.
+Two Horse (iki at), Türkiye at yarışları için gerçek zamanlı yapay zeka destekli bir analiz uygulamasıdır: TJK programı, canlı AGF ve altılı ganyan kuponları tek yerde.
 
 Neler sunar:
 • Günün TJK programı, canlı AGF ve AGF hareketleri
