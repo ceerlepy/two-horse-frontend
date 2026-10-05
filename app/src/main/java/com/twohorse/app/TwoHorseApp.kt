@@ -3,6 +3,7 @@ package com.twohorse.app
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -166,208 +167,222 @@ fun TwoHorseApp() {
         color =
             Bg
     ) {
-        when (
-            val current =
-                screen
+        /*
+         * targetSdk 35 draws the app edge to edge: the system
+         * navigation bar (gesture handle or back/home/menu buttons)
+         * sits over the bottom of the window. Pad every screen above
+         * it so bottom buttons stay tappable; the status bar is
+         * handled per screen header.
+         */
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
         ) {
-            AppScreen.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Green
+            when (
+                val current =
+                    screen
+            ) {
+                AppScreen.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Green
+                        )
+                    }
+                }
+
+                AppScreen.Login -> {
+                    LoginScreen(
+                        repository = repository,
+                        onLoginSuccess = { user ->
+                            currentUser = user
+                            screen = AppScreen.Home
+                        }
                     )
                 }
-            }
 
-            AppScreen.Login -> {
-                LoginScreen(
-                    repository = repository,
-                    onLoginSuccess = { user ->
-                        currentUser = user
-                        screen = AppScreen.Home
-                    }
-                )
-            }
+                AppScreen.Home -> {
+                    HomeScreen(
+                        onRaceClick = {
+                            race ->
+                            screen =
+                                AppScreen.RaceDetail(
+                                    race
+                                )
+                        },
 
-            AppScreen.Home -> {
-                HomeScreen(
-                    onRaceClick = {
-                        race ->
-                        screen =
-                            AppScreen.RaceDetail(
-                                race
+                        onSixFoldClick = {
+                            cities,
+                            selectedCity ->
+
+                            screen =
+                                AppScreen.Coupons(
+                                    cities =
+                                        cities,
+                                    selectedCity =
+                                        selectedCity,
+                                    returnRace =
+                                        null
+                                )
+                        },
+
+                        onHistoryClick = {
+                            screen =
+                                AppScreen.History
+                        },
+
+                        onAccountClick = {
+                            screen =
+                                AppScreen.Account
+                        },
+
+                        onForeignClick = {
+                            screen =
+                                AppScreen.Foreign
+                        }
+                    )
+                }
+
+                AppScreen.Foreign -> {
+                    ForeignScreen(
+                        onBack = {
+                            screen =
+                                AppScreen.Home
+                        }
+                    )
+                }
+
+                AppScreen.Account -> {
+                    AccountScreen(
+                        repository = repository,
+                        initialUser = currentUser,
+                        onUserUpdated = { user ->
+                            currentUser = user
+                        },
+                        onBack = {
+                            screen = AppScreen.Home
+                        },
+                        onLoggedOut = {
+                            currentUser = null
+                            screen = AppScreen.Login
+                        }
+                    )
+                }
+
+                is AppScreen.RaceDetail -> {
+                    RaceDetailScreen(
+                        race =
+                            current.race,
+
+                        currentUser =
+                            currentUser,
+
+                        onBack = {
+                            screen =
+                                AppScreen.Home
+                        },
+
+                        onOpenCoupons = {
+                            city ->
+
+                            screen =
+                                AppScreen.Coupons(
+                                    cities =
+                                        listOf(
+                                            city
+                                        ),
+                                    selectedCity =
+                                        city,
+                                    returnRace =
+                                        current.race
+                                )
+                        },
+
+                        onUpgradeClick = {
+                            screen = AppScreen.Account
+                        }
+                    )
+                }
+
+                is AppScreen.Coupons -> {
+                    CouponScreen(
+                        cities =
+                            current.cities,
+
+                        initialCity =
+                            current.selectedCity,
+
+                        currentUser =
+                            currentUser,
+
+                        onBack = {
+                            couponBack(
+                                current
                             )
-                    },
+                        },
 
-                    onSixFoldClick = {
-                        cities,
-                        selectedCity ->
+                        onUpgradeClick = {
+                            screen = AppScreen.Account
+                        },
 
-                        screen =
-                            AppScreen.Coupons(
-                                cities =
-                                    cities,
-                                selectedCity =
-                                    selectedCity,
-                                returnRace =
-                                    null
-                            )
-                    },
+                        onOpenHistory = {
+                            screen = AppScreen.CouponHistory(current)
+                        },
 
-                    onHistoryClick = {
-                        screen =
-                            AppScreen.History
-                    },
+                        onOpenMyCoupons = {
+                            screen = AppScreen.MyCoupons(current)
+                        }
+                    )
+                }
 
-                    onAccountClick = {
-                        screen =
-                            AppScreen.Account
-                    },
+                is AppScreen.MyCoupons -> {
+                    MyCouponsScreen(
+                        onBack = {
+                            screen = current.returnTo
+                        }
+                    )
+                }
 
-                    onForeignClick = {
-                        screen =
-                            AppScreen.Foreign
-                    }
-                )
-            }
+                is AppScreen.CouponHistory -> {
+                    CouponHistoryScreen(
+                        onBack = {
+                            screen = current.returnTo
+                        }
+                    )
+                }
 
-            AppScreen.Foreign -> {
-                ForeignScreen(
-                    onBack = {
-                        screen =
-                            AppScreen.Home
-                    }
-                )
-            }
+                AppScreen.History -> {
+                    HistoryScreen(
+                        onBack = {
+                            screen =
+                                AppScreen.Home
+                        },
 
-            AppScreen.Account -> {
-                AccountScreen(
-                    repository = repository,
-                    initialUser = currentUser,
-                    onUserUpdated = { user ->
-                        currentUser = user
-                    },
-                    onBack = {
-                        screen = AppScreen.Home
-                    },
-                    onLoggedOut = {
-                        currentUser = null
-                        screen = AppScreen.Login
-                    }
-                )
-            }
+                        onRaceClick = {
+                            race ->
+                            screen =
+                                AppScreen.HistoryDetail(
+                                    race
+                                )
+                        }
+                    )
+                }
 
-            is AppScreen.RaceDetail -> {
-                RaceDetailScreen(
-                    race =
-                        current.race,
+                is AppScreen.HistoryDetail -> {
+                    HistoryDetailScreen(
+                        historyRace =
+                            current.race,
 
-                    currentUser =
-                        currentUser,
-
-                    onBack = {
-                        screen =
-                            AppScreen.Home
-                    },
-
-                    onOpenCoupons = {
-                        city ->
-
-                        screen =
-                            AppScreen.Coupons(
-                                cities =
-                                    listOf(
-                                        city
-                                    ),
-                                selectedCity =
-                                    city,
-                                returnRace =
-                                    current.race
-                            )
-                    },
-
-                    onUpgradeClick = {
-                        screen = AppScreen.Account
-                    }
-                )
-            }
-
-            is AppScreen.Coupons -> {
-                CouponScreen(
-                    cities =
-                        current.cities,
-
-                    initialCity =
-                        current.selectedCity,
-
-                    currentUser =
-                        currentUser,
-
-                    onBack = {
-                        couponBack(
-                            current
-                        )
-                    },
-
-                    onUpgradeClick = {
-                        screen = AppScreen.Account
-                    },
-
-                    onOpenHistory = {
-                        screen = AppScreen.CouponHistory(current)
-                    },
-
-                    onOpenMyCoupons = {
-                        screen = AppScreen.MyCoupons(current)
-                    }
-                )
-            }
-
-            is AppScreen.MyCoupons -> {
-                MyCouponsScreen(
-                    onBack = {
-                        screen = current.returnTo
-                    }
-                )
-            }
-
-            is AppScreen.CouponHistory -> {
-                CouponHistoryScreen(
-                    onBack = {
-                        screen = current.returnTo
-                    }
-                )
-            }
-
-            AppScreen.History -> {
-                HistoryScreen(
-                    onBack = {
-                        screen =
-                            AppScreen.Home
-                    },
-
-                    onRaceClick = {
-                        race ->
-                        screen =
-                            AppScreen.HistoryDetail(
-                                race
-                            )
-                    }
-                )
-            }
-
-            is AppScreen.HistoryDetail -> {
-                HistoryDetailScreen(
-                    historyRace =
-                        current.race,
-
-                    onBack = {
-                        screen =
-                            AppScreen.History
-                    }
-                )
+                        onBack = {
+                            screen =
+                                AppScreen.History
+                        }
+                    )
+                }
             }
         }
     }
