@@ -277,6 +277,10 @@ fun TwoHorseApp() {
                                 returnRace =
                                     current.race
                             )
+                    },
+
+                    onUpgradeClick = {
+                        screen = AppScreen.Account
                     }
                 )
             }

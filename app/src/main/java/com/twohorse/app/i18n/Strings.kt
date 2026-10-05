@@ -739,4 +739,44 @@ interface Strings {
     val accountPerYear: String
     @Composable
     fun couponHistoryWindow(pool: String, windowNumber: Int): String
+
+    // ---- AI'ya sor ----
+    @get:Composable
+    val askAiTitle: String
+    @get:Composable
+    val askAiSubtitle: String
+    @get:Composable
+    val askAiPlaceholder: String
+    @get:Composable
+    val askAiSend: String
+    @get:Composable
+    val askAiSuggestionFavorite: String
+    @get:Composable
+    val askAiSuggestionUpset: String
+    @get:Composable
+    val askAiSuggestionAgf: String
+    @get:Composable
+    val askAiDisclaimer: String
+    @get:Composable
+    val askAiYou: String
+    @get:Composable
+    val askAiLockedTitle: String
+    @get:Composable
+    val askAiLockedBody: String
+    @get:Composable
+    val askAiUpgrade: String
+    @get:Composable
+    val askAiErrorBusy: String
+    @get:Composable
+    val askAiErrorFailed: String
+    @get:Composable
+    val askAiErrorInvalid: String
+    @get:Composable
+    val askAiErrorRaceNotFound: String
+    @get:Composable
+    val askAiErrorUpgrade: String
+    @Composable
+    fun askAiRemaining(remaining: Int, limit: Int): String
+    @Composable
+    fun askAiErrorDailyLimit(limit: Int): String
 }

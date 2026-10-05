@@ -43,7 +43,8 @@ fun RaceDetailScreen(
     race: Race,
     currentUser: MembershipUser?,
     onBack: () -> Unit,
-    onOpenCoupons: (String) -> Unit
+    onOpenCoupons: (String) -> Unit,
+    onUpgradeClick: () -> Unit
 ) {
     BackHandler(onBack = onBack)
 
@@ -260,6 +261,23 @@ fun RaceDetailScreen(
                             FontWeight.Black
                     )
                 }
+            }
+        }
+
+        item {
+            Column(
+                modifier =
+                    Modifier.padding(
+                        horizontal = 18.dp
+                    )
+            ) {
+                AskAiSection(
+                    city = currentRace.city,
+                    raceNumber = currentRace.number,
+                    isPremium = currentUser?.tier == "premium",
+                    repository = repository,
+                    onUpgradeClick = onUpgradeClick
+                )
             }
         }
 
