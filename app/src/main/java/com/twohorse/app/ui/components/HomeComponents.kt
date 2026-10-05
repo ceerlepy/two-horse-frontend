@@ -763,17 +763,27 @@ fun RaceCard(
                         Modifier.height(8.dp)
                     )
 
-                    Text(
-                        text =
-                            strings.homeSurprisePrefix(horse.number, horse.name),
-                        color = Red,
-                        fontSize = 12.sp,
-                        fontWeight =
-                            FontWeight.Bold,
-                        maxLines = 1,
-                        overflow =
-                            TextOverflow.Ellipsis
-                    )
+                    Surface(
+                        color = LavenderSurface,
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text =
+                                strings.homeSurprisePrefix(horse.number, horse.name),
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 5.dp
+                                ),
+                            color = Lavender,
+                            fontSize = 12.sp,
+                            fontWeight =
+                                FontWeight.Bold,
+                            maxLines = 1,
+                            overflow =
+                                TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }

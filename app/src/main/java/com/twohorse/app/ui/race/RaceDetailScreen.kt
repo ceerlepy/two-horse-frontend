@@ -656,7 +656,7 @@ private fun ResultHero(
                                 it.name,
                                 it.score?.roundToInt() ?: 0
                             ),
-                        color = Color.White,
+                        color = Lavender,
                         fontSize = 12.sp,
                         fontWeight =
                             FontWeight.Bold
@@ -675,7 +675,7 @@ private fun ResultHero(
                                 it.name,
                                 it.score?.roundToInt() ?: 0
                             ),
-                        color = Color.White,
+                        color = Lavender,
                         fontSize = 12.sp,
                         fontWeight =
                             FontWeight.Bold
@@ -2008,7 +2008,8 @@ private fun ExpertConsensusSection(
                 value.starCount > 0
             ) {
                 AnalyticsChip(
-                    strings.raceStarTag(value.starCount, value.starScore.roundToInt())
+                    strings.raceStarTag(value.starCount, value.starScore.roundToInt()),
+                    accent = true
                 )
             }
 
@@ -2024,7 +2025,8 @@ private fun ExpertConsensusSection(
                 value.surpriseCount > 0
             ) {
                 AnalyticsChip(
-                    strings.raceSurpriseTag(value.surpriseCount, value.surpriseScore.roundToInt())
+                    strings.raceSurpriseTag(value.surpriseCount, value.surpriseScore.roundToInt()),
+                    accent = true
                 )
             }
 
