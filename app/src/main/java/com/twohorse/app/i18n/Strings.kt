@@ -713,6 +713,8 @@ interface Strings {
     val couponHistoryPending: String
     @get:Composable
     val couponHistoryAllHit: String
+    @get:Composable
+    val couponHistoryBudget: String
     @Composable
     fun couponHistoryLegsHit(hit: Int, total: Int): String
     @Composable

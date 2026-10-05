@@ -1127,6 +1127,9 @@ object ResourceStrings : Strings {
     override val couponHistoryAllHit: String
         @Composable get() = stringResource(R.string.coupon_history_all_hit)
 
+    override val couponHistoryBudget: String
+        @Composable get() = stringResource(R.string.coupon_history_budget)
+
     @Composable
     override fun couponHistoryLegsHit(hit: Int, total: Int): String =
         stringResource(R.string.coupon_history_legs_hit, hit, total)

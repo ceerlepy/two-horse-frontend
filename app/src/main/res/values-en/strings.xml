@@ -342,6 +342,7 @@
     <string name="coupon_history_empty">No saved coupons yet. Our model saves its coupons automatically before each six-fold and five-fold starts.</string>
     <string name="coupon_history_pending">Awaiting results</string>
     <string name="coupon_history_all_hit">All legs hit</string>
+    <string name="coupon_history_budget">Coupon budget</string>
     <string name="coupon_history_legs_hit">%1$d/%2$d legs hit</string>
     <string name="coupon_history_cost">%1$s TL · %2$d combinations</string>
     <string name="coupon_history_leg">Leg %1$d (race %2$d): %3$s</string>
