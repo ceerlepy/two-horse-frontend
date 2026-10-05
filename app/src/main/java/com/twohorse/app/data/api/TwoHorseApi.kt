@@ -710,6 +710,43 @@ class TwoHorseApi(
             }
         }
 
+    suspend fun ask(
+        city: String,
+        raceNumber: Int,
+        question: String,
+        language: String
+    ): AskAnswer =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/ask"
+                        )
+                        .post(
+                            JSONObject()
+                                .put("city", city)
+                                .put("raceNumber", raceNumber)
+                                .put("question", question)
+                                .put("language", language)
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            AskAnswer(
+                answer = json.optString("answer"),
+                cached = json.optBoolean("cached", false),
+                used = json.optInt("used", 0),
+                limit = json.optInt("limit", 0)
+            )
+        }
+
     private fun intList(array: JSONArray?): List<Int> =
         buildList {
             if (array != null) {

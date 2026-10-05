@@ -306,3 +306,11 @@ data class CouponHistoryEntry(
     val allLegsHit: Boolean?,
     val legs: List<CouponHistoryLeg>
 )
+
+/* "AI'ya sor": one answer and the member's allowance after it. */
+data class AskAnswer(
+    val answer: String,
+    val cached: Boolean,
+    val used: Int,
+    val limit: Int
+)
