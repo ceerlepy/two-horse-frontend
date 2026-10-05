@@ -380,4 +380,14 @@
     <string name="ask_ai_error_upgrade">AI\'ya sor Premium üyelere özel.</string>
     <string name="ask_ai_remaining">Bugün kalan soru hakkın: %1$d/%2$d</string>
     <string name="ask_ai_error_daily_limit">Bugünkü %1$d soru hakkın doldu, yarın yenilenir.</string>
+    <string name="my_coupons_button">Kuponlarım</string>
+    <string name="my_coupons_title">Kuponlarım</string>
+    <string name="my_coupons_subtitle">Kaydettiğin kuponlar ve sonuçları · son 30 gün</string>
+    <string name="my_coupons_empty">Henüz kaydettiğin kupon yok. Kupon oluşturunca kartın altındaki \"Kuponlarıma kaydet\" düğmesine dokun; yarışlar bitince kaç ayağın tuttuğu burada görünür.</string>
+    <string name="my_coupons_save">Kuponlarıma kaydet</string>
+    <string name="my_coupons_saved">Kuponlarıma kaydedildi</string>
+    <string name="my_coupons_save_failed">Kaydedilemedi, tekrar dene</string>
+    <string name="my_coupons_delete">Kuponu sil</string>
+    <string name="my_coupons_load_failed">Kuponların yüklenemedi. Biraz sonra tekrar dene.</string>
+    <string name="my_coupons_winner">Kazanan: %1$d</string>
 </resources>

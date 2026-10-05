@@ -710,6 +710,119 @@ class TwoHorseApi(
             }
         }
 
+    /* Gold and Premium: the member's own saved coupons, last 30 days. */
+    suspend fun getMyCoupons(): List<MyCoupon> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val array =
+                getJson("/api/my-coupons")
+                    .optJSONArray("coupons")
+                    ?: JSONArray()
+
+            buildList {
+                for (i in 0 until array.length()) {
+                    val item = array.getJSONObject(i)
+                    val legsArray = item.optJSONArray("legs") ?: JSONArray()
+
+                    add(
+                        MyCoupon(
+                            id = item.optLong("id"),
+                            raceDate = item.optString("raceDate"),
+                            city = item.optString("city"),
+                            pool = item.optString("pool", "sixfold"),
+                            windowNumber = item.optInt("windowNumber", 1),
+                            budgetTl = item.optDouble("budgetTl", 0.0),
+                            totalTl = item.optDouble("totalTl", 0.0),
+                            combinations = item.optLong("combinations", 0),
+                            evaluated = item.optBoolean("evaluated", false),
+                            legCount = item.optInt("legCount", legsArray.length()),
+                            hitLegs = item.optNullableInt("hitLegs"),
+                            allLegsHit =
+                                if (item.isNull("allLegsHit")) null
+                                else item.optBoolean("allLegsHit"),
+                            legs =
+                                buildList {
+                                    for (j in 0 until legsArray.length()) {
+                                        val leg = legsArray.getJSONObject(j)
+                                        add(
+                                            MyCouponLeg(
+                                                raceNumber = leg.optInt("raceNumber"),
+                                                horseNumbers = intList(leg.optJSONArray("horseNumbers")),
+                                                winner = leg.optNullableInt("winner")
+                                            )
+                                        )
+                                    }
+                                }
+                        )
+                    )
+                }
+            }
+        }
+
+    suspend fun saveMyCoupon(
+        result: CouponResult,
+        coupon: Coupon
+    ): Long =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val legs = JSONArray()
+
+            coupon.legs.forEach { leg ->
+                legs.put(
+                    JSONObject()
+                        .put("raceNumber", leg.raceNumber)
+                        .put(
+                            "horseNumbers",
+                            JSONArray(leg.horses.map { it.horseNumber })
+                        )
+                )
+            }
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/my-coupons"
+                        )
+                        .post(
+                            JSONObject()
+                                .put("city", result.city)
+                                .put("pool", result.pool)
+                                .put("windowNumber", result.sixfold)
+                                .put("budgetTl", coupon.budgetTl)
+                                .put("totalTl", coupon.totalTl)
+                                .put("combinations", coupon.combinations)
+                                .put("legs", legs)
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            json.optLong("id")
+        }
+
+    suspend fun deleteMyCoupon(
+        id: Long
+    ) {
+        withContext(
+            Dispatchers.IO
+        ) {
+            execute(
+                Request.Builder()
+                    .url(
+                        "$baseUrl/api/my-coupons?id=$id"
+                    )
+                    .delete()
+                    .build()
+            )
+        }
+    }
+
     suspend fun ask(
         city: String,
         raceNumber: Int,

@@ -307,6 +307,31 @@ data class CouponHistoryEntry(
     val legs: List<CouponHistoryLeg>
 )
 
+/* "Kuponlarım": a coupon the member saved, graded once every leg has run. */
+data class MyCouponLeg(
+    val raceNumber: Int,
+    val horseNumbers: List<Int>,
+    val winner: Int?
+) {
+    val hit: Boolean? get() = winner?.let { it in horseNumbers }
+}
+
+data class MyCoupon(
+    val id: Long,
+    val raceDate: String,
+    val city: String,
+    val pool: String,
+    val windowNumber: Int,
+    val budgetTl: Double,
+    val totalTl: Double,
+    val combinations: Long,
+    val evaluated: Boolean,
+    val legCount: Int,
+    val hitLegs: Int?,
+    val allLegsHit: Boolean?,
+    val legs: List<MyCouponLeg>
+)
+
 /* "AI'ya sor": one answer and the member's allowance after it. */
 data class AskAnswer(
     val answer: String,

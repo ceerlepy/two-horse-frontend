@@ -2,6 +2,7 @@ package com.twohorse.app.ui.coupons
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +12,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.BookmarkAdded
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Stars
@@ -68,7 +72,8 @@ fun CouponScreen(
     currentUser: MembershipUser?,
     onBack: () -> Unit,
     onUpgradeClick: () -> Unit = {},
-    onOpenHistory: () -> Unit = {}
+    onOpenHistory: () -> Unit = {},
+    onOpenMyCoupons: () -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
@@ -464,6 +469,10 @@ fun CouponScreen(
                 historyUnlocked = tier == "premium",
                 onOpenHistory = {
                     if (tier == "premium") onOpenHistory() else onUpgradeClick()
+                },
+                myCouponsUnlocked = canGenerateCoupons,
+                onOpenMyCoupons = {
+                    if (canGenerateCoupons) onOpenMyCoupons() else onUpgradeClick()
                 }
             )
         }
@@ -812,7 +821,13 @@ fun CouponScreen(
                     CouponCard(
                         coupon = coupon,
                         tierIndex = index + 1,
-                        tierCount = visibleCoupons.size
+                        tierCount = visibleCoupons.size,
+                        onSave =
+                            if (canGenerateCoupons) {
+                                { repository.saveMyCoupon(couponResult, coupon) }
+                            } else {
+                                null
+                            }
                     )
                 }
             }
@@ -832,7 +847,9 @@ fun CouponScreen(
 private fun CouponHeader(
     onBack: () -> Unit,
     historyUnlocked: Boolean,
-    onOpenHistory: () -> Unit
+    onOpenHistory: () -> Unit,
+    myCouponsUnlocked: Boolean,
+    onOpenMyCoupons: () -> Unit
 ) {
     val strings = LocalStrings.current
 
@@ -884,6 +901,30 @@ private fun CouponHeader(
         Spacer(
             modifier = Modifier.weight(1f)
         )
+
+        TextButton(
+            onClick = onOpenMyCoupons
+        ) {
+            Icon(
+                imageVector =
+                    if (myCouponsUnlocked) Icons.Default.ConfirmationNumber
+                    else Icons.Default.Lock,
+                contentDescription = null,
+                tint = if (myCouponsUnlocked) Green else Muted,
+                modifier = Modifier.size(16.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.width(4.dp)
+            )
+
+            Text(
+                text = strings.myCouponsButton,
+                color = if (myCouponsUnlocked) Green else Muted,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         if (Config.SHOW_COUPON_HISTORY) {
             TextButton(
@@ -1140,13 +1181,22 @@ private fun ResultSummary(
     }
 }
 
+private enum class SaveState { Idle, Saving, Saved, Failed }
+
 @Composable
 private fun CouponCard(
     coupon: Coupon,
     tierIndex: Int,
-    tierCount: Int
+    tierCount: Int,
+    onSave: (suspend () -> Result<Long>)?
 ) {
     val strings = LocalStrings.current
+    val scope = rememberCoroutineScope()
+
+    var saveState by
+        remember(coupon) {
+            mutableStateOf(SaveState.Idle)
+        }
 
     Card(
         modifier =
@@ -1158,74 +1208,27 @@ private fun CouponCard(
                 containerColor =
                     Surface
             ),
-        border =
-            BorderStroke(
-                1.dp,
-                Border
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = 3.dp
             )
     ) {
+        CouponCardHeader(
+            title =
+                strings.couponAmountLabel(coupon.budgetTl.toInt()),
+            subtitle =
+                strings.couponTierLabel(tierIndex, tierCount),
+            trailing = {
+                CouponPill(
+                    text = "${coupon.totalTl.toInt()} TL"
+                )
+            }
+        )
+
         Column(
             modifier =
                 Modifier.padding(16.dp)
         ) {
-            Row(
-                verticalAlignment =
-                    Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier =
-                        Modifier.weight(1f)
-                ) {
-                    Text(
-                        text =
-                            strings.couponAmountLabel(coupon.budgetTl.toInt()),
-                        color =
-                            Ink,
-                        fontSize =
-                            17.sp,
-                        fontWeight =
-                            FontWeight.ExtraBold
-                    )
-
-                    Text(
-                        text =
-                            strings.couponTierLabel(tierIndex, tierCount),
-                        color =
-                            Muted,
-                        fontSize =
-                            10.sp
-                    )
-                }
-
-                Surface(
-                    color =
-                        PaleGreen,
-                    shape =
-                        RoundedCornerShape(50)
-                ) {
-                    Text(
-                        text =
-                            "${coupon.totalTl.toInt()} TL",
-                        modifier =
-                            Modifier.padding(
-                                horizontal = 10.dp,
-                                vertical = 6.dp
-                            ),
-                        color =
-                            Green,
-                        fontWeight =
-                            FontWeight.ExtraBold,
-                        fontSize =
-                            12.sp
-                    )
-                }
-            }
-
-            Spacer(
-                modifier =
-                    Modifier.height(10.dp)
-            )
-
             Row(
                 modifier =
                     Modifier.fillMaxWidth()
@@ -1280,6 +1283,102 @@ private fun CouponCard(
                         color =
                             Border
                     )
+                }
+            }
+
+            if (onSave != null) {
+                Spacer(
+                    modifier =
+                        Modifier.height(14.dp)
+                )
+
+                if (saveState == SaveState.Saved) {
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    PaleGreen,
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .padding(vertical = 11.dp),
+                        horizontalArrangement =
+                            Arrangement.Center,
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BookmarkAdded,
+                            contentDescription = null,
+                            tint = Green,
+                            modifier = Modifier.size(18.dp)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
+
+                        Text(
+                            text = strings.myCouponsSaved,
+                            color = Green,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            saveState = SaveState.Saving
+
+                            scope.launch {
+                                saveState =
+                                    if (onSave().isSuccess) SaveState.Saved
+                                    else SaveState.Failed
+                            }
+                        },
+                        enabled =
+                            saveState != SaveState.Saving,
+                        modifier =
+                            Modifier.fillMaxWidth(),
+                        shape =
+                            RoundedCornerShape(12.dp),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Green
+                            )
+                    ) {
+                        if (saveState == SaveState.Saving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.BookmarkAdd,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier.width(6.dp)
+                            )
+
+                            Text(
+                                text = strings.myCouponsSave,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    if (saveState == SaveState.Failed) {
+                        Text(
+                            text = strings.myCouponsSaveFailed,
+                            modifier = Modifier.padding(top = 6.dp),
+                            color = Red,
+                            fontSize = 11.sp
+                        )
+                    }
                 }
             }
         }
