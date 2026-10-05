@@ -122,7 +122,7 @@
     <string name="coupon_window_ordinal">%1$s. %2$s</string>
     <string name="race_not_found_in_program">Yarış güncel programda bulunamadı. Son bilinen veri gösteriliyor.</string>
     <string name="race_refresh_failed">Yarış yenilenemedi. Son bilinen veri gösteriliyor.</string>
-    <string name="race_coupon_button">Bu şehir için Altılı Kupon</string>
+    <string name="race_coupon_button">Bu şehir için Altılı / Beşli Kupon</string>
     <string name="race_all_horses_title">Olası sıralama · tüm atlar</string>
     <string name="race_horse_count">%1$s at</string>
     <string name="race_refresh">Yarışı yenile</string>
@@ -260,7 +260,7 @@
     <string name="home_upcoming_count">%1$s yaklaşan koşu</string>
     <string name="home_close_other_races">Diğer yarışları kapat</string>
     <string name="home_open_other_races">Diğer yarışları aç</string>
-    <string name="home_sixfold_title">Altılı Kupon</string>
+    <string name="home_sixfold_title">Altılı / Beşli Kupon</string>
     <string name="home_sixfold_subtitle">Bütçene göre optimize edilmiş kupon</string>
     <string name="home_open_sixfold">Altılı kupon ekranını aç</string>
     <string name="home_favorite_summary_fallback">Model lideri</string>
@@ -338,7 +338,7 @@
     <string name="history_race_number_abbrev">%1$s. K</string>
     <string name="coupon_history_button">Geçmiş</string>
     <string name="coupon_history_title">Kupon geçmişi</string>
-    <string name="coupon_history_subtitle">Son 30 gün · yarış başlamadan önce kaydedilen kuponlar</string>
+    <string name="coupon_history_subtitle">Son 30 gün · modelimizin her altılı ve beşli başlamadan önce otomatik kaydettiği kuponlar ve sonuçları</string>
     <string name="coupon_history_empty">Henüz kayıtlı kupon yok. Kuponlar her altılı ve beşli başlamadan önce otomatik kaydedilir.</string>
     <string name="coupon_history_pending">Sonuç bekleniyor</string>
     <string name="coupon_history_all_hit">Tüm ayaklar tuttu</string>

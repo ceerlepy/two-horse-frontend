@@ -122,7 +122,7 @@
     <string name="coupon_window_ordinal">%1$s %2$s</string>
     <string name="race_not_found_in_program">Race not found in the current program. Showing the last known data.</string>
     <string name="race_refresh_failed">Couldn\'t refresh the race. Showing the last known data.</string>
-    <string name="race_coupon_button">Six-fold Coupon for this City</string>
+    <string name="race_coupon_button">Six-fold / Five-fold Coupon for this City</string>
     <string name="race_all_horses_title">Likely ranking · all horses</string>
     <string name="race_horse_count">%1$s horses</string>
     <string name="race_refresh">Refresh race</string>
@@ -260,7 +260,7 @@
     <string name="home_upcoming_count">%1$s upcoming races</string>
     <string name="home_close_other_races">Close other races</string>
     <string name="home_open_other_races">Open other races</string>
-    <string name="home_sixfold_title">Six-fold Coupon</string>
+    <string name="home_sixfold_title">Six-fold / Five-fold Coupon</string>
     <string name="home_sixfold_subtitle">Coupon optimized for your budget</string>
     <string name="home_open_sixfold">Open six-fold coupon screen</string>
     <string name="home_favorite_summary_fallback">Model leader</string>
@@ -338,8 +338,8 @@
     <string name="history_race_number_abbrev">R%1$s</string>
     <string name="coupon_history_button">History</string>
     <string name="coupon_history_title">Coupon history</string>
-    <string name="coupon_history_subtitle">Last 30 days · coupons saved before the races started</string>
-    <string name="coupon_history_empty">No saved coupons yet. Coupons are saved automatically before each Pick 6 and Pick 5 starts.</string>
+    <string name="coupon_history_subtitle">Last 30 days · coupons our model saved automatically before each six-fold and five-fold, with results</string>
+    <string name="coupon_history_empty">No saved coupons yet. Our model saves its coupons automatically before each six-fold and five-fold starts.</string>
     <string name="coupon_history_pending">Awaiting results</string>
     <string name="coupon_history_all_hit">All legs hit</string>
     <string name="coupon_history_legs_hit">%1$d/%2$d legs hit</string>
@@ -354,8 +354,8 @@
     <string name="account_period_yearly">Yearly</string>
     <string name="account_yearly_saving">2 months free</string>
     <string name="account_per_year">/yr</string>
-    <string name="coupon_history_window_sixfold">Pick 6 #%1$d</string>
-    <string name="coupon_history_window_fivefold">Pick 5 #%1$d</string>
+    <string name="coupon_history_window_sixfold">Six-fold #%1$d</string>
+    <string name="coupon_history_window_fivefold">Five-fold #%1$d</string>
     <string name="account_feature_ask_ai">Ask the AI</string>
     <string name="account_ask_ai_premium">20/day</string>
 
