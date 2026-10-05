@@ -1696,6 +1696,10 @@ private fun HorseCard(
                 )
             }
 
+            ValueModelSection(
+                horse.valueModel
+            )
+
             ExpertConsensusSection(
                 horse.expertConsensus
             )
@@ -2204,6 +2208,82 @@ private fun MarketSection(
             score = it
         )
     }
+}
+
+@Composable
+private fun ValueModelSection(
+    value: ValueModelOpinion?
+) {
+    val strings = LocalStrings.current
+
+    if (value == null) {
+        return
+    }
+
+    val pct = { p: Double -> "%.1f".format(p * 100) }
+
+    Spacer(
+        Modifier.height(12.dp)
+    )
+
+    Text(
+        text = strings.raceValueModelTitle,
+        color = Ink,
+        fontSize = 11.sp,
+        fontWeight =
+            FontWeight.Black
+    )
+
+    when (value.label) {
+        "underrated" -> {
+            Spacer(
+                Modifier.height(5.dp)
+            )
+
+            AnalyticsChip(
+                strings.raceValueUnderrated,
+                accent = true
+            )
+        }
+
+        "overrated" -> {
+            Spacer(
+                Modifier.height(5.dp)
+            )
+
+            AnalyticsChip(
+                strings.raceValueOverrated,
+                danger = true
+            )
+        }
+    }
+
+    Spacer(
+        Modifier.height(5.dp)
+    )
+
+    Text(
+        text =
+            value.agfProbability
+                ?.let {
+                    strings.raceValueVsAgf(pct(it), pct(value.probability))
+                }
+                ?: value.ganyanProbability
+                    ?.let {
+                        strings.raceValueVsGanyan(pct(it), pct(value.probability))
+                    }
+                ?: "${strings.raceValueModelTitle}: %${pct(value.probability)}",
+        color = Ink,
+        fontSize = 11.sp,
+        fontWeight =
+            FontWeight.Bold
+    )
+
+    Text(
+        text = strings.raceValueNote,
+        color = Muted,
+        fontSize = 9.sp
+    )
 }
 
 @Composable

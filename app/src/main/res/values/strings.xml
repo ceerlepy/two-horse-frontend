@@ -157,6 +157,12 @@
     <string name="race_rival_tag">%1$s rakip (%%%2$s)</string>
     <string name="race_surprise_tag">%1$s sürpriz (%%%2$s)</string>
     <string name="race_avoid_tag">%1$s olumsuz (%%%2$s)</string>
+    <string name="race_value_model_title">🔎 Değer modeli</string>
+    <string name="race_value_underrated">AGF\'nin hafife aldığı at</string>
+    <string name="race_value_overrated">AGF\'nin abarttığı at</string>
+    <string name="race_value_vs_agf">AGF %%%1$s, modelimiz %%%2$s</string>
+    <string name="race_value_vs_ganyan">Ganyan %%%1$s, modelimiz %%%2$s</string>
+    <string name="race_value_note">Uzman ve AGF skorundan ayrı görüş; bahis tavsiyesi değildir.</string>
     <string name="race_expert_score_title">Uzman skoru</string>
     <string name="race_support_confidence">Destek güveni %1$s%%</string>
     <string name="race_market_move_title">📈 Piyasa hareketi</string>

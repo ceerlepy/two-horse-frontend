@@ -1592,6 +1592,40 @@ class TwoHorseApi(
                 )
             }
 
+        val valueModel =
+            json.optJSONObject(
+                "valueModel"
+            )?.let {
+                val probability =
+                    it.optNullableDouble(
+                        "probability"
+                    )
+
+                probability?.let { p ->
+                    ValueModelOpinion(
+                        probability = p,
+                        agfProbability =
+                            it.optNullableDouble(
+                                "agfProbability"
+                            ),
+                        ganyanProbability =
+                            it.optNullableDouble(
+                                "ganyanProbability"
+                            ),
+                        odds =
+                            it.optNullableDouble(
+                                "odds"
+                            ),
+                        label =
+                            it.optString(
+                                "label"
+                            ).takeIf { label ->
+                                label == "underrated" || label == "overrated"
+                            }
+                    )
+                }
+            }
+
         return Horse(
             number =
                 json.firstInt(
@@ -1680,6 +1714,9 @@ class TwoHorseApi(
 
             fieldSignal =
                 field,
+
+            valueModel =
+                valueModel,
 
             finishPosition =
                 json.firstInt(

@@ -64,6 +64,16 @@ data class RaceCouponStrategy(
     val reason: String
 )
 
+/* The value model's separate opinion (backend §71): its win probability
+ * next to the market's, and a label when they clearly disagree. */
+data class ValueModelOpinion(
+    val probability: Double,
+    val agfProbability: Double? = null,
+    val ganyanProbability: Double? = null,
+    val odds: Double? = null,
+    val label: String? = null
+)
+
 data class Horse(
     val number: Int,
     val name: String,
@@ -82,6 +92,7 @@ data class Horse(
     val expertConsensus: ExpertConsensusSummary? = null,
     val marketMovement: MarketMovement? = null,
     val fieldSignal: FieldSignal? = null,
+    val valueModel: ValueModelOpinion? = null,
 
     val finishPosition: Int? = null
 )
