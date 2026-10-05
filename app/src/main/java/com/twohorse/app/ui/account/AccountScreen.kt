@@ -925,6 +925,8 @@ private fun PlanComparisonTable(
                     PlanCell.Label(strings.accountDailyCouponsGold),
                     PlanCell.Label(strings.accountCouponUnlimited)
                 ),
+            strings.accountFeatureMyCoupons to
+                listOf(PlanCell.No, PlanCell.Yes, PlanCell.Yes),
             strings.accountFeatureValueModel to
                 listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
             strings.accountFeatureAskAi to

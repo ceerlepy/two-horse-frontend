@@ -1213,6 +1213,9 @@ object ResourceStrings : Strings {
     override val accountAskAiPremium: String
         @Composable get() = stringResource(R.string.account_ask_ai_premium)
 
+    override val accountFeatureMyCoupons: String
+        @Composable get() = stringResource(R.string.account_feature_my_coupons)
+
     override val askAiTitle: String
         @Composable get() = stringResource(R.string.ask_ai_title)
 
