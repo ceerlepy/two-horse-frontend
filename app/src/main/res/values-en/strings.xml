@@ -380,4 +380,14 @@
     <string name="ask_ai_error_upgrade">Ask the AI is for Premium members.</string>
     <string name="ask_ai_remaining">Questions left today: %1$d/%2$d</string>
     <string name="ask_ai_error_daily_limit">You\'ve used all %1$d questions for today. They reset tomorrow.</string>
+    <string name="my_coupons_button">My coupons</string>
+    <string name="my_coupons_title">My coupons</string>
+    <string name="my_coupons_subtitle">Coupons you saved and their results · last 30 days</string>
+    <string name="my_coupons_empty">You have no saved coupons yet. After building a coupon, tap \"Save to my coupons\" under it; once the races finish, the legs it hit show here.</string>
+    <string name="my_coupons_save">Save to my coupons</string>
+    <string name="my_coupons_saved">Saved to my coupons</string>
+    <string name="my_coupons_save_failed">Couldn\'t save, try again</string>
+    <string name="my_coupons_delete">Delete coupon</string>
+    <string name="my_coupons_load_failed">Couldn\'t load your coupons. Try again shortly.</string>
+    <string name="my_coupons_winner">Winner: %1$d</string>
 </resources>

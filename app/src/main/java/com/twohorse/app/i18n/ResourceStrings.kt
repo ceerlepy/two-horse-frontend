@@ -1130,6 +1130,37 @@ object ResourceStrings : Strings {
     override val couponHistoryBudget: String
         @Composable get() = stringResource(R.string.coupon_history_budget)
 
+    override val myCouponsButton: String
+        @Composable get() = stringResource(R.string.my_coupons_button)
+
+    override val myCouponsTitle: String
+        @Composable get() = stringResource(R.string.my_coupons_title)
+
+    override val myCouponsSubtitle: String
+        @Composable get() = stringResource(R.string.my_coupons_subtitle)
+
+    override val myCouponsEmpty: String
+        @Composable get() = stringResource(R.string.my_coupons_empty)
+
+    override val myCouponsSave: String
+        @Composable get() = stringResource(R.string.my_coupons_save)
+
+    override val myCouponsSaved: String
+        @Composable get() = stringResource(R.string.my_coupons_saved)
+
+    override val myCouponsSaveFailed: String
+        @Composable get() = stringResource(R.string.my_coupons_save_failed)
+
+    override val myCouponsDelete: String
+        @Composable get() = stringResource(R.string.my_coupons_delete)
+
+    override val myCouponsLoadFailed: String
+        @Composable get() = stringResource(R.string.my_coupons_load_failed)
+
+    @Composable
+    override fun myCouponsWinner(horseNumber: Int): String =
+        stringResource(R.string.my_coupons_winner, horseNumber)
+
     @Composable
     override fun couponHistoryLegsHit(hit: Int, total: Int): String =
         stringResource(R.string.coupon_history_legs_hit, hit, total)

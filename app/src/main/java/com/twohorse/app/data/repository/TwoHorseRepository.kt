@@ -4,12 +4,14 @@ import android.content.Context
 import com.twohorse.app.data.api.TwoHorseApi
 import com.twohorse.app.data.auth.SessionStore
 import com.twohorse.app.domain.model.AskAnswer
+import com.twohorse.app.domain.model.Coupon
 import com.twohorse.app.domain.model.CouponHistoryEntry
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.MembershipUser
+import com.twohorse.app.domain.model.MyCoupon
 import com.twohorse.app.domain.model.RaceForm
 import com.twohorse.app.domain.model.RaceTraining
 import com.twohorse.app.domain.model.TodayData
@@ -153,6 +155,26 @@ class TwoHorseRepository(
     ): Result<List<CouponHistoryEntry>> =
         runCatching {
             api.getCouponHistory(days)
+        }
+
+    suspend fun myCoupons(): Result<List<MyCoupon>> =
+        runCatching {
+            api.getMyCoupons()
+        }
+
+    suspend fun saveMyCoupon(
+        result: CouponResult,
+        coupon: Coupon
+    ): Result<Long> =
+        runCatching {
+            api.saveMyCoupon(result, coupon)
+        }
+
+    suspend fun deleteMyCoupon(
+        id: Long
+    ): Result<Unit> =
+        runCatching {
+            api.deleteMyCoupon(id)
         }
 
     suspend fun ask(

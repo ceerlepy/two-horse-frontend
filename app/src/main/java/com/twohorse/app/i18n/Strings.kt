@@ -715,6 +715,26 @@ interface Strings {
     val couponHistoryAllHit: String
     @get:Composable
     val couponHistoryBudget: String
+    @get:Composable
+    val myCouponsButton: String
+    @get:Composable
+    val myCouponsTitle: String
+    @get:Composable
+    val myCouponsSubtitle: String
+    @get:Composable
+    val myCouponsEmpty: String
+    @get:Composable
+    val myCouponsSave: String
+    @get:Composable
+    val myCouponsSaved: String
+    @get:Composable
+    val myCouponsSaveFailed: String
+    @get:Composable
+    val myCouponsDelete: String
+    @get:Composable
+    val myCouponsLoadFailed: String
+    @Composable
+    fun myCouponsWinner(horseNumber: Int): String
     @Composable
     fun couponHistoryLegsHit(hit: Int, total: Int): String
     @Composable
