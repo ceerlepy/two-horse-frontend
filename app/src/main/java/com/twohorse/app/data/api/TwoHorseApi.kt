@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -624,7 +625,10 @@ class TwoHorseApi(
                                                 "track"
                                             ),
                                         runners =
-                                            runners
+                                            runners,
+                                        aiPick =
+                                            race.optJSONObject("aiPick")
+                                                ?.let(::parseForeignAiPick)
                                     )
                                 )
                             }
@@ -641,10 +645,83 @@ class TwoHorseApi(
                                     "country"
                                 ),
                             races =
-                                races
+                                races,
+                            aiCoupons =
+                                parseForeignAiCoupons(
+                                    meeting.optJSONArray("aiCoupons")
+                                )
                         )
                     )
                 }
+            }
+        }
+
+    private fun intList(array: JSONArray?): List<Int> =
+        buildList {
+            if (array != null) {
+                for (i in 0 until array.length()) {
+                    add(array.optInt(i))
+                }
+            }
+        }
+
+    private fun parseForeignAiPick(json: JSONObject): ForeignAiPick {
+        val rankedArray = json.optJSONArray("ranked")
+
+        return ForeignAiPick(
+            ranked =
+                buildList {
+                    if (rankedArray != null) {
+                        for (i in 0 until rankedArray.length()) {
+                            val item = rankedArray.getJSONObject(i)
+                            add(
+                                ForeignRankedHorse(
+                                    number = item.optInt("number"),
+                                    name = item.optString("name")
+                                )
+                            )
+                        }
+                    }
+                },
+            selection = intList(json.optJSONArray("selection")),
+            comment = json.optString("comment")
+        )
+    }
+
+    private fun parseForeignAiCoupons(array: JSONArray?): List<ForeignAiCoupon> =
+        buildList {
+            if (array == null) return@buildList
+
+            for (i in 0 until array.length()) {
+                val item = array.getJSONObject(i)
+                val legsArray = item.optJSONArray("legs")
+
+                add(
+                    ForeignAiCoupon(
+                        altili = item.optInt("altili"),
+                        startTime =
+                            if (item.isNull("startTime")) null
+                            else item.optString("startTime").takeIf { it.isNotBlank() },
+                        legs =
+                            buildList {
+                                if (legsArray != null) {
+                                    for (j in 0 until legsArray.length()) {
+                                        val leg = legsArray.getJSONObject(j)
+                                        add(
+                                            ForeignAiLeg(
+                                                raceNumber = leg.optInt("raceNumber"),
+                                                selection = intList(leg.optJSONArray("selection"))
+                                            )
+                                        )
+                                    }
+                                }
+                            },
+                        combinations =
+                            if (item.isNull("combinations")) null else item.optInt("combinations"),
+                        amountTl =
+                            if (item.isNull("amountTl")) null else item.optDouble("amountTl")
+                    )
+                )
             }
         }
 
@@ -1664,6 +1741,40 @@ class TwoHorseApi(
                 )
             }
 
+        val valueModel =
+            json.optJSONObject(
+                "valueModel"
+            )?.let {
+                val probability =
+                    it.optNullableDouble(
+                        "probability"
+                    )
+
+                probability?.let { p ->
+                    ValueModelOpinion(
+                        probability = p,
+                        agfProbability =
+                            it.optNullableDouble(
+                                "agfProbability"
+                            ),
+                        ganyanProbability =
+                            it.optNullableDouble(
+                                "ganyanProbability"
+                            ),
+                        odds =
+                            it.optNullableDouble(
+                                "odds"
+                            ),
+                        label =
+                            it.optString(
+                                "label"
+                            ).takeIf { label ->
+                                label == "underrated" || label == "overrated"
+                            }
+                    )
+                }
+            }
+
         return Horse(
             number =
                 json.firstInt(
@@ -1752,6 +1863,9 @@ class TwoHorseApi(
 
             fieldSignal =
                 field,
+
+            valueModel =
+                valueModel,
 
             finishPosition =
                 json.firstInt(

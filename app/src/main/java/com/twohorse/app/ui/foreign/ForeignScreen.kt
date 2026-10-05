@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
+import com.twohorse.app.domain.model.ForeignAiCoupon
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
@@ -157,6 +158,17 @@ fun ForeignScreen(
                     }
 
                     items(
+                        selected.aiCoupons,
+                        key = { "${selected.city}-ai-${it.altili}" }
+                    ) { coupon ->
+                        Column(
+                            modifier = Modifier.padding(horizontal = 18.dp)
+                        ) {
+                            ForeignAiCouponCard(coupon)
+                        }
+                    }
+
+                    items(
                         selected.races,
                         key = { "${selected.city}-${it.raceNumber}" }
                     ) { race ->
@@ -225,6 +237,32 @@ private fun ForeignRaceCard(race: ForeignRace) {
                 )
             }
 
+            race.aiPick?.let { pick ->
+                val top = pick.ranked.firstOrNull()
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    top?.let {
+                        LavenderLabel(strings.foreignAiTop("${it.number}-${it.name}"))
+                    }
+
+                    if (pick.selection.isNotEmpty()) {
+                        LavenderLabel(strings.foreignAiSelection(pick.selection.joinToString("-")))
+                    }
+                }
+
+                if (pick.comment.isNotBlank()) {
+                    Text(
+                        text = pick.comment,
+                        color = Muted,
+                        fontSize = 11.sp,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
             ordered.forEachIndexed { index, runner ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -269,6 +307,77 @@ private fun ForeignRaceCard(race: ForeignRace) {
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LavenderLabel(text: String) {
+    Surface(
+        color = LavenderSurface,
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+            color = Lavender,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
+    val strings = LocalStrings.current
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = LavenderSurface),
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(15.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = strings.foreignAiCouponTitle(coupon.altili),
+                    modifier = Modifier.weight(1f),
+                    color = Lavender,
+                    fontWeight = FontWeight.Black
+                )
+                coupon.startTime?.let {
+                    Text(
+                        text = strings.foreignAiCouponStart(it),
+                        color = Lavender,
+                        fontSize = 11.sp
+                    )
+                }
+            }
+
+            coupon.legs.forEach { leg ->
+                Text(
+                    text = strings.foreignAiLeg(leg.raceNumber, leg.selection.joinToString("-")),
+                    color = Lavender,
+                    fontSize = 12.sp
+                )
+            }
+
+            if (coupon.combinations != null && coupon.amountTl != null) {
+                Text(
+                    text =
+                        strings.foreignAiCouponTotal(
+                            coupon.combinations,
+                            "%.0f".format(coupon.amountTl)
+                        ),
+                    color = Lavender,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
