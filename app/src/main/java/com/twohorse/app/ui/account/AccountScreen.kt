@@ -427,7 +427,20 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(14.dp))
                 }
 
-                if (paidTier != "premium") {
+                // Yearly plans may not be switched on in Play Console yet;
+                // the toggle only appears once at least one product has one.
+                val yearlyAvailable =
+                    listOf(goldProduct, premiumProduct).any {
+                        it?.subscriptionOfferDetails.orEmpty().any { offer ->
+                            offer.basePlanId == BASE_PLAN_YEARLY
+                        }
+                    }
+
+                LaunchedEffect(yearlyAvailable) {
+                    if (!yearlyAvailable) billingPeriod = BASE_PLAN_MONTHLY
+                }
+
+                if (paidTier != "premium" && yearlyAvailable) {
                     BillingPeriodToggle(
                         selected = billingPeriod,
                         onSelect = { billingPeriod = it }
