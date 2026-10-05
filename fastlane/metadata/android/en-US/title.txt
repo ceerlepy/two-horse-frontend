@@ -1,1 +1,1 @@
-Two Horse
+Two Horse: Horse Racing AI
