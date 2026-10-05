@@ -31,4 +31,10 @@ object Config {
      * keeps saving and grading coupons either way.
      */
     const val SHOW_COUPON_HISTORY = false
+
+    /*
+     * The "Model performansı" box on the results screen (top-1 /
+     * top-3 hit rates) is for us, not for members: hidden.
+     */
+    const val SHOW_MODEL_PERFORMANCE = false
 }

@@ -42,7 +42,9 @@ fun currentLanguage(): Language {
 
 /*
  * Switches the app's per-app language. AppCompatDelegate persists
- * the choice itself and recreates the current Activity to apply it.
+ * the choice itself. MainActivity handles locale config changes
+ * (manifest), so the change reaches Compose as a new configuration
+ * and only the texts recompose; the current screen stays.
  */
 fun setLanguage(
     language: Language

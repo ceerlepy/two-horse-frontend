@@ -8,8 +8,15 @@
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.TwoHorse">
 
+        <!--
+          locale|layoutDirection: switching TR/EN in the app only swaps
+          the texts (Compose recomposes with the new resources) instead
+          of recreating the activity, which threw the member back to the
+          home screen and refetched everything.
+        -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="locale|layoutDirection"
             android:exported="true">
 
             <intent-filter>
