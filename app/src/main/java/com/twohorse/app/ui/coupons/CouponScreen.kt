@@ -369,8 +369,14 @@ fun CouponScreen(
     Scaffold(
         containerColor = Bg,
         bottomBar = {
+            /*
+             * With targetSdk 35 the app draws edge to edge, so the
+             * system navigation bar sits on top of this slot; keep the
+             * button above it or it cannot be tapped.
+             */
             Surface(
-                color = Bg
+                color = Bg,
+                modifier = Modifier.navigationBarsPadding()
             ) {
                 if (canGenerateCoupons) {
                     Button(
