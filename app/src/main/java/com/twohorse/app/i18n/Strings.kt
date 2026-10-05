@@ -51,13 +51,7 @@ interface Strings {
     @get:Composable
     val loginRegisterButton: String
     @get:Composable
-    val loginSwitchToRegister: String
-    @get:Composable
-    val loginSwitchToLogin: String
-    @get:Composable
     val loginPasswordHint: String
-    @get:Composable
-    val loginTrialNote: String
     @get:Composable
     val loginLegalNotice: String
     @get:Composable
@@ -110,6 +104,48 @@ interface Strings {
     val accountDeleteFailed: String
     @get:Composable
     val accountPurchaseOtherAccount: String
+    @get:Composable
+    val loginShowPassword: String
+    @get:Composable
+    val loginHidePassword: String
+    @get:Composable
+    val loginBenefitTrial: String
+    @get:Composable
+    val loginBenefitSignals: String
+    @get:Composable
+    val loginBenefitCancel: String
+    @get:Composable
+    val accountChoosePlan: String
+    @get:Composable
+    val accountBadgePopular: String
+    @get:Composable
+    val accountPerMonth: String
+    @get:Composable
+    val accountRenewalTerms: String
+    @get:Composable
+    val accountRestorePurchases: String
+    @get:Composable
+    val accountRestoreNone: String
+    @get:Composable
+    val accountTrialBadge: String
+    @get:Composable
+    val accountCurrentPlan: String
+    @get:Composable
+    val accountFeatureProgram: String
+    @get:Composable
+    val accountFeatureTraining: String
+    @get:Composable
+    val accountFeatureSignals: String
+    @get:Composable
+    val accountFeatureCoupons: String
+    @get:Composable
+    val accountFeatureVideos: String
+    @get:Composable
+    val accountCouponLimitGold: String
+    @get:Composable
+    val accountCouponUnlimited: String
+    @Composable
+    fun accountDaysLeft(days: Int): String
 
     // ---- Coupon errors ----
     @get:Composable

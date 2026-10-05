@@ -1,6 +1,7 @@
 package com.twohorse.app.i18n
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.twohorse.app.R
 
@@ -68,17 +69,8 @@ object ResourceStrings : Strings {
     override val loginRegisterButton: String
         @Composable get() = stringResource(R.string.login_register_button)
 
-    override val loginSwitchToRegister: String
-        @Composable get() = stringResource(R.string.login_switch_to_register)
-
-    override val loginSwitchToLogin: String
-        @Composable get() = stringResource(R.string.login_switch_to_login)
-
     override val loginPasswordHint: String
         @Composable get() = stringResource(R.string.login_password_hint)
-
-    override val loginTrialNote: String
-        @Composable get() = stringResource(R.string.login_trial_note)
 
     override val loginLegalNotice: String
         @Composable get() = stringResource(R.string.login_legal_notice)
@@ -155,6 +147,70 @@ object ResourceStrings : Strings {
 
     override val accountPurchaseOtherAccount: String
         @Composable get() = stringResource(R.string.account_purchase_other_account)
+
+    override val loginShowPassword: String
+        @Composable get() = stringResource(R.string.login_show_password)
+
+    override val loginHidePassword: String
+        @Composable get() = stringResource(R.string.login_hide_password)
+
+    override val loginBenefitTrial: String
+        @Composable get() = stringResource(R.string.login_benefit_trial)
+
+    override val loginBenefitSignals: String
+        @Composable get() = stringResource(R.string.login_benefit_signals)
+
+    override val loginBenefitCancel: String
+        @Composable get() = stringResource(R.string.login_benefit_cancel)
+
+    override val accountChoosePlan: String
+        @Composable get() = stringResource(R.string.account_choose_plan)
+
+    override val accountBadgePopular: String
+        @Composable get() = stringResource(R.string.account_badge_popular)
+
+    override val accountPerMonth: String
+        @Composable get() = stringResource(R.string.account_per_month)
+
+    override val accountRenewalTerms: String
+        @Composable get() = stringResource(R.string.account_renewal_terms)
+
+    override val accountRestorePurchases: String
+        @Composable get() = stringResource(R.string.account_restore_purchases)
+
+    override val accountRestoreNone: String
+        @Composable get() = stringResource(R.string.account_restore_none)
+
+    override val accountTrialBadge: String
+        @Composable get() = stringResource(R.string.account_trial_badge)
+
+    override val accountCurrentPlan: String
+        @Composable get() = stringResource(R.string.account_current_plan)
+
+    override val accountFeatureProgram: String
+        @Composable get() = stringResource(R.string.account_feature_program)
+
+    override val accountFeatureTraining: String
+        @Composable get() = stringResource(R.string.account_feature_training)
+
+    override val accountFeatureSignals: String
+        @Composable get() = stringResource(R.string.account_feature_signals)
+
+    override val accountFeatureCoupons: String
+        @Composable get() = stringResource(R.string.account_feature_coupons)
+
+    override val accountFeatureVideos: String
+        @Composable get() = stringResource(R.string.account_feature_videos)
+
+    override val accountCouponLimitGold: String
+        @Composable get() = stringResource(R.string.account_coupon_limit_gold)
+
+    override val accountCouponUnlimited: String
+        @Composable get() = stringResource(R.string.account_coupon_unlimited)
+
+    @Composable
+    override fun accountDaysLeft(days: Int): String =
+        pluralStringResource(R.plurals.account_days_left, days, days)
 
     override val couponErrorCityRequired: String
         @Composable get() = stringResource(R.string.coupon_error_city_required)
@@ -1016,6 +1072,6 @@ object ResourceStrings : Strings {
         when (tier) {
             "gold" -> "Gold"
             "premium" -> "Premium"
-            else -> "Free"
+            else -> stringResource(R.string.account_tier_free)
         }
 }

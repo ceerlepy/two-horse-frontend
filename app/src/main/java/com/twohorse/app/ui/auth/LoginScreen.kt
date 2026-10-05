@@ -1,6 +1,8 @@
 package com.twohorse.app.ui.auth
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,19 +10,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +46,7 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.twohorse.app.Config
+import com.twohorse.app.R
 import com.twohorse.app.data.api.ApiException as TwoHorseApiException
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.MembershipUser
@@ -285,6 +299,8 @@ fun LoginScreen(
         }
     }
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = Bg
     ) { innerPadding ->
@@ -294,11 +310,17 @@ fun LoginScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
         ) {
-            LanguageToggle(
+            // Brand header behind the top of the form card.
+            Box(
                 modifier =
                     Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Ink, Green)
+                            )
+                        )
             )
 
             Column(
@@ -306,223 +328,377 @@ fun LoginScreen(
                     Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(24.dp),
-                verticalArrangement =
-                    Arrangement.Center
+                        .padding(horizontal = 20.dp)
             ) {
-                Surface(
-                    color = Green,
-                    shape = RoundedCornerShape(18.dp)
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Stars,
+                    LanguageToggle()
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(20.dp),
+                    shadowElevation = 6.dp
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.two_horse_logo),
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.padding(14.dp)
+                        modifier =
+                            Modifier
+                                .padding(8.dp)
+                                .size(56.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
                     text = "Two Horse",
-                    color = Ink,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Black
                 )
 
                 Text(
                     text = strings.loginSubtitle,
-                    color = Muted,
-                    fontSize = 13.sp
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(22.dp))
 
-                Button(
-                    onClick = { startGoogleSignIn() },
-                    enabled = !loading,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(26.dp),
                     colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Ink
+                        CardDefaults.cardColors(
+                            containerColor = Surface
+                        ),
+                    elevation =
+                        CardDefaults.cardElevation(
+                            defaultElevation = 8.dp
                         )
                 ) {
-                    Text(
-                        text = strings.loginGoogleButton,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = Border
-                    )
-
-                    Text(
-                        text = "  ${strings.loginOr}  ",
-                        color = Muted,
-                        fontSize = 11.sp
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = Border
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (registerMode) {
-                    OutlinedTextField(
-                        value = displayName,
-                        onValueChange = { displayName = it },
-                        label = { Text(strings.loginNameLabel) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(strings.loginEmailLabel) },
-                    singleLine = true,
-                    keyboardOptions =
-                        KeyboardOptions(
-                            keyboardType = KeyboardType.Email
-                        ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(strings.loginPasswordLabel) },
-                    supportingText =
-                        if (registerMode) {
-                            { Text(strings.loginPasswordHint) }
-                        } else null,
-                    singleLine = true,
-                    visualTransformation =
-                        PasswordVisualTransformation(),
-                    keyboardOptions =
-                        KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                error?.let { loginError ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = PaleRed
-                            ),
-                        shape = RoundedCornerShape(12.dp)
+                    Column(
+                        modifier = Modifier.padding(20.dp)
                     ) {
-                        Text(
-                            text = loginErrorText(loginError, strings),
-                            modifier = Modifier.padding(12.dp),
-                            color = Red,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
+                        ModeTabs(
+                            registerMode = registerMode,
+                            enabled = !loading,
+                            onSelect = { register ->
+                                registerMode = register
+                                error = null
+                            }
                         )
+
+                        Spacer(modifier = Modifier.height(18.dp))
+
+                        OutlinedButton(
+                            onClick = { startGoogleSignIn() },
+                            enabled = !loading,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, Border),
+                            colors =
+                                ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Ink
+                                )
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_google_g),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Text(
+                                text = strings.loginGoogleButton,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 15.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(18.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                color = Border
+                            )
+
+                            Text(
+                                text = "  ${strings.loginOr}  ",
+                                color = Muted,
+                                fontSize = 12.sp
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                color = Border
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        val fieldShape = RoundedCornerShape(14.dp)
+
+                        val fieldColors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Green,
+                                unfocusedBorderColor = Border,
+                                focusedLeadingIconColor = Green,
+                                focusedLabelColor = Green,
+                                cursorColor = Green
+                            )
+
+                        AnimatedVisibility(visible = registerMode) {
+                            Column {
+                                OutlinedTextField(
+                                    value = displayName,
+                                    onValueChange = { displayName = it },
+                                    label = { Text(strings.loginNameLabel) },
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Person, contentDescription = null)
+                                    },
+                                    singleLine = true,
+                                    shape = fieldShape,
+                                    colors = fieldColors,
+                                    keyboardOptions =
+                                        KeyboardOptions(
+                                            capitalization = KeyboardCapitalization.Words,
+                                            imeAction = ImeAction.Next
+                                        ),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { email = it },
+                            label = { Text(strings.loginEmailLabel) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Email, contentDescription = null)
+                            },
+                            singleLine = true,
+                            shape = fieldShape,
+                            colors = fieldColors,
+                            keyboardOptions =
+                                KeyboardOptions(
+                                    keyboardType = KeyboardType.Email,
+                                    imeAction = ImeAction.Next
+                                ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text(strings.loginPasswordLabel) },
+                            leadingIcon = {
+                                Icon(Icons.Default.Lock, contentDescription = null)
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { passwordVisible = !passwordVisible }
+                                ) {
+                                    Icon(
+                                        imageVector =
+                                            if (passwordVisible) Icons.Default.VisibilityOff
+                                            else Icons.Default.Visibility,
+                                        contentDescription =
+                                            if (passwordVisible) strings.loginHidePassword
+                                            else strings.loginShowPassword
+                                    )
+                                }
+                            },
+                            supportingText =
+                                if (registerMode) {
+                                    { Text(strings.loginPasswordHint) }
+                                } else null,
+                            singleLine = true,
+                            shape = fieldShape,
+                            colors = fieldColors,
+                            visualTransformation =
+                                if (passwordVisible) VisualTransformation.None
+                                else PasswordVisualTransformation(),
+                            keyboardOptions =
+                                KeyboardOptions(
+                                    keyboardType = KeyboardType.Password,
+                                    imeAction = ImeAction.Done
+                                ),
+                            keyboardActions =
+                                KeyboardActions(
+                                    onDone = { submitEmailForm() }
+                                ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        error?.let { loginError ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors =
+                                    CardDefaults.cardColors(
+                                        containerColor = PaleRed
+                                    ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = loginErrorText(loginError, strings),
+                                    modifier = Modifier.padding(12.dp),
+                                    color = Red,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+                        }
+
+                        Button(
+                            onClick = { submitEmailForm() },
+                            enabled = !loading,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = Green
+                                )
+                        ) {
+                            if (loading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text =
+                                        if (registerMode)
+                                            strings.loginRegisterButton
+                                        else
+                                            strings.loginSubmitButton,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
                     }
-
-                    Spacer(modifier = Modifier.height(14.dp))
                 }
 
-                Button(
-                    onClick = { submitEmailForm() },
-                    enabled = !loading,
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Green
-                        )
-                ) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text =
-                                if (registerMode)
-                                    strings.loginRegisterButton
-                                else
-                                    strings.loginSubmitButton,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.height(20.dp))
 
-                if (registerMode) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                BenefitRow(strings.loginBenefitTrial)
+                BenefitRow(strings.loginBenefitSignals)
+                BenefitRow(strings.loginBenefitCancel)
 
-                    Text(
-                        text = strings.loginTrialNote,
-                        modifier = Modifier.fillMaxWidth(),
-                        color = Green,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                TextButton(
-                    onClick = {
-                        registerMode = !registerMode
-                        error = null
-                    },
-                    enabled = !loading,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text =
-                            if (registerMode)
-                                strings.loginSwitchToLogin
-                            else
-                                strings.loginSwitchToRegister,
-                        color = Ink,
-                        fontSize = 13.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = strings.loginLegalNotice,
                     modifier = Modifier.fillMaxWidth(),
                     color = Muted,
                     fontSize = 11.sp,
+                    lineHeight = 15.sp,
                     textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModeTabs(
+    registerMode: Boolean,
+    enabled: Boolean,
+    onSelect: (Boolean) -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Bg)
+                .padding(4.dp)
+    ) {
+        listOf(
+            false to strings.loginSubmitButton,
+            true to strings.loginRegisterButton
+        ).forEach { (isRegister, label) ->
+            val selected = registerMode == isRegister
+
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(if (selected) Surface else Color.Transparent)
+                        .clickable(enabled = enabled) { onSelect(isRegister) }
+                        .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = label,
+                    color = if (selected) Ink else Muted,
+                    fontSize = 14.sp,
+                    fontWeight =
+                        if (selected) FontWeight.Bold
+                        else FontWeight.Medium
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun BenefitRow(
+    text: String
+) {
+    Row(
+        modifier = Modifier.padding(vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = Green,
+            modifier = Modifier.size(18.dp)
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Text(
+            text = text,
+            color = Ink,
+            fontSize = 13.sp
+        )
     }
 }
 
