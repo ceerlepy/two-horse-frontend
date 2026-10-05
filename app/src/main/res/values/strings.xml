@@ -45,7 +45,7 @@
     <string name="account_purchase_other_account">Bu satın alma başka bir Two Horse hesabına ait.</string>
     <string name="login_show_password">Şifreyi göster</string>
     <string name="login_hide_password">Şifreyi gizle</string>
-    <string name="login_benefit_trial">7 gün ücretsiz Gold, kart gerekmez</string>
+    <string name="login_benefit_trial">7 gün ücretsiz Premium, kart gerekmez</string>
     <string name="login_benefit_signals">Model skoru, uzman konsensusu ve kupon önerileri</string>
     <string name="login_benefit_cancel">İstediğin zaman iptal et</string>
     <string name="account_tier_free">Ücretsiz</string>

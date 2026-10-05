@@ -45,7 +45,7 @@
     <string name="account_purchase_other_account">This purchase belongs to a different Two Horse account.</string>
     <string name="login_show_password">Show password</string>
     <string name="login_hide_password">Hide password</string>
-    <string name="login_benefit_trial">7 days of Gold free, no card needed</string>
+    <string name="login_benefit_trial">7 days of Premium free, no card needed</string>
     <string name="login_benefit_signals">Model scores, expert consensus and coupon picks</string>
     <string name="login_benefit_cancel">Cancel anytime</string>
     <string name="account_tier_free">Free</string>
