@@ -1001,7 +1001,7 @@ private fun SectionTitle(
 }
 
 @Composable
-private fun SelectChip(
+internal fun SelectChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit

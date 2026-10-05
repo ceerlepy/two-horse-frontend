@@ -342,6 +342,7 @@
     <string name="coupon_history_empty">Henüz kayıtlı kupon yok. Kuponlar her altılı ve beşli başlamadan önce otomatik kaydedilir.</string>
     <string name="coupon_history_pending">Sonuç bekleniyor</string>
     <string name="coupon_history_all_hit">Tüm ayaklar tuttu</string>
+    <string name="coupon_history_budget">Kupon bütçesi</string>
     <string name="coupon_history_legs_hit">%1$d/%2$d ayak tuttu</string>
     <string name="coupon_history_cost">%1$s TL · %2$d kombinasyon</string>
     <string name="coupon_history_leg">%1$d. ayak (%2$d. koşu): %3$s</string>

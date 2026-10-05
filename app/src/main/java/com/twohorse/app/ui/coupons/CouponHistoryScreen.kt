@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -49,6 +50,16 @@ fun CouponHistoryScreen(
     var state by
         remember {
             mutableStateOf<CouponHistoryState>(CouponHistoryState.Loading)
+        }
+
+    /*
+     * The model saves one coupon per budget tier for every window;
+     * showing all of them makes the list long, so the member picks
+     * one budget and sees that tier's coupon for each window.
+     */
+    var selectedBudget by
+        remember {
+            mutableStateOf<Double?>(null)
         }
 
     LaunchedEffect(Unit) {
@@ -139,7 +150,47 @@ fun CouponHistoryScreen(
                             )
                         }
                     } else {
-                        items(current.entries) { entry ->
+                        val budgets =
+                            current.entries
+                                .map { it.budgetTl }
+                                .distinct()
+                                .sorted()
+
+                        val budget =
+                            selectedBudget
+                                ?.takeIf { it in budgets }
+                                ?: budgets.first()
+
+                        if (budgets.size > 1) {
+                            item {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 18.dp)
+                                ) {
+                                    Text(
+                                        text = strings.couponHistoryBudget,
+                                        color = Muted,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        items(budgets) { value ->
+                                            SelectChip(
+                                                text = "${value.toInt()} TL",
+                                                selected = value == budget,
+                                                onClick = { selectedBudget = value }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        items(current.entries.filter { it.budgetTl == budget }) { entry ->
                             CouponHistoryCard(entry)
                         }
                     }
