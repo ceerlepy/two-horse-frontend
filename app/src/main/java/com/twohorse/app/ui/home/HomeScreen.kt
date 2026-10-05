@@ -43,6 +43,7 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AutoRefreshEffect
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
 import com.twohorse.app.ui.components.ForeignEntryCard
@@ -330,6 +331,26 @@ fun HomeScreen(
                 it.city
             }
             .distinct()
+
+    AutoRefreshEffect(
+        nextStartMillis =
+            allRaces
+                .mapNotNull {
+                    raceTimeMillis(
+                        it
+                    )
+                }
+                .filter {
+                    it >= nowMillis
+                }
+                .minOrNull()
+    ) {
+        if (
+            !requestInFlight
+        ) {
+            refreshKey++
+        }
+    }
 
     LazyColumn(
         modifier =
@@ -692,7 +713,7 @@ fun HomeScreen(
     }
 }
 
-private fun raceTimeMillis(
+internal fun raceTimeMillis(
     race: Race
 ): Long? {
     val value =

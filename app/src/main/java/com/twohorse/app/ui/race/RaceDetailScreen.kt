@@ -29,6 +29,7 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.*
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.*
+import com.twohorse.app.ui.home.raceTimeMillis
 import com.twohorse.app.ui.theme.*
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -132,6 +133,15 @@ fun RaceDetailScreen(
             }
 
         refreshing = false
+    }
+
+    AutoRefreshEffect(
+        nextStartMillis =
+            raceTimeMillis(currentRace)
+    ) {
+        if (!refreshing) {
+            refreshKey++
+        }
     }
 
     val horses =
