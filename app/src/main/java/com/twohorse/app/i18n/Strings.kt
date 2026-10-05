@@ -739,4 +739,8 @@ interface Strings {
     val accountPerYear: String
     @Composable
     fun couponHistoryWindow(pool: String, windowNumber: Int): String
+    @get:Composable
+    val accountFeatureAskAi: String
+    @get:Composable
+    val accountAskAiPremium: String
 }

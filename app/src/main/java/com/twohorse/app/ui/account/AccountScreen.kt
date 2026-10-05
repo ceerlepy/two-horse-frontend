@@ -929,6 +929,12 @@ private fun PlanComparisonTable(
                 listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
             strings.accountFeatureCouponHistory to
                 listOf(PlanCell.No, PlanCell.No, PlanCell.Yes),
+            strings.accountFeatureAskAi to
+                listOf(
+                    PlanCell.No,
+                    PlanCell.No,
+                    PlanCell.Label(strings.accountAskAiPremium)
+                ),
             strings.accountFeatureVideos to
                 listOf(PlanCell.Yes, PlanCell.Yes, PlanCell.Yes)
         )

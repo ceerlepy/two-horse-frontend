@@ -21,7 +21,7 @@
     <string name="account_subscription_renews_at">Subscription renews on %1$s</string>
     <string name="account_unlimited">Unlimited</string>
     <string name="account_gold_description">All model signals and expert consensus · 10 coupons a day, up to 1,500 TL</string>
-    <string name="account_premium_description">Everything in Gold + \"Underrated by AGF\" label + unlimited coupons + coupon history</string>
+    <string name="account_premium_description">Everything in Gold + \"Underrated by AGF\" label + Ask the AI (20 questions a day) + unlimited coupons + coupon history</string>
     <string name="account_upgrade_to">Upgrade to %1$s</string>
     <string name="account_loading_ellipsis">Loading…</string>
     <string name="account_already_premium">You\'re already Premium — everything is unlocked.</string>
@@ -356,4 +356,6 @@
     <string name="account_per_year">/yr</string>
     <string name="coupon_history_window_sixfold">Pick 6 #%1$d</string>
     <string name="coupon_history_window_fivefold">Pick 5 #%1$d</string>
+    <string name="account_feature_ask_ai">Ask the AI</string>
+    <string name="account_ask_ai_premium">20/day</string>
 </resources>
