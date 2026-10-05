@@ -37,4 +37,13 @@ object Config {
      * top-3 hit rates) is for us, not for members: hidden.
      */
     const val SHOW_MODEL_PERFORMANCE = false
+
+    /*
+     * Race screen internals: "Learning" (how much the last weeks'
+     * results nudged a horse's score), base -> final score, score
+     * components with their effective/configured weights, and the
+     * "Detaylı model analizi" card. They help us tune the model and mean
+     * nothing to members, so they are hidden.
+     */
+    const val SHOW_MODEL_DIAGNOSTICS = false
 }

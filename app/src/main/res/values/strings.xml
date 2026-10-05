@@ -136,7 +136,7 @@
     <string name="race_field">Saha</string>
     <string name="race_market">Piyasa</string>
     <string name="race_form">Form</string>
-    <string name="race_learning">Learning</string>
+    <string name="race_learning">Öğrenme</string>
     <string name="race_learning_delta">%1$s puan</string>
     <string name="race_top_rival">En ciddi rakip: #%1$s %2$s · %3$s/100</string>
     <string name="race_surprise">💣 Sürpriz: #%1$s %2$s · %3$s/100</string>
@@ -145,7 +145,7 @@
     <string name="race_leader_margin_metric">Lider farkı</string>
     <string name="race_expansion_metric">Genişleme</string>
     <string name="race_deep_analysis_title">Detaylı model analizi</string>
-    <string name="race_deep_analysis_subtitle">Ağırlıklar, learning ve sinyal bileşenleri</string>
+    <string name="race_deep_analysis_subtitle">Ağırlıklar, öğrenme ve sinyal bileşenleri</string>
     <string name="race_close_deep_analysis">Detaylı analizi kapat</string>
     <string name="race_open_deep_analysis">Detaylı analizi aç</string>
     <string name="race_info_fallback">Koşu bilgisi</string>
@@ -233,9 +233,9 @@
     <string name="race_field_tjk">TJK %1$s</string>
     <string name="race_field_expert">Uzman %1$s</string>
     <string name="race_field_samples">%1$s örnek</string>
-    <string name="race_learning_effect_title">🧠 Learning etkisi</string>
-    <string name="race_learning_base">Base %1$s</string>
-    <string name="race_learning_final">Final %1$s</string>
+    <string name="race_learning_effect_title">🧠 Öğrenme etkisi</string>
+    <string name="race_learning_base">Temel %1$s</string>
+    <string name="race_learning_final">Son %1$s</string>
     <string name="race_deep_view_title">Modelin derin görünümü</string>
     <string name="home_data_fetch_failed">Veri alınamadı</string>
     <string name="home_refresh_failed_stale">Yenileme başarısız. Son başarılı veri gösteriliyor.</string>
@@ -405,4 +405,9 @@
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Son 6: %1$s</string>
     <string name="home_next_day_runner_count">%1$d at</string>
+    <string name="ask_ai_open">AI\'ya sor</string>
+    <string name="ask_ai_close">Kapat</string>
+    <string name="ask_ai_clear">Sohbeti temizle</string>
+    <string name="ask_ai_thinking">Cevap hazırlanıyor…</string>
+    <string name="race_rank_label">%1$d. sıra</string>
 </resources>

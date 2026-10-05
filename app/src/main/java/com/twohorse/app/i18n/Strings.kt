@@ -829,4 +829,14 @@ interface Strings {
     fun askAiRemaining(remaining: Int, limit: Int): String
     @Composable
     fun askAiErrorDailyLimit(limit: Int): String
+    @get:Composable
+    val askAiOpen: String
+    @get:Composable
+    val askAiClose: String
+    @get:Composable
+    val askAiClear: String
+    @get:Composable
+    val askAiThinking: String
+    @Composable
+    fun raceRankLabel(rank: Int): String
 }
