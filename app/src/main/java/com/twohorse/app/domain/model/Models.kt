@@ -189,6 +189,29 @@ data class RaceTraining(
     val horses: List<HorseTraining>
 )
 
+data class FormRun(
+    val raceDate: String,
+    val city: String?,
+    val distanceMeters: Int?,
+    val track: String?,
+    val finishPosition: Int?,
+    val finishTime: String?,
+    val jockey: String?,
+    val weight: Double?,
+    val odds: Double?,
+    val raceClass: String?
+)
+
+data class HorseForm(
+    val horseNumber: Int,
+    val horseName: String,
+    val runs: List<FormRun>
+)
+
+data class RaceForm(
+    val horses: List<HorseForm>
+)
+
 data class ForeignRunner(
     val number: Int,
     val name: String,

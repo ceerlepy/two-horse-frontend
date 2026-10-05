@@ -30,6 +30,10 @@ val Red = Color(0xFFB64A3A)
 val PaleRed = Color(0xFFFFECE8)
 
 val Border = Color(0xFFE1E7E3)
+
+/* Accent for "surprise"-type labels: lavender text on dark plum. */
+val Lavender = Color(0xFFB297F8)
+val LavenderSurface = Color(0xFF393346)
 val LoadingBlue = Color(0xFF1976D2)
 
 private val TwoHorseColors =

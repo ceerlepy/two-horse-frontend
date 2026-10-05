@@ -39,11 +39,13 @@ fun isLandscapeScreen(): Boolean =
 fun AnalyticsChip(
     text: String,
     strong: Boolean = false,
-    danger: Boolean = false
+    danger: Boolean = false,
+    accent: Boolean = false
 ) {
     Surface(
         color =
             when {
+                accent -> LavenderSurface
                 danger -> PaleRed
                 strong -> PaleGreen
                 else -> Color(0xFFF2F4F3)
@@ -60,6 +62,7 @@ fun AnalyticsChip(
                 ),
             color =
                 when {
+                    accent -> Lavender
                     danger -> Red
                     strong -> Green
                     else -> Muted

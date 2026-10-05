@@ -140,6 +140,13 @@
     <string name="race_training_retry">Try again</string>
     <string name="race_training_video">Training video</string>
     <string name="race_training_jockey">Training jockey: %1$s</string>
+    <string name="race_form_title">Recent Races</string>
+    <string name="race_form_subtitle">Each horse\'s last 6 TJK runs</string>
+    <string name="race_form_open">Open recent races</string>
+    <string name="race_form_close">Close recent races</string>
+    <string name="race_form_empty">Race history for these horses has not been collected yet. Check back shortly.</string>
+    <string name="race_form_no_runs">First start</string>
+    <string name="race_form_odds">Odds %1$s</string>
     <string name="race_close_model_detail">Close model detail</string>
     <string name="race_open_model_detail">Open model detail</string>
     <string name="race_score_components">Score components</string>

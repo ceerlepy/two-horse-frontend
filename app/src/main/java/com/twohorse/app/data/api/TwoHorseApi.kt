@@ -648,6 +648,92 @@ class TwoHorseApi(
             }
         }
 
+    suspend fun getRaceForm(
+        raceDate: String,
+        city: String,
+        raceNumber: Int
+    ): RaceForm =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val url =
+                (
+                    baseUrl +
+                    "/api/races/form"
+                )
+                    .toHttpUrl()
+                    .newBuilder()
+                    .addQueryParameter("raceDate", raceDate)
+                    .addQueryParameter("city", city)
+                    .addQueryParameter("raceNumber", raceNumber.toString())
+                    .build()
+
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()
+                )
+
+            fun JSONObject.nullableString(key: String): String? =
+                if (!has(key) || isNull(key)) null
+                else optString(key).takeIf { it.isNotBlank() }
+
+            fun JSONObject.nullableInt(key: String): Int? =
+                if (!has(key) || isNull(key)) null else optInt(key)
+
+            fun JSONObject.nullableDouble(key: String): Double? =
+                if (!has(key) || isNull(key)) null
+                else optDouble(key).takeIf { !it.isNaN() }
+
+            val horsesArray =
+                json.optJSONArray("horses")
+
+            val horses =
+                buildList {
+                    if (horsesArray != null) {
+                        for (i in 0 until horsesArray.length()) {
+                            val item = horsesArray.getJSONObject(i)
+                            val runsArray = item.optJSONArray("runs")
+
+                            val runs =
+                                buildList {
+                                    if (runsArray != null) {
+                                        for (j in 0 until runsArray.length()) {
+                                            val run = runsArray.getJSONObject(j)
+                                            add(
+                                                FormRun(
+                                                    raceDate = run.optString("raceDate"),
+                                                    city = run.nullableString("city"),
+                                                    distanceMeters = run.nullableInt("distanceMeters"),
+                                                    track = run.nullableString("track"),
+                                                    finishPosition = run.nullableInt("finishPosition"),
+                                                    finishTime = run.nullableString("finishTime"),
+                                                    jockey = run.nullableString("jockey"),
+                                                    weight = run.nullableDouble("weight"),
+                                                    odds = run.nullableDouble("odds"),
+                                                    raceClass = run.nullableString("raceClass")
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                            add(
+                                HorseForm(
+                                    horseNumber = item.optInt("horseNumber"),
+                                    horseName = item.optString("horseName"),
+                                    runs = runs
+                                )
+                            )
+                        }
+                    }
+                }
+
+            RaceForm(horses = horses)
+        }
+
     suspend fun getRaceTraining(
         raceDate: String,
         city: String,
