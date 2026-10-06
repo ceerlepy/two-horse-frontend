@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.*
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.R
+import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
@@ -1177,4 +1180,128 @@ private fun raceTime(
                 ?.value
                 ?: "--:--"
         }
+}
+
+private enum class AppErrorKind { NoInternet, Timeout, Server, Generic }
+
+private fun appErrorKind(error: Throwable): AppErrorKind {
+    val message = error.message.orEmpty()
+
+    return when {
+        error is java.net.UnknownHostException ||
+            error is java.net.ConnectException ||
+            message.contains("Unable to resolve host", ignoreCase = true) ->
+            AppErrorKind.NoInternet
+
+        error is java.io.InterruptedIOException ||
+            message.contains("timeout", ignoreCase = true) ->
+            AppErrorKind.Timeout
+
+        (error as? ApiException)?.let { it.statusCode >= 500 } == true ->
+            AppErrorKind.Server
+
+        else ->
+            AppErrorKind.Generic
+    }
+}
+
+/*
+ * Friendly full-width error state: an illustration, a plain-language
+ * title and message (never the raw exception text) and a retry button.
+ */
+@Composable
+fun AppErrorState(
+    error: Throwable?,
+    onRetry: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    val kind =
+        error?.let(::appErrorKind)
+            ?: AppErrorKind.Generic
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 40.dp),
+        horizontalAlignment =
+            Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .size(112.dp)
+                    .background(PaleGreen, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(76.dp)
+                        .background(Color.White, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector =
+                        if (kind == AppErrorKind.NoInternet)
+                            Icons.Filled.WifiOff
+                        else
+                            Icons.Filled.CloudOff,
+                    contentDescription = null,
+                    tint = Green,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(
+            text = strings.errorTitle,
+            style = MaterialTheme.typography.titleMedium,
+            color = Ink,
+            fontWeight = FontWeight.Black,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text =
+                when (kind) {
+                    AppErrorKind.NoInternet -> strings.errorNoInternet
+                    AppErrorKind.Timeout -> strings.errorTimeout
+                    AppErrorKind.Server -> strings.errorServer
+                    AppErrorKind.Generic -> strings.errorGeneric
+                },
+            color = Muted,
+            fontSize = 13.sp,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+
+        Spacer(Modifier.height(22.dp))
+
+        Button(
+            onClick = onRetry,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Green
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                text = strings.homeRetryButton,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }

@@ -1440,4 +1440,25 @@ object ResourceStrings : Strings {
     @Composable
     override fun couponLegRace(n: Int): String =
         stringResource(R.string.coupon_leg_race, n)
+
+    override val infoModelScoreTitle: String
+        @Composable get() = stringResource(R.string.info_model_score_title)
+
+    override val infoModelScore: String
+        @Composable get() = stringResource(R.string.info_model_score)
+
+    override val errorTitle: String
+        @Composable get() = stringResource(R.string.error_title)
+
+    override val errorTimeout: String
+        @Composable get() = stringResource(R.string.error_timeout)
+
+    override val errorNoInternet: String
+        @Composable get() = stringResource(R.string.error_no_internet)
+
+    override val errorServer: String
+        @Composable get() = stringResource(R.string.error_server)
+
+    override val errorGeneric: String
+        @Composable get() = stringResource(R.string.error_generic)
 }
