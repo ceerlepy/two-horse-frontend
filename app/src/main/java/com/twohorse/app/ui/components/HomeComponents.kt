@@ -498,11 +498,13 @@ fun UpcomingRaceCard(
                 ),
         colors =
             CardDefaults.cardColors(
-                containerColor = Surface
+                containerColor = CardTone
             ),
         border =
-            CardDefaults
-                .outlinedCardBorder(),
+            BorderStroke(
+                1.dp,
+                CardToneBorder
+            ),
         shape =
             RoundedCornerShape(18.dp)
     ) {
@@ -630,11 +632,13 @@ fun RaceCard(
                 ),
         colors =
             CardDefaults.cardColors(
-                containerColor = Surface
+                containerColor = CardTone
             ),
         border =
-            CardDefaults
-                .outlinedCardBorder(),
+            BorderStroke(
+                1.dp,
+                CardToneBorder
+            ),
         shape =
             RoundedCornerShape(20.dp)
     ) {
@@ -839,11 +843,13 @@ fun RemainingRacesToggle(
                 ),
         colors =
             CardDefaults.cardColors(
-                containerColor = Surface
+                containerColor = CardTone
             ),
         border =
-            CardDefaults
-                .outlinedCardBorder(),
+            BorderStroke(
+                1.dp,
+                CardToneBorder
+            ),
         shape =
             RoundedCornerShape(18.dp)
     ) {
