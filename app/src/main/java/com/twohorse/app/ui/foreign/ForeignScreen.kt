@@ -252,7 +252,7 @@ private fun ForeignRaceCard(race: ForeignRace) {
                     shape = RoundedCornerShape(9.dp)
                 ) {
                     Text(
-                        text = strings.homeCourseNumberCaps(race.raceNumber.toString()),
+                        text = strings.homeCourseNumberCaps(race.raceNumber),
                         modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
                         color = Green,
                         fontSize = 10.sp,
