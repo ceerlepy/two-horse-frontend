@@ -43,6 +43,7 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.AutoRefreshEffect
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
@@ -112,7 +113,7 @@ fun HomeScreen(
 
     var error by
         remember {
-            mutableStateOf<String?>(
+            mutableStateOf<Throwable?>(
                 null
             )
         }
@@ -249,7 +250,7 @@ fun HomeScreen(
                 }
             }
             .onFailure {
-                error = it.message
+                error = it
 
                 showingStaleData =
                     data != null
@@ -479,26 +480,16 @@ fun HomeScreen(
                     horizontalAlignment =
                         Alignment.CenterHorizontally
                 ) {
-                    EmptyRaceState(
-                        message =
-                            error
-                                ?: strings.homeDataFetchFailed
-                    )
-
-                    Button(
-                        onClick = {
+                    AppErrorState(
+                        error = error,
+                        onRetry = {
                             if (
                                 !requestInFlight
                             ) {
                                 refreshKey++
                             }
                         }
-                    ) {
-                        Text(
-                            text =
-                                strings.homeRetryButton
-                        )
-                    }
+                    )
                 }
             }
         } else if (

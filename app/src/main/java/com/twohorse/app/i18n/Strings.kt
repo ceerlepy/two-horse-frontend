@@ -911,4 +911,18 @@ interface Strings {
     val strategyShortBalanced: String
     @Composable
     fun couponLegRace(n: Int): String
+    @get:Composable
+    val infoModelScoreTitle: String
+    @get:Composable
+    val infoModelScore: String
+    @get:Composable
+    val errorTitle: String
+    @get:Composable
+    val errorTimeout: String
+    @get:Composable
+    val errorNoInternet: String
+    @get:Composable
+    val errorServer: String
+    @get:Composable
+    val errorGeneric: String
 }

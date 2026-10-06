@@ -583,23 +583,37 @@ private fun ResultHero(
                             TextOverflow.Ellipsis
                     )
 
-                    Text(
-                        text =
-                            strings.raceConfidenceScore(
-                                favorite.score
-                                    ?.let {
-                                        "%.1f".format(it)
-                                    }
-                                    ?: "—"
-                            ),
-                        color =
-                            Color.White.copy(
-                                alpha = 0.72f
-                            ),
-                        fontSize = 13.sp,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text =
+                                strings.raceConfidenceScore(
+                                    favorite.score
+                                        ?.let {
+                                            "%.1f".format(it)
+                                        }
+                                        ?: "—"
+                                ),
+                            color =
+                                Color.White.copy(
+                                    alpha = 0.72f
+                                ),
+                            fontSize = 13.sp,
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+
+                        InfoButton(
+                            title = strings.infoModelScoreTitle,
+                            body = strings.infoModelScore,
+                            tint =
+                                Color.White.copy(
+                                    alpha = 0.72f
+                                )
+                        )
+                    }
                 }
 
                 Surface(
@@ -1769,14 +1783,24 @@ private fun HorseCard(
                             FontWeight.Black
                     )
 
-                    Text(
-                        text =
-                            strings.raceRankLabel(rank),
-                        color = Muted,
-                        fontSize = 9.sp,
-                        fontWeight =
-                            FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment =
+                            Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text =
+                                strings.raceRankLabel(rank),
+                            color = Muted,
+                            fontSize = 9.sp,
+                            fontWeight =
+                                FontWeight.Bold
+                        )
+
+                        InfoButton(
+                            title = strings.infoModelScoreTitle,
+                            body = strings.infoModelScore
+                        )
+                    }
                 }
             }
 

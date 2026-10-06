@@ -34,11 +34,11 @@ class TwoHorseApi(
                 TimeUnit.SECONDS
             )
             .readTimeout(
-                15,
+                25,
                 TimeUnit.SECONDS
             )
             .callTimeout(
-                20,
+                30,
                 TimeUnit.SECONDS
             )
             .retryOnConnectionFailure(true)
