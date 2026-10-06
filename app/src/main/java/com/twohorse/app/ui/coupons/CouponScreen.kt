@@ -38,6 +38,7 @@ import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -1253,7 +1254,11 @@ private fun CouponCard(
                     value =
                         probabilityText(
                             coupon.estimatedSurvivalProbability
-                        )
+                        ),
+                    infoTitle =
+                        strings.couponCoverageInfoTitle,
+                    infoBody =
+                        strings.couponCoverageInfo
                 )
             }
 
@@ -1506,7 +1511,9 @@ private fun CouponLegRow(
 private fun SmallMetric(
     modifier: Modifier,
     title: String,
-    value: String
+    value: String,
+    infoTitle: String? = null,
+    infoBody: String? = null
 ) {
     Surface(
         modifier =
@@ -1522,11 +1529,26 @@ private fun SmallMetric(
             modifier =
                 Modifier.padding(9.dp)
         ) {
-            Text(
-                text = title,
-                color = Muted,
-                fontSize = 9.sp
-            )
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    color = Muted,
+                    fontSize = 9.sp
+                )
+
+                if (
+                    infoTitle != null &&
+                    infoBody != null
+                ) {
+                    InfoButton(
+                        title = infoTitle,
+                        body = infoBody
+                    )
+                }
+            }
 
             Text(
                 text = value,

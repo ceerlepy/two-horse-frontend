@@ -112,12 +112,17 @@ private fun PromptShell(
 ) {
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                /* The dialog draws edge to edge, so it insets itself below. */
+                decorFitsSystemWindows = false
+            )
     ) {
         Card(
             modifier =
                 Modifier
-                    .systemBarsPadding()
+                    .safeDrawingPadding()
                     .fillMaxWidth()
                     .padding(horizontal = 18.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = CardTone),
