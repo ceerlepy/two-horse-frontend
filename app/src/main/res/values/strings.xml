@@ -214,7 +214,7 @@
     <string name="race_category_strong">güçlü aday</string>
     <string name="race_category_star">yıldız aday</string>
     <string name="race_category_surprise">sürpriz aday</string>
-    <string name="race_category_rival">rakip aday</string>
+    <string name="race_category_rival">favoriye rakip</string>
     <string name="race_value_model_title">🔎 Değer modeli</string>
     <string name="race_value_underrated">AGF\'nin hafife aldığı at</string>
     <string name="race_value_overrated">AGF\'nin fazla önemsediği at</string>
@@ -433,7 +433,7 @@
     <string name="info_leader_margin">Favorinin farkı: model puanında 1. at ile 2. at arasındaki fark. Fark büyükse favori net önde, küçükse yarış çekişmeli.</string>
     <string name="info_coupon_advice">Kupon önerisi: bu ayakta kaç at yazmanın mantıklı olduğu. Tek: tek at yeterli. Dar: 2-3 at. Dengeli: birkaç at. Geniş: çok at yaz, sürpriz çıkabilir.</string>
     <string name="info_value_model">Değer modeli: kendi modelimizin bu ata verdiği kazanma ihtimali ile AGF\'nin karşılaştırması. Bizim ihtimalimiz AGF\'den belirgin yüksekse \"AGF\'nin hafife aldığı at\" etiketi çıkar. Bahis tavsiyesi değildir.</string>
-    <string name="info_expert">Uzman konsensüsü: uzmanların bu at için tahminlerinin özeti. Her bar, uzmanların yüzde kaçının atı o şekilde gösterdiğini söyler. Favori/banko: kazanmasını bekliyorlar. Güçlü aday: ilk sıralar için ciddi aday. Rakip aday: favoriyi zorlayabilecek at. Sürpriz aday: az beklenen ama şansı olan at. Alttaki uzman desteği barı hepsinin özetidir (0–100, 50 ortada).</string>
+    <string name="info_expert">Uzman konsensüsü: yarış yorumlarındaki genel eğilimin bu at için özeti. Her bar, bu koşuyu değerlendiren uzmanların yüzde kaçının atı o şekilde gördüğünü söyler. Favori/banko: kazanmasını bekliyorlar. Güçlü aday: ilk sıralar için ciddi aday. Favoriye rakip: uzmanın kendi favorisini zorlayabilecek at (bizim sıralamamızdaki favori olmayabilir). Sürpriz aday: az beklenen ama şansı olan at. Uzman desteği barı hepsinin özetidir (0–100, 50 ortada); az uzman görüşü varsa puan 50\'ye yakın tutulur.</string>
     <string name="info_market">AGF değişimi: yarıştan önceki son 90 dakikada AGF\'nin nasıl değiştiği. 50\'nin üstü bu ata para geliyor, altı para çıkıyor demek. AGF yarış sabahı açıldığı için gece ve sabah erkenden veri yoktur.</string>
     <string name="info_field">Pist uyumu: atın bu pist türündeki (çim, kum, sentetik) geçmiş koşularına göre ne kadar iyi koştuğu. 50 ortalama, üstü bu pistte iyi. Az koşmuş atlarda veri olmayabilir.</string>
     <string name="info_form">Son yarışları: atın son 6 yarıştaki derecesi, soldan sağa eskiden yeniye. 5-2-5: önce 5., sonra 2., en son 5. olmuş. 10+: onuncu veya daha geride. Altın renk 1., yeşil 2. ve 3. derece.</string>
@@ -447,7 +447,7 @@
     <string name="strategy_short_balanced">Dengeli</string>
     <string name="coupon_leg_race">%1$d. Koşu</string>
     <string name="info_model_score_title">Model puanı</string>
-    <string name="info_model_score" formatted="false">Bu puanı kendi modelimiz hesaplar (0–100). Atın bilgileri şu ağırlıklarla birleştirilir: AGF %25, uzman konsensüsü %22, son yarışlar %18, HP %15, AGF değişimi %10, kilo %5, pist uyumu %5. Eksik bilgi varsa kalanlar kendi oranlarıyla kullanılır. Puanı yüksek olan daha güçlü adaydır; kesin kazanır demek değildir.</string>
+    <string name="info_model_score" formatted="false">Bu puanı kendi geliştirdiğimiz model hesaplar. Model; atın AGF\'si, uzman görüşleri, son yarışları, handikap puanı, AGF\'deki değişim, taşıdığı kilo ve pist uyumu gibi bilgileri birlikte değerlendirip her ata 0–100 arası tek bir puan verir. Puanı yüksek olan at daha güçlü adaydır; ancak kesin kazanır anlamına gelmez.</string>
     <string name="error_title">Hay aksi, bir şeyler ters gitti</string>
     <string name="error_timeout">Sunucu şu an geç cevap veriyor. Birazdan tekrar dener misin?</string>
     <string name="error_no_internet">İnternet bağlantısı yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.</string>
