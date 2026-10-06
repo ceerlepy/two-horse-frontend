@@ -61,6 +61,7 @@ private sealed interface AccountMessage {
     data object PurchaseOtherAccount : AccountMessage
     data object DeleteFailed : AccountMessage
     data object RestoreNone : AccountMessage
+    data object BillingUnavailable : AccountMessage
 }
 
 internal fun formatIsoDate(
@@ -132,6 +133,17 @@ fun AccountScreen(
         remember { mutableStateOf(BASE_PLAN_MONTHLY) }
 
     var confirmSwitch by
+        remember { mutableStateOf(false) }
+
+    /*
+     * null while Google Play is being asked, false when it can't sell
+     * here (e.g. an APK not installed from Play), true once the plans
+     * have loaded. Without this the buttons said "Loading" forever.
+     */
+    var billingReady by
+        remember { mutableStateOf<Boolean?>(null) }
+
+    var restoring by
         remember { mutableStateOf(false) }
 
     var confirmCancel by
@@ -242,6 +254,10 @@ fun AccountScreen(
         val connected =
             billingManager.connect()
 
+        if (!connected) {
+            billingReady = false
+        }
+
         if (connected) {
             val products =
                 billingManager.queryProductDetails(
@@ -260,6 +276,9 @@ fun AccountScreen(
                 products.firstOrNull {
                     it.productId == Config.PRODUCT_ID_PREMIUM_MONTHLY
                 }
+
+            billingReady =
+                goldProduct != null || premiumProduct != null
 
             ownedSubscriptions =
                 billingManager
@@ -310,10 +329,16 @@ fun AccountScreen(
     }
 
     fun restorePurchases() {
-        if (purchaseInFlight) return
+        if (purchaseInFlight || restoring) return
+
+        if (billingReady == false) {
+            message = AccountMessage.BillingUnavailable
+            return
+        }
 
         scope.launch {
             message = null
+            restoring = true
 
             val owned =
                 billingManager
@@ -327,6 +352,7 @@ fun AccountScreen(
 
             if (owned.isEmpty()) {
                 message = AccountMessage.RestoreNone
+                restoring = false
                 return@launch
             }
 
@@ -336,6 +362,8 @@ fun AccountScreen(
                     silent = false
                 )
             }
+
+            restoring = false
         }
     }
 
@@ -417,6 +445,9 @@ fun AccountScreen(
 
                             AccountMessage.RestoreNone ->
                                 strings.accountRestoreNone
+
+                            AccountMessage.BillingUnavailable ->
+                                strings.accountBillingUnavailable
                         }
 
                     Card(
@@ -465,6 +496,15 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(14.dp))
                 }
 
+                if (billingReady == false && paidTier != "premium") {
+                    NoteCard(
+                        text = strings.accountBillingUnavailable,
+                        warning = true
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
                 // Yearly plans may not be switched on in Play Console yet;
                 // the toggle only appears once at least one product has one.
                 val yearlyAvailable =
@@ -499,6 +539,7 @@ fun AccountScreen(
                         enabled =
                             goldProduct?.offerFor(billingPeriod) != null &&
                                 !purchaseInFlight,
+                        unavailable = billingReady == false,
                         onClick = {
                             goldProduct?.let { launchPurchase(it, billingPeriod) }
                         }
@@ -519,6 +560,7 @@ fun AccountScreen(
                         enabled =
                             premiumProduct?.offerFor(billingPeriod) != null &&
                                 !purchaseInFlight,
+                        unavailable = billingReady == false,
                         onClick = {
                             premiumProduct?.let { launchPurchase(it, billingPeriod) }
                         }
@@ -536,9 +578,19 @@ fun AccountScreen(
 
                     TextButton(
                         onClick = { restorePurchases() },
-                        enabled = !purchaseInFlight,
+                        enabled = !purchaseInFlight && !restoring,
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        if (restoring) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = Green,
+                                strokeWidth = 2.dp
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
                         Text(
                             text = strings.accountRestorePurchases,
                             color = Green,
@@ -587,6 +639,7 @@ fun AccountScreen(
                                     !purchaseInFlight,
                             buttonText = strings.accountSwitchToGold,
                             note = strings.accountGoldDowngradeNote,
+                            unavailable = billingReady == false,
                             onClick = { confirmSwitch = true }
                         )
 
@@ -1316,6 +1369,7 @@ private fun PlanCard(
     enabled: Boolean,
     buttonText: String? = null,
     note: String? = null,
+    unavailable: Boolean = false,
     onClick: () -> Unit
 ) {
     val strings = LocalStrings.current
@@ -1427,10 +1481,11 @@ private fun PlanCard(
             ) {
                 Text(
                     text =
-                        if (enabled)
-                            buttonText ?: strings.accountUpgradeTo(title)
-                        else
-                            strings.accountLoadingEllipsis,
+                        when {
+                            unavailable -> strings.accountBillingUnavailableButton
+                            enabled -> buttonText ?: strings.accountUpgradeTo(title)
+                            else -> strings.accountLoadingEllipsis
+                        },
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )

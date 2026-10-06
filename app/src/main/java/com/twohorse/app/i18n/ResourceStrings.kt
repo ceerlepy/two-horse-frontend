@@ -1577,4 +1577,14 @@ object ResourceStrings : Strings {
     @Composable
     override fun raceExpertHeroStrong(a1: Int): String =
         stringResource(R.string.race_expert_hero_strong, a1)
+
+    override val accountBillingUnavailable: String
+        @Composable get() = stringResource(R.string.account_billing_unavailable)
+
+    override val accountBillingUnavailableButton: String
+        @Composable get() = stringResource(R.string.account_billing_unavailable_button)
+
+    @Composable
+    override fun homeNextDayExpertHorses(a1: Int): String =
+        stringResource(R.string.home_next_day_expert_horses, a1)
 }

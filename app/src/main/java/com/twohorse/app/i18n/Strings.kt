@@ -944,6 +944,12 @@ interface Strings {
     @Composable
     fun raceExpertHeroStrong(a1: Int): String
     @get:Composable
+    val accountBillingUnavailable: String
+    @get:Composable
+    val accountBillingUnavailableButton: String
+    @Composable
+    fun homeNextDayExpertHorses(a1: Int): String
+    @get:Composable
     val raceExpertFirstChoice: String
     @get:Composable
     val raceExpertSecondChoice: String
