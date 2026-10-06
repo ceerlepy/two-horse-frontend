@@ -1371,13 +1371,18 @@ class TwoHorseApi(
         }
     }
 
-    suspend fun authMe(): MembershipUser =
+    suspend fun authMe(
+        refreshSubscription: Boolean = false
+    ): MembershipUser =
         withContext(
             Dispatchers.IO
         ) {
             val json =
                 getJson(
-                    "/api/auth/me"
+                    if (refreshSubscription)
+                        "/api/auth/me?refresh=1"
+                    else
+                        "/api/auth/me"
                 )
 
             parseMembershipUser(
@@ -1462,6 +1467,20 @@ class TwoHorseApi(
             subscriptionExpiresAt =
                 json.firstString(
                     "subscriptionExpiresAt"
+                ),
+
+            subscriptionAutoRenew =
+                if (
+                    json.has("subscriptionAutoRenew") &&
+                    !json.isNull("subscriptionAutoRenew")
+                )
+                    json.optBoolean("subscriptionAutoRenew")
+                else
+                    null,
+
+            subscriptionPendingTier =
+                json.firstString(
+                    "subscriptionPendingTier"
                 )
         )
 

@@ -15,6 +15,7 @@ import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.ui.account.AccountScreen
+import com.twohorse.app.ui.account.MembershipPrompts
 import com.twohorse.app.ui.auth.LoginScreen
 import com.twohorse.app.ui.coupons.CouponHistoryScreen
 import com.twohorse.app.ui.coupons.MyCouponsScreen
@@ -250,6 +251,16 @@ fun TwoHorseApp() {
                         onForeignClick = {
                             screen =
                                 AppScreen.Foreign
+                        },
+
+                        user = currentUser
+                    )
+
+                    MembershipPrompts(
+                        user = currentUser,
+                        onOpenPlans = {
+                            screen =
+                                AppScreen.Account
                         }
                     )
                 }

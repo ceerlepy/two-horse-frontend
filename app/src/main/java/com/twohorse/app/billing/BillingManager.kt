@@ -183,7 +183,8 @@ class BillingManager(
         productDetails: ProductDetails,
         accountId: String?,
         basePlanId: String,
-        oldPurchaseToken: String? = null
+        oldPurchaseToken: String? = null,
+        deferred: Boolean = false
     ): Boolean {
         val client =
             billingClient
@@ -225,9 +226,16 @@ class BillingManager(
                         oldPurchaseToken
                     )
                     .setSubscriptionReplacementMode(
-                        BillingFlowParams.SubscriptionUpdateParams
-                            .ReplacementMode
-                            .WITH_TIME_PRORATION
+                        // A downgrade waits for the paid period to end,
+                        // so the member keeps what they already paid for.
+                        if (deferred)
+                            BillingFlowParams.SubscriptionUpdateParams
+                                .ReplacementMode
+                                .DEFERRED
+                        else
+                            BillingFlowParams.SubscriptionUpdateParams
+                                .ReplacementMode
+                                .WITH_TIME_PRORATION
                     )
                     .build()
             )

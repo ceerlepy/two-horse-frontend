@@ -1465,4 +1465,77 @@ object ResourceStrings : Strings {
     @Composable
     override fun raceCategoryCountOf(n: Int, total: Int): String =
         stringResource(R.string.race_category_count_of, n, total)
+
+    override val welcomeTitle: String
+        @Composable get() = stringResource(R.string.welcome_title)
+
+    @Composable
+    override fun welcomeBody(a1: String): String =
+        stringResource(R.string.welcome_body, a1)
+
+    override val welcomeStart: String
+        @Composable get() = stringResource(R.string.welcome_start)
+
+    override val welcomePlans: String
+        @Composable get() = stringResource(R.string.welcome_plans)
+
+    override val trialEndedTitle: String
+        @Composable get() = stringResource(R.string.trial_ended_title)
+
+    override val trialEndedBody: String
+        @Composable get() = stringResource(R.string.trial_ended_body)
+
+    override val trialEndedCompare: String
+        @Composable get() = stringResource(R.string.trial_ended_compare)
+
+    override val trialEndedContinueFree: String
+        @Composable get() = stringResource(R.string.trial_ended_continue_free)
+
+    override val homeTrialStrip: String
+        @Composable get() = stringResource(R.string.home_trial_strip)
+
+    override val accountChangePlan: String
+        @Composable get() = stringResource(R.string.account_change_plan)
+
+    override val accountSwitchToGold: String
+        @Composable get() = stringResource(R.string.account_switch_to_gold)
+
+    override val accountGoldDowngradeNote: String
+        @Composable get() = stringResource(R.string.account_gold_downgrade_note)
+
+    override val accountSwitchTitle: String
+        @Composable get() = stringResource(R.string.account_switch_title)
+
+    @Composable
+    override fun accountSwitchBody(a1: String): String =
+        stringResource(R.string.account_switch_body, a1)
+
+    @Composable
+    override fun accountSwitchScheduled(a1: String): String =
+        stringResource(R.string.account_switch_scheduled, a1)
+
+    @Composable
+    override fun accountSwitchScheduledCard(a1: String): String =
+        stringResource(R.string.account_switch_scheduled_card, a1)
+
+    override val accountCancelButton: String
+        @Composable get() = stringResource(R.string.account_cancel_button)
+
+    @Composable
+    override fun accountCancelBody(a1: String, a2: String): String =
+        stringResource(R.string.account_cancel_body, a1, a2)
+
+    override val accountGoToPlay: String
+        @Composable get() = stringResource(R.string.account_go_to_play)
+
+    @Composable
+    override fun accountCanceledCard(a1: String): String =
+        stringResource(R.string.account_canceled_card, a1)
+
+    @Composable
+    override fun accountCanceledNote(a1: String, a2: String): String =
+        stringResource(R.string.account_canceled_note, a1, a2)
+
+    override val accountResume: String
+        @Composable get() = stringResource(R.string.account_resume)
 }

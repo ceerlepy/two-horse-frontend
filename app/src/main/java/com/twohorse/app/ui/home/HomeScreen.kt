@@ -40,6 +40,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.twohorse.app.data.repository.TwoHorseRepository
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
@@ -54,6 +55,12 @@ import com.twohorse.app.ui.components.RemainingRacesToggle
 import com.twohorse.app.ui.components.ShimmerBlock
 import com.twohorse.app.ui.components.SixFoldEntryCard
 import com.twohorse.app.ui.components.TwoHorseHeader
+import com.twohorse.app.ui.account.daysLeft
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Stars
+import com.twohorse.app.ui.theme.PaleGreen
 import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
@@ -70,7 +77,8 @@ fun HomeScreen(
     onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
     onHistoryClick: () -> Unit = {},
     onAccountClick: () -> Unit = {},
-    onForeignClick: () -> Unit = {}
+    onForeignClick: () -> Unit = {},
+    user: MembershipUser? = null
 ) {
     val context = LocalContext.current
     val strings = LocalStrings.current
@@ -390,6 +398,21 @@ fun HomeScreen(
                 onHistory = onHistoryClick,
                 onAccount = onAccountClick
             )
+        }
+
+        // Keeps the trial's end in sight, so the switch to Free on
+        // day 8 is never a surprise.
+        if (
+            user != null &&
+            user.tierSource == "trial" &&
+            !user.isFree
+        ) {
+            item {
+                TrialStrip(
+                    daysLeft = daysLeft(user.trialEndsAt) ?: 0,
+                    onClick = onAccountClick
+                )
+            }
         }
 
         if (
@@ -966,5 +989,50 @@ private fun DayOverCard(
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+}
+
+@Composable
+private fun TrialStrip(
+    daysLeft: Int,
+    onClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Row(
+        modifier =
+            Modifier
+                .padding(horizontal = 18.dp)
+                .fillMaxWidth()
+                .background(
+                    PaleGreen,
+                    RoundedCornerShape(12.dp)
+                )
+                .clickable(onClick = onClick)
+                .padding(horizontal = 12.dp, vertical = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Stars,
+            contentDescription = null,
+            tint = Green,
+            modifier = Modifier.size(18.dp)
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            text = strings.homeTrialStrip + " · " + strings.accountDaysLeft(daysLeft),
+            modifier = Modifier.weight(1f),
+            color = Green,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = null,
+            tint = Green
+        )
     }
 }

@@ -927,4 +927,48 @@ interface Strings {
     val errorGeneric: String
     @Composable
     fun raceCategoryCountOf(n: Int, total: Int): String
+    @get:Composable
+    val welcomeTitle: String
+    @Composable
+    fun welcomeBody(a1: String): String
+    @get:Composable
+    val welcomeStart: String
+    @get:Composable
+    val welcomePlans: String
+    @get:Composable
+    val trialEndedTitle: String
+    @get:Composable
+    val trialEndedBody: String
+    @get:Composable
+    val trialEndedCompare: String
+    @get:Composable
+    val trialEndedContinueFree: String
+    @get:Composable
+    val homeTrialStrip: String
+    @get:Composable
+    val accountChangePlan: String
+    @get:Composable
+    val accountSwitchToGold: String
+    @get:Composable
+    val accountGoldDowngradeNote: String
+    @get:Composable
+    val accountSwitchTitle: String
+    @Composable
+    fun accountSwitchBody(a1: String): String
+    @Composable
+    fun accountSwitchScheduled(a1: String): String
+    @Composable
+    fun accountSwitchScheduledCard(a1: String): String
+    @get:Composable
+    val accountCancelButton: String
+    @Composable
+    fun accountCancelBody(a1: String, a2: String): String
+    @get:Composable
+    val accountGoToPlay: String
+    @Composable
+    fun accountCanceledCard(a1: String): String
+    @Composable
+    fun accountCanceledNote(a1: String, a2: String): String
+    @get:Composable
+    val accountResume: String
 }

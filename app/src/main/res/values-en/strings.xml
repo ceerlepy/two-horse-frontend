@@ -454,4 +454,26 @@
     <string name="error_server">The server has a temporary problem. Please try again shortly.</string>
     <string name="error_generic">We couldn\'t load the data. Please try again.</string>
     <string name="race_category_count_of">%1$d/%2$d experts</string>
+    <string name="welcome_title">Welcome! Your 7-day Premium trial has started</string>
+    <string name="welcome_body">Everything is open until %1$s. We did not ask for a card, so nothing is charged when it ends.</string>
+    <string name="welcome_start">Let\'s start</string>
+    <string name="welcome_plans">See plans</string>
+    <string name="trial_ended_title">Your Premium trial has ended</string>
+    <string name="trial_ended_body">Programme, AGF, results and videos stay free. Choose a plan for model signals and coupons.</string>
+    <string name="trial_ended_compare">Compare plans</string>
+    <string name="trial_ended_continue_free">Continue for free</string>
+    <string name="home_trial_strip">Premium trial</string>
+    <string name="account_change_plan">Change plan</string>
+    <string name="account_switch_to_gold">Switch to Gold</string>
+    <string name="account_gold_downgrade_note">Gold does not include Ask AI, the \"Underrated by AGF\" label or unlimited coupons.</string>
+    <string name="account_switch_title">Switch to Gold?</string>
+    <string name="account_switch_body">Your Premium continues until %1$s. Gold starts that day and is charged at the Gold price. No extra charge or refund today.</string>
+    <string name="account_switch_scheduled">Your plan becomes Gold on %1$s. Until then everything in Premium stays open.</string>
+    <string name="account_switch_scheduled_card">Switches to Gold on %1$s</string>
+    <string name="account_cancel_button">Cancel subscription</string>
+    <string name="account_cancel_body">Cancelling is done in Google Play. You keep %2$s until %1$s, then your account moves to the Free plan. Your saved coupons are kept.</string>
+    <string name="account_go_to_play">Go to Google Play</string>
+    <string name="account_canceled_card">Ends on %1$s and will not renew</string>
+    <string name="account_canceled_note">Your subscription is cancelled. %2$s stays open until %1$s.</string>
+    <string name="account_resume">Keep my subscription</string>
 </resources>

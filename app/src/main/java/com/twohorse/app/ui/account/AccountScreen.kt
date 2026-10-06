@@ -29,6 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.twohorse.app.data.api.ApiException
@@ -53,13 +56,14 @@ import java.util.Locale
 
 private sealed interface AccountMessage {
     data class PurchaseActivated(val tier: String) : AccountMessage
+    data object SwitchScheduled : AccountMessage
     data object PurchaseVerifyFailed : AccountMessage
     data object PurchaseOtherAccount : AccountMessage
     data object DeleteFailed : AccountMessage
     data object RestoreNone : AccountMessage
 }
 
-private fun formatIsoDate(
+internal fun formatIsoDate(
     value: String?,
     language: Language
 ): String? {
@@ -127,6 +131,15 @@ fun AccountScreen(
     var billingPeriod by
         remember { mutableStateOf(BASE_PLAN_MONTHLY) }
 
+    var confirmSwitch by
+        remember { mutableStateOf(false) }
+
+    var confirmCancel by
+        remember { mutableStateOf(false) }
+
+    val lifecycleOwner =
+        LocalLifecycleOwner.current
+
     /*
      * Sends a Play purchase to the backend, the only place that can
      * grant a tier. [silent] is used for purchases found again on
@@ -162,8 +175,13 @@ fun AccountScreen(
                 }
 
                 if (!silent) {
+                    // A Premium -> Gold switch is only booked for the
+                    // end of the paid period; nothing changes today.
                     message =
-                        AccountMessage.PurchaseActivated(updated.tier)
+                        if (updated.subscriptionPendingTier != null)
+                            AccountMessage.SwitchScheduled
+                        else
+                            AccountMessage.PurchaseActivated(updated.tier)
                 }
             }
             .onFailure { throwable ->
@@ -188,7 +206,8 @@ fun AccountScreen(
      */
     fun launchPurchase(
         product: ProductDetails,
-        basePlanId: String
+        basePlanId: String,
+        deferred: Boolean = false
     ) {
         val oldToken =
             ownedSubscriptions
@@ -202,14 +221,24 @@ fun AccountScreen(
             product,
             accountId = user?.id,
             basePlanId = basePlanId,
-            oldPurchaseToken = oldToken
+            oldPurchaseToken = oldToken,
+            deferred = deferred
         )
     }
 
-    LaunchedEffect(Unit) {
-        repository.me()
-            .onSuccess { fresh -> user = fresh; onUserUpdated(fresh) }
+    // Cancelling, resuming or a pending plan change happen in Google
+    // Play, so the plan is re-read from Play every time the member
+    // comes back to this screen.
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(
+            Lifecycle.State.RESUMED
+        ) {
+            repository.me(refreshSubscription = true)
+                .onSuccess { fresh -> user = fresh; onUserUpdated(fresh) }
+        }
+    }
 
+    LaunchedEffect(Unit) {
         val connected =
             billingManager.connect()
 
@@ -359,13 +388,22 @@ fun AccountScreen(
 
                 message?.let { msg ->
                     val isError =
-                        msg !is AccountMessage.PurchaseActivated
+                        msg !is AccountMessage.PurchaseActivated &&
+                            msg !is AccountMessage.SwitchScheduled
 
                     val messageText =
                         when (msg) {
                             is AccountMessage.PurchaseActivated ->
                                 strings.accountPurchaseActivated(
                                     strings.accountTierTitle(msg.tier)
+                                )
+
+                            AccountMessage.SwitchScheduled ->
+                                strings.accountSwitchScheduled(
+                                    formatIsoDate(
+                                        activeUser?.subscriptionExpiresAt,
+                                        currentLanguage()
+                                    ) ?: ""
                                 )
 
                             AccountMessage.PurchaseVerifyFailed ->
@@ -456,7 +494,7 @@ fun AccountScreen(
                         price = goldProduct.priceFor(billingPeriod),
                         yearly = billingPeriod == BASE_PLAN_YEARLY,
                         highlighted = true,
-                        badge = strings.accountBadgePopular,
+                        badge = null,
                         accent = Gold,
                         enabled =
                             goldProduct?.offerFor(billingPeriod) != null &&
@@ -511,67 +549,117 @@ fun AccountScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
                 } else {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = PaleGreen
-                            ),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                tint = Green
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            Text(
-                                text = strings.accountAlreadyPremium,
-                                color = Green,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
+                    AlreadyPremiumCard()
 
                     Spacer(modifier = Modifier.height(12.dp))
+
+                    val onPlay =
+                        activeUser?.tierSource == "play_subscription"
+
+                    val switchPending =
+                        activeUser?.subscriptionPendingTier != null
+
+                    val canceled =
+                        activeUser?.subscriptionAutoRenew == false
+
+                    // Downgrade waits for the paid month to end (Play
+                    // DEFERRED replacement), like other subscription apps.
+                    if (onPlay && !switchPending && !canceled) {
+                        Text(
+                            text = strings.accountChangePlan,
+                            color = Ink,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        PlanCard(
+                            title = strings.accountTierTitle("gold"),
+                            description = strings.accountGoldDescription,
+                            price = goldProduct.priceFor(BASE_PLAN_MONTHLY),
+                            yearly = false,
+                            highlighted = false,
+                            badge = null,
+                            accent = Gold,
+                            enabled =
+                                goldProduct?.offerFor(BASE_PLAN_MONTHLY) != null &&
+                                    !purchaseInFlight,
+                            buttonText = strings.accountSwitchToGold,
+                            note = strings.accountGoldDowngradeNote,
+                            onClick = { confirmSwitch = true }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
 
                 if (activeUser?.tierSource == "play_subscription") {
-                    OutlinedButton(
-                        onClick = {
-                            val productId =
-                                activeUser.subscriptionProductId()
+                    val endDate =
+                        formatIsoDate(
+                            activeUser.subscriptionExpiresAt,
+                            currentLanguage()
+                        ) ?: ""
 
-                            context.startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse(
-                                        "https://play.google.com/store/account/subscriptions" +
-                                            "?package=${context.packageName}" +
-                                            (productId?.let { "&sku=$it" } ?: "")
-                                    )
-                                )
-                            )
-                        },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        border = BorderStroke(1.dp, Border)
-                    ) {
-                        Text(
-                            text = strings.accountManageSubscription,
-                            color = Ink,
-                            fontWeight = FontWeight.SemiBold
+                    val tierTitle =
+                        strings.accountTierTitle(activeUser.tier)
+
+                    if (activeUser.subscriptionAutoRenew == false) {
+                        NoteCard(
+                            text = strings.accountCanceledNote(endDate, tierTitle),
+                            warning = true
                         )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Button(
+                            onClick = {
+                                openPlaySubscriptions(
+                                    context,
+                                    activeUser.subscriptionProductId()
+                                )
+                            },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = Green
+                                )
+                        ) {
+                            Text(
+                                text = strings.accountResume,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        if (activeUser.subscriptionPendingTier != null) {
+                            NoteCard(
+                                text = strings.accountSwitchScheduled(endDate),
+                                warning = false
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        OutlinedButton(
+                            onClick = { confirmCancel = true },
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.dp, Border)
+                        ) {
+                            Text(
+                                text = strings.accountCancelButton,
+                                color = Ink,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -628,6 +716,92 @@ fun AccountScreen(
         }
     }
 
+    val dialogUser = user
+
+    if (confirmSwitch && dialogUser != null) {
+        AlertDialog(
+            onDismissRequest = { confirmSwitch = false },
+            title = { Text(strings.accountSwitchTitle) },
+            text = {
+                Text(
+                    strings.accountSwitchBody(
+                        formatIsoDate(
+                            dialogUser.subscriptionExpiresAt,
+                            currentLanguage()
+                        ) ?: ""
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmSwitch = false
+
+                        goldProduct?.let {
+                            launchPurchase(
+                                it,
+                                BASE_PLAN_MONTHLY,
+                                deferred = true
+                            )
+                        }
+                    }
+                ) {
+                    Text(
+                        text = strings.accountSwitchToGold,
+                        color = Green,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmSwitch = false }) {
+                    Text(strings.accountDeleteCancel)
+                }
+            }
+        )
+    }
+
+    if (confirmCancel && dialogUser != null) {
+        AlertDialog(
+            onDismissRequest = { confirmCancel = false },
+            title = { Text(strings.accountCancelButton) },
+            text = {
+                Text(
+                    strings.accountCancelBody(
+                        formatIsoDate(
+                            dialogUser.subscriptionExpiresAt,
+                            currentLanguage()
+                        ) ?: "",
+                        strings.accountTierTitle(dialogUser.tier)
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmCancel = false
+
+                        openPlaySubscriptions(
+                            context,
+                            dialogUser.subscriptionProductId()
+                        )
+                    }
+                ) {
+                    Text(
+                        text = strings.accountGoToPlay,
+                        color = Green,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmCancel = false }) {
+                    Text(strings.accountDeleteCancel)
+                }
+            }
+        )
+    }
+
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = {
@@ -671,6 +845,80 @@ fun AccountScreen(
                     Text(strings.accountDeleteCancel)
                 }
             }
+        )
+    }
+}
+
+private fun openPlaySubscriptions(
+    context: android.content.Context,
+    productId: String?
+) {
+    context.startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(
+                "https://play.google.com/store/account/subscriptions" +
+                    "?package=${context.packageName}" +
+                    (productId?.let { "&sku=$it" } ?: "")
+            )
+        )
+    )
+}
+
+@Composable
+private fun AlreadyPremiumCard() {
+    val strings = LocalStrings.current
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = PaleGreen
+            ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = Green
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = strings.accountAlreadyPremium,
+                color = Green,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoteCard(
+    text: String,
+    warning: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = if (warning) PaleGold else PaleGreen
+            ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(12.dp),
+            color = Ink,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -733,7 +981,7 @@ private fun BillingPeriodToggle(
     }
 }
 
-private fun daysLeft(
+internal fun daysLeft(
     isoEnd: String?
 ): Int? {
     val end =
@@ -755,8 +1003,9 @@ private fun CurrentTierCard(
     val strings = LocalStrings.current
     val language = currentLanguage()
 
+    // An ended trial reads as a plain Free plan, not "0 days left".
     val onTrial =
-        user.tierSource == "trial"
+        user.tierSource == "trial" && !user.isFree
 
     val gradient =
         when (user.tier) {
@@ -875,7 +1124,17 @@ private fun CurrentTierCard(
 
                 user.tierSource == "play_subscription" && subscriptionEnds != null ->
                     Text(
-                        text = strings.accountSubscriptionRenewsAt(subscriptionEnds),
+                        text =
+                            when {
+                                user.subscriptionPendingTier != null ->
+                                    strings.accountSwitchScheduledCard(subscriptionEnds)
+
+                                user.subscriptionAutoRenew == false ->
+                                    strings.accountCanceledCard(subscriptionEnds)
+
+                                else ->
+                                    strings.accountSubscriptionRenewsAt(subscriptionEnds)
+                            },
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 12.sp
                     )
@@ -900,7 +1159,7 @@ private sealed interface PlanCell {
 }
 
 @Composable
-private fun PlanComparisonTable(
+internal fun PlanComparisonTable(
     currentTier: String
 ) {
     val strings = LocalStrings.current
@@ -1055,6 +1314,8 @@ private fun PlanCard(
     badge: String?,
     accent: Color,
     enabled: Boolean,
+    buttonText: String? = null,
+    note: String? = null,
     onClick: () -> Unit
 ) {
     val strings = LocalStrings.current
@@ -1136,6 +1397,18 @@ private fun PlanCard(
                 lineHeight = 16.sp
             )
 
+            if (note != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = note,
+                    color = Ink,
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
@@ -1155,7 +1428,7 @@ private fun PlanCard(
                 Text(
                     text =
                         if (enabled)
-                            strings.accountUpgradeTo(title)
+                            buttonText ?: strings.accountUpgradeTo(title)
                         else
                             strings.accountLoadingEllipsis,
                     fontWeight = FontWeight.Bold,
