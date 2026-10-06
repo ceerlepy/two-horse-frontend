@@ -318,25 +318,18 @@ private fun MyCouponLegRow(
         Box(
             modifier =
                 Modifier
-                    .size(38.dp)
-                    .background(pale, RoundedCornerShape(11.dp)),
+                    .width(62.dp)
+                    .background(pale, RoundedCornerShape(11.dp))
+                    .padding(vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "$legIndex.",
-                    color = accent,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "${leg.raceNumber}.K",
-                    color = accent,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
+            Text(
+                text = strings.couponLegRace(leg.raceNumber),
+                color = accent,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1
+            )
         }
 
         Column(

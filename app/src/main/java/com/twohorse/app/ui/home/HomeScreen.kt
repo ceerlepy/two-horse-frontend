@@ -796,7 +796,7 @@ private fun displayRaceTime(
     }
         .getOrElse {
             Regex(
-                """\b\d{2}:\d{2}\b"""
+                """\d{2}:\d{2}"""
             )
                 .find(value)
                 ?.value
