@@ -1,7 +1,9 @@
 package com.twohorse.app.ui.foreign
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -10,8 +12,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -28,8 +33,6 @@ import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
-import com.twohorse.app.ui.coupons.CouponCardHeader
-import com.twohorse.app.ui.coupons.CouponPill
 import com.twohorse.app.ui.theme.*
 
 private sealed interface ForeignLoadState {
@@ -227,26 +230,75 @@ private fun ForeignRaceCard(race: ForeignRace) {
             }.thenBy { it.number }
         )
 
-    /* Same look as the domestic coupon cards: green header, white body. */
+    var expanded by rememberSaveable(race.raceNumber) { mutableStateOf(false) }
+
+    /* Same shell as the home and next-day race cards. */
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+        colors = CardDefaults.cardColors(containerColor = CardTone),
+        border = BorderStroke(1.dp, CardToneBorder),
         shape = RoundedCornerShape(20.dp)
     ) {
-        CouponCardHeader(
-            title = strings.foreignRaceTitle(race.raceNumber.toString()),
-            subtitle =
-                listOfNotNull(
-                    race.distanceMeters?.let { "${it}m" },
-                    race.track
-                ).joinToString(" · "),
-            trailing = {
-                race.time?.let {
-                    CouponPill(text = it)
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    color = PaleGreen,
+                    shape = RoundedCornerShape(9.dp)
+                ) {
+                    Text(
+                        text = strings.homeCourseNumberCaps(race.raceNumber),
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+                        color = Green,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 }
+
+                race.time?.let {
+                    Spacer(Modifier.width(9.dp))
+
+                    Text(
+                        text = it,
+                        color = Ink,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Icon(
+                    imageVector =
+                        if (expanded) Icons.Default.KeyboardArrowDown
+                        else Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Muted
+                )
             }
-        )
+
+            Text(
+                text =
+                    listOfNotNull(
+                        race.distanceMeters?.let { "$it m" },
+                        race.track,
+                        strings.homeNextDayRunnerCount(race.runners.size)
+                    ).joinToString(" · "),
+                color = Muted,
+                fontSize = 11.sp
+            )
+        }
+
+        if (!expanded) {
+            return@Card
+        }
+
+        HorizontalDivider(color = CardToneBorder)
 
         Column(
             modifier = Modifier.padding(15.dp),
