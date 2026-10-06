@@ -839,4 +839,32 @@ interface Strings {
     val askAiThinking: String
     @Composable
     fun raceRankLabel(rank: Int): String
+    @get:Composable
+    val raceExpertScoreHint: String
+    @get:Composable
+    val raceMarketScoreHint: String
+    @get:Composable
+    val raceFieldHint: String
+    @get:Composable
+    val raceFormHint: String
+    @get:Composable
+    val raceFormTenPlus: String
+    @get:Composable
+    val raceRiskHint: String
+    @get:Composable
+    val raceOpenVideos: String
+    @get:Composable
+    val raceCloseVideos: String
+    @get:Composable
+    val couponHeaderSubtitle: String
+    @get:Composable
+    val myCouponsLocked: String
+    @get:Composable
+    val myCouponsUpgrade: String
+    @get:Composable
+    val homeDayOverCouponsBody: String
+    @get:Composable
+    val homeDayOverCouponsButton: String
+    @Composable
+    fun raceLeaderMarginValue(value: String): String
 }

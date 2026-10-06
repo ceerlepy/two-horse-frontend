@@ -23,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -652,11 +653,10 @@ private fun ResultHero(
 
                 DarkTile(
                     Modifier.weight(1f),
-                    strings.raceField,
-                    favorite.fieldSignal
-                        ?.score
+                    strings.raceGuven,
+                    favorite.confidence
                         ?.let {
-                            "%.1f".format(it)
+                            "%${(it * 100).roundToInt()}"
                         }
                         ?: "—"
                 )
@@ -698,9 +698,14 @@ private fun ResultHero(
 
                     DarkRule()
 
+                    val tenPlus = strings.raceFormTenPlus
+
                     DarkMetric(
                         strings.raceForm,
-                        favorite.recentForm
+                        parseRecentForm(favorite.recentForm)
+                            .joinToString("  ") {
+                                if (it >= 10) tenPlus else it.toString()
+                            }
                             .ifBlank {
                                 strings.noData
                             }
@@ -897,44 +902,106 @@ private fun RaceRiskCard(
                     FontWeight.Black
             )
 
-            RaceInsightSummary(
-                race = race
+            val uncertainty =
+                race.uncertainty
+
+            val strategy =
+                race.couponStrategy
+
+            if (
+                uncertainty == null &&
+                strategy == null
+            ) {
+                return@Column
+            }
+
+            Spacer(
+                Modifier.height(10.dp)
             )
 
-            race.uncertainty?.let {
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(7.dp)
+            ) {
+                InsetMetric(
+                    Modifier.weight(1f),
+                    strings.raceUncertaintyMetric,
+                    uncertainty
+                        ?.let {
+                            uncertaintyText(it.level)
+                        }
+                        ?: "—"
+                )
+
+                InsetMetric(
+                    Modifier.weight(1f),
+                    strings.raceLeaderMarginMetric,
+                    uncertainty
+                        ?.let {
+                            strings.raceLeaderMarginValue(
+                                "%.1f".format(it.topMargin)
+                            )
+                        }
+                        ?: "—"
+                )
+
+                InsetMetric(
+                    Modifier.weight(1f),
+                    strings.raceExpansionMetric,
+                    strategy
+                        ?.let {
+                            when (it.mode.lowercase()) {
+                                "single" -> strings.strategySingle
+                                "compact", "narrow" -> strings.strategyCompact
+                                "spread", "wide", "broad" -> strings.strategySpread
+                                else -> strings.strategyBalanced
+                            }
+                        }
+                        ?: "—"
+                )
+            }
+
+            val summary =
+                listOfNotNull(
+                    uncertainty?.let {
+                        when {
+                            it.topMargin <= 3.0 -> strings.explanationClose
+                            it.topMargin <= 7.0 -> strings.explanationTop3Close
+                            else -> strings.explanationClearLeader
+                        }
+                    },
+                    strategy?.let {
+                        when {
+                            it.horseNumbers.size == 1 -> strings.strategyOneCandidate
+                            it.horseNumbers.isNotEmpty() -> strings.strategyCandidates(it.horseNumbers.size)
+                            else -> null
+                        }
+                    }
+                ).joinToString(" · ")
+
+            if (summary.isNotBlank()) {
                 Spacer(
                     Modifier.height(9.dp)
                 )
 
-                Row(
-                    horizontalArrangement =
-                        Arrangement.spacedBy(7.dp)
-                ) {
-                    InsetMetric(
-                        Modifier.weight(1f),
-                        strings.raceUncertaintyMetric,
-                        uncertaintyText(
-                            it.level
-                        )
-                    )
-
-                    InsetMetric(
-                        Modifier.weight(1f),
-                        strings.raceLeaderMarginMetric,
-                        "%.1f".format(
-                            it.topMargin
-                        )
-                    )
-
-                    InsetMetric(
-                        Modifier.weight(1f),
-                        strings.raceExpansionMetric,
-                        "%.1f".format(
-                            it.expansionPressure
-                        )
-                    )
-                }
+                Text(
+                    text = summary,
+                    color = Ink,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
+
+            Spacer(
+                Modifier.height(4.dp)
+            )
+
+            Text(
+                text = strings.raceRiskHint,
+                color = Muted,
+                fontSize = 10.sp,
+                lineHeight = 14.sp
+            )
         }
     }
 }
@@ -1766,21 +1833,22 @@ private fun HorseCard(
             )
 
             if (
-                horse.recentForm
-                    .isNotBlank()
+                parseRecentForm(horse.recentForm)
+                    .isNotEmpty()
             ) {
                 InsetBox(
                     title = strings.raceForm
                 ) {
+                    RecentFormDots(
+                        raw = horse.recentForm,
+                        tenPlusLabel = strings.raceFormTenPlus
+                    )
+
                     Text(
-                        text =
-                            horse.recentForm,
-                        color = Ink,
-                        fontSize = 13.sp,
-                        fontWeight =
-                            FontWeight.Bold,
-                        letterSpacing =
-                            1.sp
+                        text = strings.raceFormHint,
+                        color = Muted,
+                        fontSize = 10.sp,
+                        lineHeight = 13.sp
                     )
                 }
             }
@@ -1789,80 +1857,79 @@ private fun HorseCard(
                 ToneDivider()
 
                 Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable {
+                                videoExpanded =
+                                    !videoExpanded
+
+                                if (
+                                    videoExpanded &&
+                                    canViewVideos &&
+                                    !videoFetched &&
+                                    !videoLoading
+                                ) {
+                                    videoLoading = true
+
+                                    scope.launch {
+                                        videoRepository
+                                            .horseVideos(
+                                                raceDate =
+                                                    raceDate,
+                                                city = city,
+                                                raceNumber = raceNumber,
+                                                horseNumber = horse.number
+                                            )
+                                            .onSuccess {
+                                                videos = it
+                                            }
+                                            .onFailure {
+                                                videos = emptyList()
+                                            }
+
+                                        videoFetched = true
+                                        videoLoading = false
+                                    }
+                                }
+                            }
+                            .padding(
+                                horizontal = 4.dp,
+                                vertical = 8.dp
+                            ),
                     verticalAlignment =
                         Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = {
-                            videoExpanded =
-                                !videoExpanded
+                    Icon(
+                        Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint =
+                            if (canViewVideos)
+                                Green
+                            else
+                                Muted
+                    )
 
-                            if (
-                                videoExpanded &&
-                                canViewVideos &&
-                                !videoFetched &&
-                                !videoLoading
-                            ) {
-                                videoLoading = true
+                    Spacer(Modifier.width(6.dp))
 
-                                scope.launch {
-                                    videoRepository
-                                        .horseVideos(
-                                            raceDate =
-                                                raceDate,
-                                            city = city,
-                                            raceNumber = raceNumber,
-                                            horseNumber = horse.number
-                                        )
-                                        .onSuccess {
-                                            videos = it
-                                        }
-                                        .onFailure {
-                                            videos = emptyList()
-                                        }
-
-                                    videoFetched = true
-                                    videoLoading = false
-                                }
-                            }
-                        },
-                        contentPadding =
-                            PaddingValues(
-                                horizontal = 4.dp,
-                                vertical = 0.dp
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.PlayArrow,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint =
-                                if (canViewVideos)
-                                    Green
-                                else
-                                    Muted
-                        )
-
-                        Spacer(Modifier.width(4.dp))
-
-                        Text(
-                            text =
-                                if (canViewVideos)
-                                    strings.raceVideoLabel
-                                else
-                                    strings.raceVideoLabelLocked,
-                            color =
-                                if (canViewVideos)
-                                    Green
-                                else
-                                    Muted,
-                            fontSize = 12.sp,
-                            fontWeight =
-                                FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text =
+                            if (canViewVideos)
+                                strings.raceVideoLabel
+                            else
+                                strings.raceVideoLabelLocked,
+                        modifier = Modifier.weight(1f),
+                        color =
+                            if (canViewVideos)
+                                Green
+                            else
+                                Muted,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
 
                     if (videoLoading) {
                         CircularProgressIndicator(
@@ -1876,7 +1943,11 @@ private fun HorseCard(
                                 Icons.Default.KeyboardArrowUp
                             else
                                 Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
+                            contentDescription =
+                                if (videoExpanded)
+                                    strings.raceCloseVideos
+                                else
+                                    strings.raceOpenVideos,
                             tint = Muted
                         )
                     }
@@ -2127,13 +2198,7 @@ private fun ExpertConsensusSection(
             ScoreProgress(
                 title = strings.raceExpertScoreTitle,
                 score = it,
-                subtitle =
-                    value.supportConfidence
-                        ?.let { confidence ->
-                            strings.raceSupportConfidence(
-                                "%.1f".format(confidence * 100)
-                            )
-                        }
+                subtitle = strings.raceExpertScoreHint
             )
         }
     }
@@ -2145,7 +2210,8 @@ private fun MarketSection(
 ) {
     val strings = LocalStrings.current
 
-    if (value == null) {
+    // AGF only moves on race morning; until then there's nothing to show.
+    if (value == null || value.score == null) {
         return
     }
 
@@ -2273,7 +2339,8 @@ private fun MarketSection(
             ScoreProgress(
                 title =
                     strings.raceMarketScoreTitle,
-                score = it
+                score = it,
+                subtitle = strings.raceMarketScoreHint
             )
         }
     }
@@ -2356,35 +2423,12 @@ private fun FieldSection(
                 strings.raceFieldCombinedTitle,
             score = score,
             subtitle =
-                buildString {
-                    value.tjkScore?.let {
-                        append(
-                            strings.raceFieldTjk("%.1f".format(it))
-                        )
-                    }
-
-                    value.expertScore?.let {
-                        if (isNotEmpty()) {
-                            append(" · ")
-                        }
-
-                        append(
-                            strings.raceFieldExpert("%.1f".format(it))
-                        )
-                    }
-
-                    if (
-                        value.tjkSampleSize > 0
-                    ) {
-                        if (isNotEmpty()) {
-                            append(" · ")
-                        }
-
-                        append(
-                            strings.raceFieldSamples(value.tjkSampleSize)
-                        )
-                    }
-                }.ifBlank { null }
+                listOfNotNull(
+                    strings.raceFieldHint,
+                    value.tjkSampleSize
+                        .takeIf { it > 0 }
+                        ?.let { strings.raceFieldSamples(it) }
+                ).joinToString(" · ")
         )
     }
 }

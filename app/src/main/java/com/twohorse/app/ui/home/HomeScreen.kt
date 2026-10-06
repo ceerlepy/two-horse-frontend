@@ -947,7 +947,7 @@ private fun DayOverCard(
         )
 
         Text(
-            text = strings.homeDayOverBody,
+            text = strings.homeDayOverCouponsBody,
             color = Color(0xFFCFE9DC),
             fontSize = 13.sp,
             lineHeight = 18.sp
@@ -967,7 +967,7 @@ private fun DayOverCard(
                 )
         ) {
             Text(
-                text = strings.homeDayOverButton,
+                text = strings.homeDayOverCouponsButton,
                 fontWeight = FontWeight.Bold
             )
         }

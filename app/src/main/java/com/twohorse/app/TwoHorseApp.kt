@@ -61,7 +61,8 @@ private sealed interface AppScreen {
         AppScreen
 
     data class MyCoupons(
-        val returnTo: Coupons
+        /* null: opened from the home screen. */
+        val returnTo: Coupons?
     ) :
         AppScreen
 
@@ -145,7 +146,7 @@ fun TwoHorseApp() {
                     current.returnTo
 
                 is AppScreen.MyCoupons ->
-                    current.returnTo
+                    current.returnTo ?: AppScreen.Home
 
                 is AppScreen.Coupons ->
                     current.returnRace
@@ -232,8 +233,13 @@ fun TwoHorseApp() {
                         },
 
                         onHistoryClick = {
+                            // Members see their own saved coupons; the
+                            // model's race-by-race record is for us.
                             screen =
-                                AppScreen.History
+                                if (Config.SHOW_MODEL_PERFORMANCE)
+                                    AppScreen.History
+                                else
+                                    AppScreen.MyCoupons(null)
                         },
 
                         onAccountClick = {
@@ -343,7 +349,10 @@ fun TwoHorseApp() {
                 is AppScreen.MyCoupons -> {
                     MyCouponsScreen(
                         onBack = {
-                            screen = current.returnTo
+                            screen = current.returnTo ?: AppScreen.Home
+                        },
+                        onUpgradeClick = {
+                            screen = AppScreen.Account
                         }
                     )
                 }

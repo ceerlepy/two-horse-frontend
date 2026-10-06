@@ -890,7 +890,7 @@ private fun CouponHeader(
 
             Text(
                 text =
-                    "Two Horse optimizer",
+                    strings.couponHeaderSubtitle,
                 color =
                     Muted,
                 fontSize =

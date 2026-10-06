@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -155,7 +156,7 @@ fun TwoHorseHeader(
                     Modifier.size(48.dp)
             ) {
                 Icon(
-                    Icons.Default.History,
+                    Icons.Default.ConfirmationNumber,
                     contentDescription =
                         strings.homeHistoryDescription,
                     tint = Ink
