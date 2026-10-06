@@ -1887,6 +1887,8 @@ class TwoHorseApi(
                         ),
                     primaryCount =
                         it.firstInt("primaryCount"),
+                    strongOnlyCount =
+                        it.firstInt("strongOnlyCount"),
                     secondaryCount =
                         it.firstInt("secondaryCount"),
                     surpriseOnlyCount =

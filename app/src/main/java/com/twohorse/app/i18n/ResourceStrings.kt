@@ -1552,4 +1552,29 @@ object ResourceStrings : Strings {
     @Composable
     override fun raceExpertHeroSecond(a1: Int): String =
         stringResource(R.string.race_expert_hero_second, a1)
+
+    override val expertRowStrong: String
+        @Composable get() = stringResource(R.string.expert_row_strong)
+
+    override val expertRowSurprise: String
+        @Composable get() = stringResource(R.string.expert_row_surprise)
+
+    override val expertRowAvoid: String
+        @Composable get() = stringResource(R.string.expert_row_avoid)
+
+    override val expertChipFavorite: String
+        @Composable get() = stringResource(R.string.expert_chip_favorite)
+
+    override val expertChipBanko: String
+        @Composable get() = stringResource(R.string.expert_chip_banko)
+
+    override val expertChipStar: String
+        @Composable get() = stringResource(R.string.expert_chip_star)
+
+    override val expertFirstChoiceInfo: String
+        @Composable get() = stringResource(R.string.expert_first_choice_info)
+
+    @Composable
+    override fun raceExpertHeroStrong(a1: Int): String =
+        stringResource(R.string.race_expert_hero_strong, a1)
 }

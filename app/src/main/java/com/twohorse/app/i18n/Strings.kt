@@ -928,6 +928,22 @@ interface Strings {
     @Composable
     fun raceCategoryCountOf(n: Int, total: Int): String
     @get:Composable
+    val expertRowStrong: String
+    @get:Composable
+    val expertRowSurprise: String
+    @get:Composable
+    val expertRowAvoid: String
+    @get:Composable
+    val expertChipFavorite: String
+    @get:Composable
+    val expertChipBanko: String
+    @get:Composable
+    val expertChipStar: String
+    @get:Composable
+    val expertFirstChoiceInfo: String
+    @Composable
+    fun raceExpertHeroStrong(a1: Int): String
+    @get:Composable
     val raceExpertFirstChoice: String
     @get:Composable
     val raceExpertSecondChoice: String

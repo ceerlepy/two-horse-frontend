@@ -18,6 +18,7 @@ data class ExpertConsensusSummary(
     val avoidCount: Int = 0,
     /* Experts counted once each, by the strongest role they gave. */
     val primaryCount: Int? = null,
+    val strongOnlyCount: Int? = null,
     val secondaryCount: Int? = null,
     val surpriseOnlyCount: Int? = null,
     val bankoScore: Double = 0.0,
