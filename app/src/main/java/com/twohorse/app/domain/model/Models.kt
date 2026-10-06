@@ -301,7 +301,11 @@ data class MembershipUser(
     val tier: String,
     val tierSource: String,
     val trialEndsAt: String?,
-    val subscriptionExpiresAt: String?
+    val subscriptionExpiresAt: String?,
+    /* false once the member cancelled in Google Play (runs to expiry). */
+    val subscriptionAutoRenew: Boolean? = null,
+    /* Plan a scheduled switch moves to at the next renewal. */
+    val subscriptionPendingTier: String? = null
 ) {
     val isFree: Boolean get() = tier == "free"
     val isGold: Boolean get() = tier == "gold"

@@ -454,4 +454,26 @@
     <string name="error_server">Sunucuda geçici bir sorun var. Birazdan tekrar dene.</string>
     <string name="error_generic">Veriler yüklenemedi. Tekrar dener misin?</string>
     <string name="race_category_count_of">%1$d/%2$d uzman</string>
+    <string name="welcome_title">Hoş geldin! 7 günlük Premium denemen başladı</string>
+    <string name="welcome_body">%1$s tarihine kadar her şey açık. Kart bilgisi istemedik; süre bitince kendiliğinden ücretli olmaz.</string>
+    <string name="welcome_start">Başlayalım</string>
+    <string name="welcome_plans">Planları incele</string>
+    <string name="trial_ended_title">Premium denemen bitti</string>
+    <string name="trial_ended_body">Program, AGF, sonuçlar ve videolar ücretsiz açık kalır. Model sinyalleri ve kuponlar için bir plan seç.</string>
+    <string name="trial_ended_compare">Planları karşılaştır</string>
+    <string name="trial_ended_continue_free">Ücretsiz devam et</string>
+    <string name="home_trial_strip">Premium denemesi</string>
+    <string name="account_change_plan">Planı değiştir</string>
+    <string name="account_switch_to_gold">Gold\'a geç</string>
+    <string name="account_gold_downgrade_note">Gold\'da AI\'ya sor, \"AGF\'nin hafife aldığı at\" ve sınırsız kupon olmaz.</string>
+    <string name="account_switch_title">Gold\'a geçilsin mi?</string>
+    <string name="account_switch_body">Premium\'un %1$s tarihine kadar devam eder. O gün Gold başlar ve Gold ücreti alınır. Bugün ek ücret ya da iade yok.</string>
+    <string name="account_switch_scheduled">Planın %1$s tarihinde Gold olacak. O güne kadar Premium\'un her şeyi açık.</string>
+    <string name="account_switch_scheduled_card">%1$s tarihinde Gold\'a geçecek</string>
+    <string name="account_cancel_button">Aboneliği iptal et</string>
+    <string name="account_cancel_body">İptal Google Play\'den yapılır. İptal etsen de %1$s tarihine kadar %2$s kullanmaya devam edersin; sonra hesabın Ücretsiz plana geçer. Kayıtlı kuponların silinmez.</string>
+    <string name="account_go_to_play">Google Play\'e git</string>
+    <string name="account_canceled_card">%1$s tarihinde sona erecek, yenilenmeyecek</string>
+    <string name="account_canceled_note">Aboneliğin iptal edildi. %1$s tarihine kadar %2$s açık.</string>
+    <string name="account_resume">Aboneliği sürdür</string>
 </resources>

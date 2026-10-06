@@ -95,10 +95,13 @@ class TwoHorseRepository(
             sessionStore.clear()
         }
 
-    suspend fun me():
+    /* refreshSubscription re-asks Google (cancel / plan switch made in Play). */
+    suspend fun me(
+        refreshSubscription: Boolean = false
+    ):
         Result<MembershipUser> =
         runCatching {
-            api.authMe()
+            api.authMe(refreshSubscription)
         }
 
     fun logout() {
