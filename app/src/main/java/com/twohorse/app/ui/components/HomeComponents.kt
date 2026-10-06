@@ -1155,13 +1155,26 @@ private fun raceMeta(
 
 private fun raceTime(
     race: Race
-): String =
-    race.startsAt
-        ?.let {
-            Regex(
-                """\b\d{2}:\d{2}\b"""
+): String {
+    val value =
+        race.startsAt
+            ?: return "--:--"
+
+    // starts_at is UTC ("2026-10-06T09:30:00Z"); show Turkey time.
+    return runCatching {
+        java.time.OffsetDateTime
+            .parse(value)
+            .atZoneSameInstant(
+                java.time.ZoneId.of("Europe/Istanbul")
             )
-                .find(it)
+            .toLocalTime()
+            .toString()
+            .take(5)
+    }
+        .getOrElse {
+            Regex("""\d{2}:\d{2}""")
+                .find(value)
                 ?.value
+                ?: "--:--"
         }
-        ?: "--:--"
+}

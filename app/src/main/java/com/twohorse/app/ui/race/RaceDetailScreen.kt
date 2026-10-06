@@ -1625,24 +1625,15 @@ private fun marketSummary(
         horse.marketMovement
             ?: return strings.noData
 
-    return buildString {
-        append(
-            "${marketArrow(m.direction)} ${
-                marketText(m.direction)
-            }"
-        )
+    val first = m.firstAgf
+    val latest = m.latestAgf
+    val word = marketText(m.direction)
 
-        m.absoluteDelta?.let {
-            append(
-                " · AGF ${
-                    if (it >= 0)
-                        "+"
-                    else
-                        ""
-                }${"%.1f".format(it)}"
-            )
-        }
-    }
+    // Plain "AGF %33,0 → %34,0 (Yatay)" instead of arrows and deltas.
+    return if (first != null && latest != null)
+        "%${"%.1f".format(first)} → %${"%.1f".format(latest)} ($word)"
+    else
+        word
 }
 
 @Composable
@@ -1830,7 +1821,8 @@ private fun HorseCard(
             }
 
             ValueModelSection(
-                horse.valueModel
+                horse.valueModel,
+                horse.agfPercent
             )
 
             ExpertConsensusSection(
@@ -2334,7 +2326,8 @@ private fun MarketSection(
 
 @Composable
 private fun ValueModelSection(
-    value: ValueModelOpinion?
+    value: ValueModelOpinion?,
+    agfPercent: Double?
 ) {
     val strings = LocalStrings.current
 
@@ -2365,7 +2358,8 @@ private fun ValueModelSection(
     ) {
         Text(
             text =
-                value.agfProbability
+                // Same AGF figure as the tile above, so the numbers match.
+                (agfPercent?.div(100) ?: value.agfProbability)
                     ?.let {
                         strings.raceValueVsAgf(pct(it), pct(value.probability))
                     }

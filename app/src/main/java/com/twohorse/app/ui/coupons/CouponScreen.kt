@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.Config
@@ -1399,42 +1401,30 @@ private fun CouponLegRow(
             Alignment.Top
     ) {
         Surface(
+            modifier =
+                Modifier.width(62.dp),
             color =
                 PaleGreen,
             shape =
                 RoundedCornerShape(11.dp)
         ) {
-            Column(
+            Text(
+                text =
+                    strings.couponLegRace(leg.raceNumber),
                 modifier =
                     Modifier.padding(
-                        horizontal = 9.dp,
-                        vertical = 7.dp
+                        vertical = 8.dp
                     ),
-                horizontalAlignment =
-                    Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text =
-                        "$legIndex.",
-                    color =
-                        Green,
-                    fontSize =
-                        10.sp,
-                    fontWeight =
-                        FontWeight.Bold
-                )
-
-                Text(
-                    text =
-                        "${leg.raceNumber}.K",
-                    color =
-                        Green,
-                    fontSize =
-                        11.sp,
-                    fontWeight =
-                        FontWeight.ExtraBold
-                )
-            }
+                color =
+                    Green,
+                fontSize =
+                    11.sp,
+                fontWeight =
+                    FontWeight.ExtraBold,
+                textAlign =
+                    TextAlign.Center,
+                maxLines = 1
+            )
         }
 
         Column(
@@ -1443,26 +1433,58 @@ private fun CouponLegRow(
                     .weight(1f)
                     .padding(
                         start = 10.dp
-                    )
+                    ),
+            verticalArrangement =
+                Arrangement.spacedBy(5.dp)
         ) {
-            Text(
-                text =
-                    leg.horses
-                        .joinToString(
-                            " · "
-                        ) {
-                            "${it.horseNumber} ${it.horseName}"
-                        },
-                color =
-                    Ink,
-                fontSize =
-                    12.sp,
-                fontWeight =
-                    FontWeight.Bold,
-                maxLines = 3,
-                overflow =
-                    TextOverflow.Ellipsis
-            )
+            // One line per horse: number in a green circle, then the name.
+            leg.horses.forEach { horse ->
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .background(
+                                    Green,
+                                    CircleShape
+                                ),
+                        contentAlignment =
+                            Alignment.Center
+                    ) {
+                        Text(
+                            text =
+                                horse.horseNumber.toString(),
+                            color =
+                                Color.White,
+                            fontSize =
+                                11.sp,
+                            fontWeight =
+                                FontWeight.ExtraBold
+                        )
+                    }
+
+                    Text(
+                        text =
+                            horse.horseName,
+                        modifier =
+                            Modifier.padding(
+                                start = 8.dp
+                            ),
+                        color =
+                            Ink,
+                        fontSize =
+                            12.sp,
+                        fontWeight =
+                            FontWeight.Bold,
+                        maxLines = 1,
+                        overflow =
+                            TextOverflow.Ellipsis
+                    )
+                }
+            }
 
             Text(
                 text =

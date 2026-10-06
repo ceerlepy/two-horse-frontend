@@ -128,13 +128,13 @@
     <string name="race_refresh">Refresh race</string>
     <string name="race_city_and_number">%1$s · Race %2$s</string>
     <string name="race_likely_winner">LIKELY WINNER</string>
-    <string name="race_confidence_score">Confidence Score %1$s/100</string>
+    <string name="race_confidence_score">Model score %1$s/100</string>
     <string name="race_agf">AGF</string>
     <string name="race_hp">HP</string>
     <string name="race_hp_points">%1$s pts</string>
     <string name="race_expert_support">Expert support</string>
     <string name="race_field">Field</string>
-    <string name="race_market">Market</string>
+    <string name="race_market">AGF change</string>
     <string name="race_form">Recent runs</string>
     <string name="race_learning">Learning</string>
     <string name="race_learning_delta">%1$s pts</string>
@@ -155,7 +155,7 @@
     <string name="race_expert_banko_count">⭐ %1$s banko</string>
     <string name="race_expert_strong_count">%1$s strong</string>
     <string name="race_field_combined">Combined %1$s</string>
-    <string name="race_guven">Confidence</string>
+    <string name="race_guven">Data coverage</string>
     <string name="race_video_label">Last 3 race videos</string>
     <string name="race_video_label_locked">Last 3 race videos 🔒 Premium</string>
     <string name="race_video_locked_body">The horse video archive unlocks with Premium.</string>
@@ -223,7 +223,7 @@
     <string name="race_value_note">A separate opinion from the expert and AGF score; not betting advice.</string>
     <string name="race_expert_score_title">Expert support</string>
     <string name="race_support_confidence">Support confidence %1$s%%</string>
-    <string name="race_market_move_title">📈 Market movement</string>
+    <string name="race_market_move_title">📈 AGF change</string>
     <string name="race_market_first">first %%%1$s</string>
     <string name="race_market_to">→ %%%1$s</string>
     <string name="race_market_samples">%1$s samples</string>
@@ -426,14 +426,14 @@
     <string name="home_day_over_coupons_button">Open my coupons</string>
     <string name="info_ok">OK</string>
     <string name="info_open">Explanation</string>
-    <string name="info_guven">How confident the model is in this horse. Expert picks, AGF and HP are combined. A high value does not mean the horse will surely win.</string>
+    <string name="info_guven">What share of the information needed to score this horse (expert picks, AGF, HP, form and so on) we have. 100% means everything is available. It is not a win chance; when it is low, the score was built on partial information.</string>
     <string name="info_agf">AGF (Altılı Ganyan Favourite): the share of altılı players who picked this horse. Published by TJK; 30% means 30% of players picked it. Opens on race-day morning.</string>
     <string name="info_hp">HP (Handicap Points): TJK\'s rating of the horse. Used to compare horses in the same race; higher HP usually means a stronger horse.</string>
     <string name="info_uncertainty">Uncertainty: how open the race is. Low: clear favourite. Very high: many horses can win, so keep this leg wide on the coupon.</string>
     <string name="info_leader_margin">Favourite\'s lead: the gap in model score between the 1st and 2nd horse. A big gap means a clear favourite, a small one a close race.</string>
     <string name="info_coupon_advice">Coupon advice: how many horses it makes sense to pick in this leg. Single: one horse is enough. Narrow: 2-3 horses. Balanced: a few. Wide: pick many, an upset is possible.</string>
     <string name="info_value_model">Value model: our own model\'s win probability for this horse compared with AGF. When ours is clearly higher, the \"underrated by AGF\" tag shows. Not betting advice.</string>
-    <string name="info_expert">Expert consensus: picks for this horse from the expert sites we follow. Each bar shows what share of experts named the horse that way (favourite, banker, upset…). The expert support bar sums them up: 50 undecided, 100 every expert backs it.</string>
+    <string name="info_expert">Expert consensus: a summary of the experts\' picks for this horse. Each bar shows what share of experts named the horse that way (favourite, banker, upset…). The expert support bar sums them up: 50 undecided, 100 every expert backs it.</string>
     <string name="info_market">AGF change: how AGF moved in the last 90 minutes before the race. Above 50 money is coming in, below 50 going out. AGF opens on race-day morning, so there is no data at night or early morning.</string>
     <string name="info_field">Track fit: how well the horse ran on this surface (turf, dirt, synthetic) in past races. 50 is average, higher is good on this track. Horses with few runs may have no data.</string>
     <string name="info_form">Recent runs: finishing position in the last 6 races, oldest on the left, newest on the right. 5-2-5: 5th, then 2nd, then 5th last time. 10+: tenth or worse. Gold is 1st, green 2nd and 3rd.</string>
@@ -445,4 +445,5 @@
     <string name="strategy_short_compact">Narrow</string>
     <string name="strategy_short_spread">Wide</string>
     <string name="strategy_short_balanced">Balanced</string>
+    <string name="coupon_leg_race">Race %1$d</string>
 </resources>

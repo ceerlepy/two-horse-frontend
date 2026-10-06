@@ -1436,4 +1436,8 @@ object ResourceStrings : Strings {
 
     override val strategyShortBalanced: String
         @Composable get() = stringResource(R.string.strategy_short_balanced)
+
+    @Composable
+    override fun couponLegRace(n: Int): String =
+        stringResource(R.string.coupon_leg_race, n)
 }

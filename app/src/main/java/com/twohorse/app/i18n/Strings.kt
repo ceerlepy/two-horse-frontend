@@ -909,4 +909,6 @@ interface Strings {
     val strategyShortSpread: String
     @get:Composable
     val strategyShortBalanced: String
+    @Composable
+    fun couponLegRace(n: Int): String
 }
