@@ -313,6 +313,9 @@ fun RaceDetailScreen(
                 }
             }
 
+            val raceExpertSources =
+                horses.maxOfOrNull { it.expertConsensus?.sourceCount ?: 0 } ?: 0
+
             itemsIndexed(
                 items = horses,
                 key = {
@@ -333,6 +336,7 @@ fun RaceDetailScreen(
                     HorseCard(
                         horse = horse,
                         rank = index + 1,
+                        raceExpertSources = raceExpertSources,
                         raceDate = currentRace.raceDate,
                         city = currentRace.city,
                         raceNumber = currentRace.number,
@@ -1668,6 +1672,7 @@ private fun fieldSummary(
 private fun HorseCard(
     horse: Horse,
     rank: Int,
+    raceExpertSources: Int,
     raceDate: String?,
     city: String,
     raceNumber: Int,
@@ -1850,7 +1855,8 @@ private fun HorseCard(
             )
 
             ExpertConsensusSection(
-                horse.expertConsensus
+                horse.expertConsensus,
+                raceExpertSources
             )
 
             MarketSection(
@@ -2130,7 +2136,8 @@ private fun HorseCard(
 
 @Composable
 private fun ExpertConsensusSection(
-    value: ExpertConsensusSummary?
+    value: ExpertConsensusSummary?,
+    raceExpertSources: Int
 ) {
     val strings = LocalStrings.current
 
@@ -2182,11 +2189,20 @@ private fun ExpertConsensusSection(
         val avoidLabel = strings.raceCategoryAvoid
         val surpriseLabel = strings.raceCategorySurprise
 
+        /*
+         * Category shares come from the server relative to the experts
+         * that mention this horse, so one expert reads as 100%. Scale
+         * them to every expert covering the race instead.
+         */
+        val coverage =
+            value.sourceCount.toDouble() /
+                maxOf(raceExpertSources, value.sourceCount)
+
         categories.forEach { (label, count, percent) ->
             CategoryBar(
                 label = label.replaceFirstChar { it.uppercase() },
                 detail = strings.raceCategoryCount(count),
-                percent = percent,
+                percent = percent * coverage,
                 color =
                     when (label) {
                         avoidLabel -> Red
@@ -2196,22 +2212,16 @@ private fun ExpertConsensusSection(
             )
         }
 
-        if (
-            value.summary.isNotBlank()
-        ) {
-            Text(
-                text = consensusSummary(value),
-                color = Ink,
-                fontSize = 12.sp,
-                lineHeight = 16.sp
-            )
-        }
-
         ToneDivider()
 
+        // Same damping the model applies: few experts pull the score
+        // toward 50, so one or two picks never read as near-certain.
         ScoreProgress(
             title = strings.raceExpertScoreTitle,
-            score = value.expertScore,
+            score =
+                value.expertScore?.let { raw ->
+                    50 + (raw - 50) * (value.supportConfidence ?: 1.0)
+                },
             subtitle = strings.raceExpertScoreHint
         )
     }

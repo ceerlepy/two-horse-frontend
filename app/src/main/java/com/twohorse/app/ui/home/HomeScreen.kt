@@ -708,13 +708,9 @@ fun HomeScreen(
                                     horizontal = 18.dp
                                 )
                         ) {
-                            RaceCard(
+                            // Same compact card (with arrow) as the first races.
+                            UpcomingRaceCard(
                                 race = race,
-                                countdown =
-                                    countdownText(
-                                        race,
-                                        nowMillis
-                                    ),
                                 time =
                                     displayRaceTime(
                                         race
