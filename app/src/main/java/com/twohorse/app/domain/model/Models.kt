@@ -116,7 +116,9 @@ data class Race(
     val horses: List<Horse> = emptyList(),
     val uncertainty: RaceUncertainty? = null,
     val couponStrategy: RaceCouponStrategy? = null,
-    val raceDate: String? = null
+    val raceDate: String? = null,
+    /* Distinct expert sources with any pick in this race (paid tiers). */
+    val expertSourceCount: Int? = null
 )
 
 data class Meeting(

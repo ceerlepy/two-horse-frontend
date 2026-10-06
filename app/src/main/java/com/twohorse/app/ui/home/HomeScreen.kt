@@ -54,7 +54,6 @@ import com.twohorse.app.ui.components.RemainingRacesToggle
 import com.twohorse.app.ui.components.ShimmerBlock
 import com.twohorse.app.ui.components.SixFoldEntryCard
 import com.twohorse.app.ui.components.TwoHorseHeader
-import com.twohorse.app.ui.components.UpcomingRaceCard
 import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
@@ -649,8 +648,13 @@ fun HomeScreen(
                                 horizontal = 18.dp
                             )
                     ) {
-                        UpcomingRaceCard(
+                        RaceCard(
                             race = race,
+                            countdown =
+                                countdownText(
+                                    race,
+                                    nowMillis
+                                ),
                             time =
                                 displayRaceTime(
                                     race
@@ -708,9 +712,13 @@ fun HomeScreen(
                                     horizontal = 18.dp
                                 )
                         ) {
-                            // Same compact card (with arrow) as the first races.
-                            UpcomingRaceCard(
+                            RaceCard(
                                 race = race,
+                                countdown =
+                                    countdownText(
+                                        race,
+                                        nowMillis
+                                    ),
                                 time =
                                     displayRaceTime(
                                         race

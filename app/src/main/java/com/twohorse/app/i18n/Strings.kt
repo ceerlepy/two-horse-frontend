@@ -925,4 +925,6 @@ interface Strings {
     val errorServer: String
     @get:Composable
     val errorGeneric: String
+    @Composable
+    fun raceCategoryCountOf(n: Int, total: Int): String
 }
