@@ -361,9 +361,9 @@ interface Strings {
     val foreignAgfNote: String
     @get:Composable
     val foreignWinProbNote: String
-
+    @get:Composable
     val foreignWinProbInfoTitle: String
-
+    @get:Composable
     val foreignWinProbInfo: String
     @Composable
     fun foreignWinProb(percent: String): String
