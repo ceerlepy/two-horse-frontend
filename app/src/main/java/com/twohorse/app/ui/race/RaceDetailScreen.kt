@@ -698,11 +698,13 @@ private fun ResultHero(
 
                     DarkRule()
 
+                    val tenPlus = strings.raceFormTenPlus
+
                     DarkMetric(
                         strings.raceForm,
                         parseRecentForm(favorite.recentForm)
                             .joinToString("  ") {
-                                if (it >= 10) strings.raceFormTenPlus else it.toString()
+                                if (it >= 10) tenPlus else it.toString()
                             }
                             .ifBlank {
                                 strings.noData
