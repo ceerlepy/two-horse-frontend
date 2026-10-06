@@ -928,6 +928,14 @@ interface Strings {
     @Composable
     fun raceCategoryCountOf(n: Int, total: Int): String
     @get:Composable
+    val raceExpertFirstChoice: String
+    @get:Composable
+    val raceExpertSecondChoice: String
+    @Composable
+    fun raceExpertHeroFirst(a1: Int, a2: Int): String
+    @Composable
+    fun raceExpertHeroSecond(a1: Int): String
+    @get:Composable
     val welcomeTitle: String
     @Composable
     fun welcomeBody(a1: String): String

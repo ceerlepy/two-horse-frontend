@@ -1619,30 +1619,21 @@ private fun expertSummary(
         horse.expertConsensus
             ?: return strings.raceExpertSourceMissing
 
+    val total =
+        maxOf(raceExpertSources, e.sourceCount)
+
+    val primary =
+        e.primaryCount
+            ?: maxOf(e.bankoCount, e.favoriteCount, e.strongCount, e.starCount)
+
+    val secondary =
+        e.secondaryCount ?: e.rivalCount
+
     return buildString {
-        append(
-            strings.raceCategoryCountOf(
-                e.sourceCount,
-                maxOf(raceExpertSources, e.sourceCount)
-            )
-        )
+        append(strings.raceExpertHeroFirst(primary, total))
 
-        if (e.favoriteCount > 0) {
-            append(
-                " · ${strings.raceExpertFavoriteCount(e.favoriteCount)}"
-            )
-        }
-
-        if (e.bankoCount > 0) {
-            append(
-                " · ${strings.raceExpertBankoCount(e.bankoCount)}"
-            )
-        }
-
-        if (e.strongCount > 0) {
-            append(
-                " · ${strings.raceExpertStrongCount(e.strongCount)}"
-            )
+        if (secondary > 0) {
+            append(" · ${strings.raceExpertHeroSecond(secondary)}")
         }
     }
 }
@@ -2187,41 +2178,42 @@ private fun ExpertConsensusSection(
             return@InsetBox
         }
 
-        // One percentage bar per category the experts used for this horse.
-        val categories =
-            listOf(
-                Triple(strings.raceCategoryBanko, value.bankoCount, value.bankoScore),
-                Triple(strings.raceCategoryFavorite, value.favoriteCount, value.favoriteScore),
-                Triple(strings.raceCategoryStrong, value.strongCount, value.strongScore),
-                Triple(strings.raceCategoryStar, value.starCount, value.starScore),
-                Triple(strings.raceCategoryRival, value.rivalCount, value.rivalScore),
-                Triple(strings.raceCategorySurprise, value.surpriseCount, value.surpriseScore),
-                Triple(strings.raceCategoryAvoid, value.avoidCount, value.avoidScore)
-            )
-                .filter { it.second > 0 }
-
-        val avoidLabel = strings.raceCategoryAvoid
-        val surpriseLabel = strings.raceCategorySurprise
-
         /*
-         * Plain counts over every expert covering the race: "1/4 uzman"
-         * and a 25% bar. The server's shares only count experts that
-         * named this horse, which made a single expert read as 100%.
+         * Each expert counted once, by the strongest role they gave the
+         * horse, over every expert covering the race: "İlk tercih 2/4".
+         * Older servers without the role counts fall back to the largest
+         * single main-pick label.
          */
         val total =
             maxOf(raceExpertSources, value.sourceCount, 1)
 
-        categories.forEach { (label, count, _) ->
+        val primary =
+            value.primaryCount
+                ?: maxOf(value.bankoCount, value.favoriteCount, value.strongCount, value.starCount)
+
+        val secondary =
+            value.secondaryCount ?: value.rivalCount
+
+        val surpriseOnly =
+            value.surpriseOnlyCount ?: value.surpriseCount
+
+        val rows =
+            listOf(
+                Triple(strings.raceExpertFirstChoice, primary, Green),
+                Triple(strings.raceExpertSecondChoice, secondary, Green.copy(alpha = 0.55f)),
+                Triple(strings.raceCategorySurprise.replaceFirstChar { it.uppercase() }, surpriseOnly, Lavender),
+                Triple(strings.raceCategoryAvoid.replaceFirstChar { it.uppercase() }, value.avoidCount, Red)
+            )
+                // First and second choice always show, so "0/4" says as
+                // much as "3/4"; the rarer roles only when present.
+                .filterIndexed { index, row -> index < 2 || row.second > 0 }
+
+        rows.forEach { (label, count, color) ->
             CategoryBar(
-                label = label.replaceFirstChar { it.uppercase() },
+                label = label,
                 detail = strings.raceCategoryCountOf(count, total),
                 percent = count * 100.0 / total,
-                color =
-                    when (label) {
-                        avoidLabel -> Red
-                        surpriseLabel -> Lavender
-                        else -> Green
-                    }
+                color = color
             )
         }
 

@@ -1885,6 +1885,12 @@ class TwoHorseApi(
                             "avoidCount",
                             0
                         ),
+                    primaryCount =
+                        it.firstInt("primaryCount"),
+                    secondaryCount =
+                        it.firstInt("secondaryCount"),
+                    surpriseOnlyCount =
+                        it.firstInt("surpriseOnlyCount"),
                     bankoScore =
                         it.optDouble(
                             "bankoScore",
