@@ -93,7 +93,7 @@ fun ScoreProgress(
                 text = title,
                 modifier = Modifier.weight(1f),
                 color = Ink,
-                fontSize = 10.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -137,7 +137,7 @@ fun ScoreProgress(
                 else
                     Green,
             trackColor =
-                Color(0xFFE8ECEA)
+                Color(0xFFE3DED4)
         )
 
         subtitle
@@ -152,7 +152,8 @@ fun ScoreProgress(
                 Text(
                     text = it,
                     color = Muted,
-                    fontSize = 8.sp
+                    fontSize = 10.sp,
+                    lineHeight = 13.sp
                 )
             }
     }

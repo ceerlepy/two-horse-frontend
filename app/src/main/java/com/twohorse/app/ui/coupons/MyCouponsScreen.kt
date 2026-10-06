@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.MyCoupon
 import com.twohorse.app.domain.model.MyCouponLeg
@@ -33,6 +34,7 @@ private sealed interface MyCouponsState {
     data object Loading : MyCouponsState
     data class Loaded(val coupons: List<MyCoupon>) : MyCouponsState
     data object Failed : MyCouponsState
+    data object Locked : MyCouponsState
 }
 
 /*
@@ -41,7 +43,8 @@ private sealed interface MyCouponsState {
  */
 @Composable
 fun MyCouponsScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onUpgradeClick: () -> Unit
 ) {
     BackHandler(onBack = onBack)
 
@@ -64,7 +67,12 @@ fun MyCouponsScreen(
             repository.myCoupons()
                 .fold(
                     onSuccess = { MyCouponsState.Loaded(it) },
-                    onFailure = { MyCouponsState.Failed }
+                    onFailure = {
+                        if ((it as? ApiException)?.apiCode == "TIER_UPGRADE_REQUIRED")
+                            MyCouponsState.Locked
+                        else
+                            MyCouponsState.Failed
+                    }
                 )
     }
 
@@ -123,6 +131,35 @@ fun MyCouponsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(color = Green)
+                        }
+                    }
+
+                MyCouponsState.Locked ->
+                    item {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 18.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = strings.myCouponsLocked,
+                                color = Ink,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp
+                            )
+
+                            Button(
+                                onClick = onUpgradeClick,
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = Green
+                                    ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = strings.myCouponsUpgrade,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
 

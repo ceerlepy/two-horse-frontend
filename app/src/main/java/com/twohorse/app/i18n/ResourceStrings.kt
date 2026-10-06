@@ -1329,4 +1329,47 @@ object ResourceStrings : Strings {
     @Composable
     override fun raceRankLabel(rank: Int): String =
         stringResource(R.string.race_rank_label, rank)
+
+    override val raceExpertScoreHint: String
+        @Composable get() = stringResource(R.string.race_expert_score_hint)
+
+    override val raceMarketScoreHint: String
+        @Composable get() = stringResource(R.string.race_market_score_hint)
+
+    override val raceFieldHint: String
+        @Composable get() = stringResource(R.string.race_field_hint)
+
+    override val raceFormHint: String
+        @Composable get() = stringResource(R.string.race_form_hint)
+
+    override val raceFormTenPlus: String
+        @Composable get() = stringResource(R.string.race_form_ten_plus)
+
+    override val raceRiskHint: String
+        @Composable get() = stringResource(R.string.race_risk_hint)
+
+    override val raceOpenVideos: String
+        @Composable get() = stringResource(R.string.race_open_videos)
+
+    override val raceCloseVideos: String
+        @Composable get() = stringResource(R.string.race_close_videos)
+
+    override val couponHeaderSubtitle: String
+        @Composable get() = stringResource(R.string.coupon_header_subtitle)
+
+    override val myCouponsLocked: String
+        @Composable get() = stringResource(R.string.my_coupons_locked)
+
+    override val myCouponsUpgrade: String
+        @Composable get() = stringResource(R.string.my_coupons_upgrade)
+
+    override val homeDayOverCouponsBody: String
+        @Composable get() = stringResource(R.string.home_day_over_coupons_body)
+
+    override val homeDayOverCouponsButton: String
+        @Composable get() = stringResource(R.string.home_day_over_coupons_button)
+
+    @Composable
+    override fun raceLeaderMarginValue(value: String): String =
+        stringResource(R.string.race_leader_margin_value, value)
 }

@@ -144,12 +144,16 @@ internal fun InsetMetric(
                 overflow = TextOverflow.Ellipsis
             )
 
+            // Long values ("ÇOK YÜKSEK") get a smaller size and a second line.
+            val long = value.length > 8
+
             Text(
                 text = value,
                 color = if (accent) Green else Ink,
-                fontSize = 15.sp,
+                fontSize = if (long) 12.sp else 15.sp,
+                lineHeight = if (long) 14.sp else 18.sp,
                 fontWeight = FontWeight.Black,
-                maxLines = 1,
+                maxLines = 2,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis
             )
@@ -183,7 +187,8 @@ internal fun NumberBadge(
 /* Finishing position in a small circle: gold for a win, green for places. */
 @Composable
 internal fun PositionDot(
-    position: Int?
+    position: Int?,
+    label: String? = null
 ) {
     val (background, foreground) =
         when (position) {
@@ -200,9 +205,9 @@ internal fun PositionDot(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
-                text = position?.toString() ?: "–",
+                text = label ?: position?.toString() ?: "–",
                 color = foreground,
-                fontSize = 11.sp,
+                fontSize = if ((label?.length ?: 0) > 2) 9.sp else 11.sp,
                 fontWeight = FontWeight.Black
             )
         }
@@ -285,5 +290,31 @@ internal fun FactTag(
             fontWeight = FontWeight.Bold,
             maxLines = 1
         )
+    }
+}
+
+/*
+ * TJK's "son 6 yarış" string, e.g. "735564": one digit per race,
+ * oldest on the left, newest on the right; 0 means tenth or worse.
+ * Returns finishing positions with 10 standing for "10+".
+ */
+internal fun parseRecentForm(raw: String): List<Int> =
+    raw.filter { it.isDigit() }
+        .map { if (it == '0') 10 else it.digitToInt() }
+
+@Composable
+internal fun RecentFormDots(
+    raw: String,
+    tenPlusLabel: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        parseRecentForm(raw).forEach {
+            PositionDot(
+                position = it,
+                label = if (it >= 10) tenPlusLabel else null
+            )
+        }
     }
 }
