@@ -27,14 +27,18 @@ private const val PREFS = "membership_prompts"
 private fun isTrialActive(user: MembershipUser): Boolean =
     user.tierSource == "trial" && !user.isFree
 
-/* The trial ran out and no paid plan replaced it. */
+/*
+ * The trial is over and no paid plan replaced it. A member who signs up
+ * again with an identity that already used its trial has no trial date at
+ * all, so they get the same plan prompt instead of nothing.
+ */
 private fun isTrialEnded(user: MembershipUser): Boolean {
     if (user.tierSource != "trial" || !user.isFree) return false
 
     val end =
         user.trialEndsAt
             ?.let { runCatching { Instant.parse(it) }.getOrNull() }
-            ?: return false
+            ?: return true
 
     return end.isBefore(Instant.now())
 }
