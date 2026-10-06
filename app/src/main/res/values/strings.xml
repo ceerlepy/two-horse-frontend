@@ -118,6 +118,8 @@
     <string name="coupon_amount_label">%1$s TL Kupon</string>
     <string name="coupon_metric_combinations">Kombinasyon</string>
     <string name="coupon_metric_coverage">Kapsama</string>
+    <string name="coupon_coverage_info_title">Kapsama</string>
+    <string name="coupon_coverage_info">Bu kuponun bütün ayaklarını birden tutturma ihtimali. Modelin her ata verdiği kazanma ihtimallerinden hesaplanır. Örneğin yüzde 8, benzer kuponlardan ortalama her 12-13 tanesinden birinin tamamını tutturması beklenir demektir. Altılıda bu oran doğası gereği düşüktür; bütçe arttıkça yükselir. Tahmindir, garanti değildir.</string>
     <string name="coupon_leg_coverage">Ayak kapsama: %1$s</string>
     <string name="coupon_window_ordinal">%1$s. %2$s</string>
     <string name="race_not_found_in_program">Yarış güncel programda bulunamadı. Son bilinen veri gösteriliyor.</string>

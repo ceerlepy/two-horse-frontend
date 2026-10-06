@@ -118,6 +118,8 @@
     <string name="coupon_amount_label">%1$s TL Coupon</string>
     <string name="coupon_metric_combinations">Combinations</string>
     <string name="coupon_metric_coverage">Coverage</string>
+    <string name="coupon_coverage_info_title">Coverage</string>
+    <string name="coupon_coverage_info">The chance this coupon gets every leg right. It is worked out from the win chances the model gives each horse. A figure of 8 per cent, for example, means about one in twelve or thirteen such coupons is expected to land every leg. In a six-leg pool this figure is low by nature and rises with the budget. It is an estimate, not a guarantee.</string>
     <string name="coupon_leg_coverage">Leg coverage: %1$s</string>
     <string name="coupon_window_ordinal">%1$s %2$s</string>
     <string name="race_not_found_in_program">Race not found in the current program. Showing the last known data.</string>

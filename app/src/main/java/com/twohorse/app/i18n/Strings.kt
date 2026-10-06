@@ -255,6 +255,10 @@ interface Strings {
     val couponMetricCombinations: String
     @get:Composable
     val couponMetricCoverage: String
+    @get:Composable
+    val couponCoverageInfoTitle: String
+    @get:Composable
+    val couponCoverageInfo: String
     @Composable
     fun couponLegCoverage(pct: String): String
     @Composable

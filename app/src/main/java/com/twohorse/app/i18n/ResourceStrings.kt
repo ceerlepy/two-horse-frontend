@@ -382,6 +382,12 @@ object ResourceStrings : Strings {
     override val couponMetricCoverage: String
         @Composable get() = stringResource(R.string.coupon_metric_coverage)
 
+    override val couponCoverageInfoTitle: String
+        @Composable get() = stringResource(R.string.coupon_coverage_info_title)
+
+    override val couponCoverageInfo: String
+        @Composable get() = stringResource(R.string.coupon_coverage_info)
+
     @Composable
     override fun couponLegCoverage(pct: String): String =
         stringResource(R.string.coupon_leg_coverage, pct)
