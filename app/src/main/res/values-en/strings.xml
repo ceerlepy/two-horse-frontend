@@ -150,7 +150,7 @@
     <string name="race_open_deep_analysis">Open detailed analysis</string>
     <string name="race_info_fallback">Race info</string>
     <string name="race_expert_source_missing">Awaiting source / not found</string>
-    <string name="race_expert_sources_count">%1$s sources</string>
+    <string name="race_expert_sources_count">%1$s experts</string>
     <string name="race_expert_favorite_count">%1$s favorite</string>
     <string name="race_expert_banko_count">⭐ %1$s banko</string>
     <string name="race_expert_strong_count">%1$s strong</string>
@@ -214,7 +214,7 @@
     <string name="race_category_strong">a strong contender</string>
     <string name="race_category_star">a star pick</string>
     <string name="race_category_surprise">a surprise pick</string>
-    <string name="race_category_rival">rival to the favourite</string>
+    <string name="race_category_rival">second choice</string>
     <string name="race_value_model_title">🔎 Value model</string>
     <string name="race_value_underrated">Underrated by AGF</string>
     <string name="race_value_overrated">Overrated by AGF</string>
@@ -433,7 +433,7 @@
     <string name="info_leader_margin">Favourite\'s lead: the gap in model score between the 1st and 2nd horse. A big gap means a clear favourite, a small one a close race.</string>
     <string name="info_coupon_advice">Coupon advice: how many horses it makes sense to pick in this leg. Single: one horse is enough. Narrow: 2-3 horses. Balanced: a few. Wide: pick many, an upset is possible.</string>
     <string name="info_value_model">Value model: our own model\'s win probability for this horse compared with AGF. When ours is clearly higher, the \"underrated by AGF\" tag shows. Not betting advice.</string>
-    <string name="info_expert">Expert consensus: a summary of the general view in race previews for this horse. Each bar shows what share of the experts covering this race see the horse that way. Favourite/banker: they expect it to win. Strong contender: a serious candidate for the top places. Rival to the favourite: a horse that can challenge that expert\'s own favourite (not necessarily our favourite). Upset pick: less expected but has a chance. The expert support bar sums them up (0–100, 50 is neutral); with few expert opinions the score stays close to 50.</string>
+    <string name="info_expert">Expert consensus: the general view on this horse among experts covering this race. \"1/4 experts\" means 1 of the 4 experts covering the race sees the horse that way. Favourite/banker: they expect it to win. Strong contender: a serious candidate for the top places. Second choice: next after that expert\'s own favourite. Upset pick: less expected but has a chance. The expert support bar sums them up (0–100, 50 is neutral); with few experts the score stays close to 50.</string>
     <string name="info_market">AGF change: how AGF moved in the last 90 minutes before the race. Above 50 money is coming in, below 50 going out. AGF opens on race-day morning, so there is no data at night or early morning.</string>
     <string name="info_field">Track fit: how well the horse ran on this surface (turf, dirt, synthetic) in past races. 50 is average, higher is good on this track. Horses with few runs may have no data.</string>
     <string name="info_form">Recent runs: finishing position in the last 6 races, oldest on the left, newest on the right. 5-2-5: 5th, then 2nd, then 5th last time. 10+: tenth or worse. Gold is 1st, green 2nd and 3rd.</string>
@@ -453,4 +453,5 @@
     <string name="error_no_internet">It looks like you\'re offline. Check your connection and try again.</string>
     <string name="error_server">The server has a temporary problem. Please try again shortly.</string>
     <string name="error_generic">We couldn\'t load the data. Please try again.</string>
+    <string name="race_category_count_of">%1$d/%2$d experts</string>
 </resources>

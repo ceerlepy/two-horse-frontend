@@ -1461,4 +1461,8 @@ object ResourceStrings : Strings {
 
     override val errorGeneric: String
         @Composable get() = stringResource(R.string.error_generic)
+
+    @Composable
+    override fun raceCategoryCountOf(n: Int, total: Int): String =
+        stringResource(R.string.race_category_count_of, n, total)
 }

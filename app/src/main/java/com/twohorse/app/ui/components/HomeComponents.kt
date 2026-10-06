@@ -689,6 +689,17 @@ fun RaceCard(
                     fontWeight =
                         FontWeight.Bold
                 )
+
+                Spacer(
+                    Modifier.weight(1f)
+                )
+
+                Icon(
+                    imageVector =
+                        Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Muted
+                )
             }
 
             Spacer(

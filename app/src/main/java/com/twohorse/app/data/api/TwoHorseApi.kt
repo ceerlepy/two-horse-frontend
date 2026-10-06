@@ -1735,7 +1735,12 @@ class TwoHorseApi(
                 strategy,
 
             raceDate =
-                raceDate
+                raceDate,
+
+            expertSourceCount =
+                json.firstInt(
+                    "expertSourceCount"
+                )
         )
     }
 

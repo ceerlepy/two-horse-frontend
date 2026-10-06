@@ -238,7 +238,8 @@ fun RaceDetailScreen(
                     ResultHero(
                         favorite = it,
                         rival = rival,
-                        surprise = surprise
+                        surprise = surprise,
+                        raceExpertSources = raceExpertTotal(currentRace)
                     )
                 }
             }
@@ -314,7 +315,7 @@ fun RaceDetailScreen(
             }
 
             val raceExpertSources =
-                horses.maxOfOrNull { it.expertConsensus?.sourceCount ?: 0 } ?: 0
+                raceExpertTotal(currentRace)
 
             itemsIndexed(
                 items = horses,
@@ -539,7 +540,8 @@ private fun RaceHeader(
 private fun ResultHero(
     favorite: Horse,
     rival: Horse?,
-    surprise: Horse?
+    surprise: Horse?,
+    raceExpertSources: Int
 ) {
     val strings = LocalStrings.current
 
@@ -701,7 +703,8 @@ private fun ResultHero(
                     DarkMetric(
                         strings.raceExpertSupport,
                         expertSummary(
-                            favorite
+                            favorite,
+                            raceExpertSources
                         )
                     )
 
@@ -1598,9 +1601,17 @@ private fun raceMeta(
         }
 }
 
+/* Experts with any pick in this race; older servers lack the field,
+ * so fall back to the widest per-horse count. */
+private fun raceExpertTotal(race: Race): Int =
+    race.expertSourceCount
+        ?: race.horses.maxOfOrNull { it.expertConsensus?.sourceCount ?: 0 }
+        ?: 0
+
 @Composable
 private fun expertSummary(
-    horse: Horse
+    horse: Horse,
+    raceExpertSources: Int
 ): String {
     val strings = LocalStrings.current
 
@@ -1610,7 +1621,10 @@ private fun expertSummary(
 
     return buildString {
         append(
-            strings.raceExpertSourcesCount(e.sourceCount)
+            strings.raceCategoryCountOf(
+                e.sourceCount,
+                maxOf(raceExpertSources, e.sourceCount)
+            )
         )
 
         if (e.favoriteCount > 0) {
@@ -2147,7 +2161,7 @@ private fun ExpertConsensusSection(
         trailing = {
             if (value != null && value.sourceCount > 0) {
                 Text(
-                    text = strings.raceExpertSourcesCount(value.sourceCount),
+                    text = strings.raceExpertSourcesCount(maxOf(raceExpertSources, value.sourceCount)),
                     color = Ink,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
@@ -2190,19 +2204,18 @@ private fun ExpertConsensusSection(
         val surpriseLabel = strings.raceCategorySurprise
 
         /*
-         * Category shares come from the server relative to the experts
-         * that mention this horse, so one expert reads as 100%. Scale
-         * them to every expert covering the race instead.
+         * Plain counts over every expert covering the race: "1/4 uzman"
+         * and a 25% bar. The server's shares only count experts that
+         * named this horse, which made a single expert read as 100%.
          */
-        val coverage =
-            value.sourceCount.toDouble() /
-                maxOf(raceExpertSources, value.sourceCount)
+        val total =
+            maxOf(raceExpertSources, value.sourceCount, 1)
 
-        categories.forEach { (label, count, percent) ->
+        categories.forEach { (label, count, _) ->
             CategoryBar(
                 label = label.replaceFirstChar { it.uppercase() },
-                detail = strings.raceCategoryCount(count),
-                percent = percent * coverage,
+                detail = strings.raceCategoryCountOf(count, total),
+                percent = count * 100.0 / total,
                 color =
                     when (label) {
                         avoidLabel -> Red
