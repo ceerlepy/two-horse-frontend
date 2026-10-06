@@ -1538,4 +1538,18 @@ object ResourceStrings : Strings {
 
     override val accountResume: String
         @Composable get() = stringResource(R.string.account_resume)
+
+    override val raceExpertFirstChoice: String
+        @Composable get() = stringResource(R.string.race_expert_first_choice)
+
+    override val raceExpertSecondChoice: String
+        @Composable get() = stringResource(R.string.race_expert_second_choice)
+
+    @Composable
+    override fun raceExpertHeroFirst(a1: Int, a2: Int): String =
+        stringResource(R.string.race_expert_hero_first, a1, a2)
+
+    @Composable
+    override fun raceExpertHeroSecond(a1: Int): String =
+        stringResource(R.string.race_expert_hero_second, a1)
 }
