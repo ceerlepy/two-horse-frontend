@@ -552,6 +552,12 @@ object ResourceStrings : Strings {
     override val foreignWinProbNote: String
         @Composable get() = stringResource(R.string.foreign_win_prob_note)
 
+    override val foreignWinProbInfoTitle: String
+        @Composable get() = stringResource(R.string.foreign_win_prob_info_title)
+
+    override val foreignWinProbInfo: String
+        @Composable get() = stringResource(R.string.foreign_win_prob_info)
+
     @Composable
     override fun foreignWinProb(percent: String): String =
         stringResource(R.string.foreign_win_prob, percent)

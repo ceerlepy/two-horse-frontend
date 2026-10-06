@@ -171,6 +171,8 @@
     <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler bir yapay zeka tahmin sitesinin seçimleri.</string>
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
     <string name="foreign_win_prob">Kazanma %%%1$s</string>
+    <string name="foreign_win_prob_info_title">Kazanma %</string>
+    <string name="foreign_win_prob_info">Yeşil yüzde AGF\'dir: oyuncuların o ata yatırdığı paranın oranı. Sarı \"Kazanma %\" ise bizim modelimizin tahminidir. Modeli geçmiş yurt dışı koşularla eğittik ve modelin hiç görmediği sonraki koşularda sınadık. Bahis oyuncuları favoriyi olduğundan güçlü, dışarıdaki atı olduğundan zayıf gösterir; model bu sapmayı düzeltir. Kesin kazanır anlamına gelmez.</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
     <string name="foreign_ai_top">Yapay zeka: %1$s</string>
