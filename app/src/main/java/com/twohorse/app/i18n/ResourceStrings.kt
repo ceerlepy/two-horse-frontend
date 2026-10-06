@@ -1372,4 +1372,68 @@ object ResourceStrings : Strings {
     @Composable
     override fun raceLeaderMarginValue(value: String): String =
         stringResource(R.string.race_leader_margin_value, value)
+
+    override val infoOk: String
+        @Composable get() = stringResource(R.string.info_ok)
+
+    override val infoOpen: String
+        @Composable get() = stringResource(R.string.info_open)
+
+    override val infoGuven: String
+        @Composable get() = stringResource(R.string.info_guven)
+
+    override val infoAgf: String
+        @Composable get() = stringResource(R.string.info_agf)
+
+    override val infoHp: String
+        @Composable get() = stringResource(R.string.info_hp)
+
+    override val infoUncertainty: String
+        @Composable get() = stringResource(R.string.info_uncertainty)
+
+    override val infoLeaderMargin: String
+        @Composable get() = stringResource(R.string.info_leader_margin)
+
+    override val infoCouponAdvice: String
+        @Composable get() = stringResource(R.string.info_coupon_advice)
+
+    override val infoValueModel: String
+        @Composable get() = stringResource(R.string.info_value_model)
+
+    override val infoExpert: String
+        @Composable get() = stringResource(R.string.info_expert)
+
+    override val infoMarket: String
+        @Composable get() = stringResource(R.string.info_market)
+
+    override val infoField: String
+        @Composable get() = stringResource(R.string.info_field)
+
+    override val infoForm: String
+        @Composable get() = stringResource(R.string.info_form)
+
+    override val raceCategoryAvoid: String
+        @Composable get() = stringResource(R.string.race_category_avoid)
+
+    override val raceMarketNoDataHint: String
+        @Composable get() = stringResource(R.string.race_market_no_data_hint)
+
+    override val raceExpertNone: String
+        @Composable get() = stringResource(R.string.race_expert_none)
+
+    @Composable
+    override fun raceCategoryCount(n: Int): String =
+        stringResource(R.string.race_category_count, n)
+
+    override val strategyShortSingle: String
+        @Composable get() = stringResource(R.string.strategy_short_single)
+
+    override val strategyShortCompact: String
+        @Composable get() = stringResource(R.string.strategy_short_compact)
+
+    override val strategyShortSpread: String
+        @Composable get() = stringResource(R.string.strategy_short_spread)
+
+    override val strategyShortBalanced: String
+        @Composable get() = stringResource(R.string.strategy_short_balanced)
 }

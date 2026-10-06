@@ -698,14 +698,12 @@ private fun ResultHero(
 
                     DarkRule()
 
-                    val tenPlus = strings.raceFormTenPlus
-
                     DarkMetric(
                         strings.raceForm,
-                        parseRecentForm(favorite.recentForm)
-                            .joinToString("  ") {
-                                if (it >= 10) tenPlus else it.toString()
-                            }
+                        recentFormText(
+                            favorite.recentForm,
+                            strings.raceFormTenPlus
+                        )
                             .ifBlank {
                                 strings.noData
                             }
@@ -923,14 +921,24 @@ private fun RaceRiskCard(
                 horizontalArrangement =
                     Arrangement.spacedBy(7.dp)
             ) {
-                InsetMetric(
+                LevelMetric(
                     Modifier.weight(1f),
-                    strings.raceUncertaintyMetric,
-                    uncertainty
-                        ?.let {
-                            uncertaintyText(it.level)
-                        }
-                        ?: "—"
+                    label = strings.raceUncertaintyMetric,
+                    level =
+                        when (uncertainty?.level?.lowercase()) {
+                            "low" -> 1
+                            "medium" -> 2
+                            "high" -> 3
+                            "very-high" -> 4
+                            else -> 0
+                        },
+                    levelText =
+                        uncertainty
+                            ?.let {
+                                uncertaintyText(it.level)
+                            }
+                            ?: "—",
+                    info = strings.infoUncertainty
                 )
 
                 InsetMetric(
@@ -942,7 +950,8 @@ private fun RaceRiskCard(
                                 "%.1f".format(it.topMargin)
                             )
                         }
-                        ?: "—"
+                        ?: "—",
+                    info = strings.infoLeaderMargin
                 )
 
                 InsetMetric(
@@ -951,13 +960,14 @@ private fun RaceRiskCard(
                     strategy
                         ?.let {
                             when (it.mode.lowercase()) {
-                                "single" -> strings.strategySingle
-                                "compact", "narrow" -> strings.strategyCompact
-                                "spread", "wide", "broad" -> strings.strategySpread
-                                else -> strings.strategyBalanced
+                                "single" -> strings.strategyShortSingle
+                                "compact", "narrow" -> strings.strategyShortCompact
+                                "spread", "wide", "broad" -> strings.strategyShortSpread
+                                else -> strings.strategyShortBalanced
                             }
                         }
-                        ?: "—"
+                        ?: "—",
+                    info = strings.infoCouponAdvice
                 )
             }
 
@@ -1794,7 +1804,8 @@ private fun HorseCard(
                         }
                         ?: "—",
                     accent =
-                        rank == 1
+                        rank == 1,
+                    info = strings.infoGuven
                 )
 
                 InsetMetric(
@@ -1804,7 +1815,8 @@ private fun HorseCard(
                         ?.let {
                             "%${"%.1f".format(it)}"
                         }
-                        ?: "—"
+                        ?: "—",
+                    info = strings.infoAgf
                 )
 
                 InsetMetric(
@@ -1812,7 +1824,8 @@ private fun HorseCard(
                     strings.raceHp,
                     horse.hp
                         ?.toString()
-                        ?: "—"
+                        ?: "—",
+                    info = strings.infoHp
                 )
             }
 
@@ -1832,13 +1845,17 @@ private fun HorseCard(
                 horse.fieldSignal
             )
 
-            if (
-                parseRecentForm(horse.recentForm)
-                    .isNotEmpty()
+            InsetBox(
+                title = strings.raceForm,
+                info = strings.infoForm
             ) {
-                InsetBox(
-                    title = strings.raceForm
-                ) {
+                if (parseRecentForm(horse.recentForm).isEmpty()) {
+                    Text(
+                        text = strings.noData,
+                        color = Muted,
+                        fontSize = 11.sp
+                    )
+                } else {
                     RecentFormDots(
                         raw = horse.recentForm,
                         tenPlusLabel = strings.raceFormTenPlus
@@ -2101,84 +2118,66 @@ private fun ExpertConsensusSection(
 ) {
     val strings = LocalStrings.current
 
-    if (
-        value == null ||
-        value.sourceCount <= 0
-    ) {
-        return
-    }
-
     InsetBox(
         title = strings.raceExpertConsensusTitle,
+        info = strings.infoExpert,
         trailing = {
-            Text(
-                text = strings.raceExpertSourcesCount(value.sourceCount),
-                color = Ink,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
-            )
+            if (value != null && value.sourceCount > 0) {
+                Text(
+                    text = strings.raceExpertSourcesCount(value.sourceCount),
+                    color = Ink,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     ) {
-        val chips =
-            buildList<@Composable () -> Unit> {
-                if (value.favoriteCount > 0) add {
-                    AnalyticsChip(
-                        "${strings.raceExpertFavoriteCount(value.favoriteCount)} (%${value.favoriteScore.roundToInt()})",
-                        strong = true
-                    )
-                }
+        if (
+            value == null ||
+            value.sourceCount <= 0
+        ) {
+            Text(
+                text = strings.raceExpertNone,
+                color = Muted,
+                fontSize = 11.sp
+            )
 
-                if (value.bankoCount > 0) add {
-                    AnalyticsChip(
-                        "${strings.raceExpertBankoCount(value.bankoCount)} (%${value.bankoScore.roundToInt()})",
-                        strong = true
-                    )
-                }
+            ScoreProgress(
+                title = strings.raceExpertScoreTitle,
+                score = null
+            )
 
-                if (value.strongCount > 0) add {
-                    AnalyticsChip(
-                        strings.raceExpertStrongCount(value.strongCount) +
-                            " (%${value.strongScore.roundToInt()})"
-                    )
-                }
+            return@InsetBox
+        }
 
-                if (value.starCount > 0) add {
-                    AnalyticsChip(
-                        strings.raceStarTag(value.starCount, value.starScore.roundToInt()),
-                        accent = true
-                    )
-                }
+        // One percentage bar per category the experts used for this horse.
+        val categories =
+            listOf(
+                Triple(strings.raceCategoryBanko, value.bankoCount, value.bankoScore),
+                Triple(strings.raceCategoryFavorite, value.favoriteCount, value.favoriteScore),
+                Triple(strings.raceCategoryStrong, value.strongCount, value.strongScore),
+                Triple(strings.raceCategoryStar, value.starCount, value.starScore),
+                Triple(strings.raceCategoryRival, value.rivalCount, value.rivalScore),
+                Triple(strings.raceCategorySurprise, value.surpriseCount, value.surpriseScore),
+                Triple(strings.raceCategoryAvoid, value.avoidCount, value.avoidScore)
+            )
+                .filter { it.second > 0 }
 
-                if (value.rivalCount > 0) add {
-                    AnalyticsChip(
-                        strings.raceRivalTag(value.rivalCount, value.rivalScore.roundToInt())
-                    )
-                }
+        val avoidLabel = strings.raceCategoryAvoid
+        val surpriseLabel = strings.raceCategorySurprise
 
-                if (value.surpriseCount > 0) add {
-                    AnalyticsChip(
-                        strings.raceSurpriseTag(value.surpriseCount, value.surpriseScore.roundToInt()),
-                        accent = true
-                    )
-                }
-
-                if (value.avoidCount > 0) add {
-                    AnalyticsChip(
-                        strings.raceAvoidTag(value.avoidCount, value.avoidScore.roundToInt()),
-                        danger = true
-                    )
-                }
-            }
-
-        if (chips.isNotEmpty()) {
-            FlowRow(
-                horizontalArrangement =
-                    Arrangement.spacedBy(5.dp),
-                verticalArrangement =
-                    Arrangement.spacedBy(5.dp)
-            ) {
-                chips.forEach { it() }
-            }
+        categories.forEach { (label, count, percent) ->
+            CategoryBar(
+                label = label.replaceFirstChar { it.uppercase() },
+                detail = strings.raceCategoryCount(count),
+                percent = percent,
+                color =
+                    when (label) {
+                        avoidLabel -> Red
+                        surpriseLabel -> Lavender
+                        else -> Green
+                    }
+            )
         }
 
         if (
@@ -2192,15 +2191,13 @@ private fun ExpertConsensusSection(
             )
         }
 
-        value.expertScore?.let {
-            ToneDivider()
+        ToneDivider()
 
-            ScoreProgress(
-                title = strings.raceExpertScoreTitle,
-                score = it,
-                subtitle = strings.raceExpertScoreHint
-            )
-        }
+        ScoreProgress(
+            title = strings.raceExpertScoreTitle,
+            score = value.expertScore,
+            subtitle = strings.raceExpertScoreHint
+        )
     }
 }
 
@@ -2210,139 +2207,128 @@ private fun MarketSection(
 ) {
     val strings = LocalStrings.current
 
-    // AGF only moves on race morning; until then there's nothing to show.
-    if (value == null || value.score == null) {
-        return
-    }
+    val score =
+        value?.score
 
     InsetBox(
-        title = strings.raceMarketMoveTitle
+        title = strings.raceMarketMoveTitle,
+        info = strings.infoMarket
     ) {
-        Row(
-            verticalAlignment =
-                Alignment.CenterVertically
-        ) {
-            Surface(
-                color =
-                    when (
-                        value.direction
-                    ) {
-                        "strong-up",
-                        "up" ->
-                            PaleGreen
-
-                        "strong-down",
-                        "down" ->
-                            PaleRed
-
-                        else ->
-                            Color.White.copy(
-                                alpha = 0.7f
-                            )
-                    },
-                shape =
-                    RoundedCornerShape(10.dp)
+        if (value != null && score != null) {
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
             ) {
-                Text(
-                    text =
-                        marketArrow(
-                            value.direction
-                        ),
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 10.dp,
-                            vertical = 5.dp
-                        ),
+                Surface(
                     color =
                         when (
                             value.direction
                         ) {
                             "strong-up",
                             "up" ->
-                                Green
+                                PaleGreen
 
                             "strong-down",
                             "down" ->
-                                Red
+                                PaleRed
 
                             else ->
-                                Muted
+                                Color.White.copy(
+                                    alpha = 0.7f
+                                )
                         },
-                    fontSize = 16.sp,
-                    fontWeight =
-                        FontWeight.Black
-                )
-            }
-
-            Column(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .padding(start = 10.dp)
-            ) {
-                Text(
-                    text =
-                        marketText(
-                            value.direction
-                        ),
-                    color = Ink,
-                    fontSize = 12.sp,
-                    fontWeight =
-                        FontWeight.Bold
-                )
-
-                val detail =
-                    buildString {
-                        value.firstAgf?.let {
-                            append(
-                                strings.raceMarketFirst("%.1f".format(it))
-                            )
-                        }
-
-                        value.latestAgf?.let {
-                            if (isNotEmpty()) {
-                                append(" ")
-                            }
-
-                            append(
-                                strings.raceMarketTo("%.1f".format(it))
-                            )
-                        }
-
-                        if (
-                            value.sampleSize > 0
-                        ) {
-                            if (isNotEmpty()) {
-                                append(" · ")
-                            }
-
-                            append(
-                                strings.raceMarketSamples(value.sampleSize)
-                            )
-                        }
-                    }
-
-                if (detail.isNotBlank()) {
+                    shape =
+                        RoundedCornerShape(10.dp)
+                ) {
                     Text(
-                        text = detail,
-                        color = Muted,
-                        fontSize = 10.sp,
-                        maxLines = 2
+                        text =
+                            marketArrow(
+                                value.direction
+                            ),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 10.dp,
+                                vertical = 5.dp
+                            ),
+                        color =
+                            when (
+                                value.direction
+                            ) {
+                                "strong-up",
+                                "up" ->
+                                    Green
+
+                                "strong-down",
+                                "down" ->
+                                    Red
+
+                                else ->
+                                    Muted
+                            },
+                        fontSize = 16.sp,
+                        fontWeight =
+                            FontWeight.Black
                     )
+                }
+
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 10.dp)
+                ) {
+                    Text(
+                        text =
+                            marketText(
+                                value.direction
+                            ),
+                        color = Ink,
+                        fontSize = 12.sp,
+                        fontWeight =
+                            FontWeight.Bold
+                    )
+
+                    val detail =
+                        buildString {
+                            value.firstAgf?.let {
+                                append(
+                                    strings.raceMarketFirst("%.1f".format(it))
+                                )
+                            }
+
+                            value.latestAgf?.let {
+                                if (isNotEmpty()) {
+                                    append(" ")
+                                }
+
+                                append(
+                                    strings.raceMarketTo("%.1f".format(it))
+                                )
+                            }
+                        }
+
+                    if (detail.isNotBlank()) {
+                        Text(
+                            text = detail,
+                            color = Muted,
+                            fontSize = 10.sp,
+                            maxLines = 2
+                        )
+                    }
                 }
             }
         }
 
-        value.score?.let {
-            ToneDivider()
-
-            ScoreProgress(
-                title =
-                    strings.raceMarketScoreTitle,
-                score = it,
-                subtitle = strings.raceMarketScoreHint
-            )
-        }
+        ScoreProgress(
+            title =
+                strings.raceMarketScoreTitle,
+            score = score,
+            subtitle =
+                if (score != null)
+                    strings.raceMarketScoreHint
+                else
+                    strings.raceMarketNoDataHint
+        )
     }
 }
 
@@ -2360,6 +2346,7 @@ private fun ValueModelSection(
 
     InsetBox(
         title = strings.raceValueModelTitle,
+        info = strings.infoValueModel,
         trailing = {
             when (value.label) {
                 "underrated" ->
@@ -2407,16 +2394,18 @@ private fun FieldSection(
 ) {
     val strings = LocalStrings.current
 
-    if (value == null) {
-        return
-    }
-
+    /*
+     * The model only uses the field score when at least half the race
+     * has it (the server nulls `score` otherwise), but the horse's own
+     * TJK surface figure is still worth showing on screen.
+     */
     val score =
-        value.score
-            ?: return
+        value?.score
+            ?: value?.tjkScore
 
     InsetBox(
-        title = strings.raceFieldSignalTitle
+        title = strings.raceFieldSignalTitle,
+        info = strings.infoField
     ) {
         ScoreProgress(
             title =
@@ -2425,8 +2414,9 @@ private fun FieldSection(
             subtitle =
                 listOfNotNull(
                     strings.raceFieldHint,
-                    value.tjkSampleSize
-                        .takeIf { it > 0 }
+                    value
+                        ?.tjkSampleSize
+                        ?.takeIf { score != null && it > 0 }
                         ?.let { strings.raceFieldSamples(it) }
                 ).joinToString(" · ")
         )
