@@ -54,7 +54,8 @@ import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
 import com.twohorse.app.ui.theme.PaleGreen
-import com.twohorse.app.ui.theme.Surface
+import com.twohorse.app.ui.theme.CardTone
+import com.twohorse.app.ui.theme.CardToneBorder
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -224,10 +225,13 @@ internal fun NextDayRaceCard(
                 .clickable { expanded = !expanded },
         colors =
             CardDefaults.cardColors(
-                containerColor = Surface
+                containerColor = CardTone
             ),
         border =
-            CardDefaults.outlinedCardBorder(),
+            BorderStroke(
+                1.dp,
+                CardToneBorder
+            ),
         shape =
             RoundedCornerShape(20.dp)
     ) {
