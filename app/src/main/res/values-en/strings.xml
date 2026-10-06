@@ -171,6 +171,8 @@
     <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels are an AI prediction site\'s picks.</string>
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
     <string name="foreign_win_prob">Win %1$s%%</string>
+    <string name="foreign_win_prob_info_title">Win chance</string>
+    <string name="foreign_win_prob_info">The green percentage is AGF: the share of money bet on that horse. The yellow \"Win\" figure is our own model. We trained it on past foreign races and tested it on later races it had never seen. Bettors make favourites look stronger and outsiders weaker than they are, and the model corrects that bias. It does not mean the horse will win.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
     <string name="foreign_ai_top">AI pick: %1$s</string>

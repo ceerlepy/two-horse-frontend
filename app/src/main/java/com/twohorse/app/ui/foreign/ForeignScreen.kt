@@ -33,6 +33,7 @@ import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
+import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
 
 private sealed interface ForeignLoadState {
@@ -272,6 +273,11 @@ private fun ForeignRaceCard(race: ForeignRace) {
                 }
 
                 Spacer(Modifier.weight(1f))
+
+                InfoButton(
+                    title = strings.foreignWinProbInfoTitle,
+                    body = strings.foreignWinProbInfo
+                )
 
                 Icon(
                     imageVector =
