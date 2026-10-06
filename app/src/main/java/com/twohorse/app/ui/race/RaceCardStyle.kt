@@ -513,7 +513,9 @@ internal fun CategoryBar(
     label: String,
     detail: String,
     percent: Double,
-    color: Color
+    color: Color,
+    info: String? = null,
+    chips: List<Pair<String, Int>> = emptyList()
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(3.dp)
@@ -527,6 +529,10 @@ internal fun CategoryBar(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            if (info != null) {
+                InfoButton(title = label, body = info)
+            }
 
             Text(
                 text = " · $detail",
@@ -554,5 +560,28 @@ internal fun CategoryBar(
             color = color,
             trackColor = InsetToneBorder
         )
+
+        // Which roles make up the count, e.g. "Favori 2 · Banko 1".
+        if (chips.isNotEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                chips.forEach { (chipLabel, chipCount) ->
+                    Surface(
+                        color = InsetTone,
+                        border = BorderStroke(1.dp, InsetToneBorder),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "$chipLabel $chipCount",
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                            color = Ink,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+        }
     }
 }

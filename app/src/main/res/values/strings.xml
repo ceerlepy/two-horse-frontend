@@ -433,7 +433,7 @@
     <string name="info_leader_margin">Favorinin farkı: model puanında 1. at ile 2. at arasındaki fark. Fark büyükse favori net önde, küçükse yarış çekişmeli.</string>
     <string name="info_coupon_advice">Kupon önerisi: bu ayakta kaç at yazmanın mantıklı olduğu. Tek: tek at yeterli. Dar: 2-3 at. Dengeli: birkaç at. Geniş: çok at yaz, sürpriz çıkabilir.</string>
     <string name="info_value_model">Değer modeli: kendi modelimizin bu ata verdiği kazanma ihtimali ile AGF\'nin karşılaştırması. Bizim ihtimalimiz AGF\'den belirgin yüksekse \"AGF\'nin hafife aldığı at\" etiketi çıkar. Bahis tavsiyesi değildir.</string>
-    <string name="info_expert">Uzman konsensüsü: bu koşuyu değerlendiren uzmanların bu ata bakışı. Her uzman bir kez sayılır. İlk tercih: uzman bu atı kazanmaya en yakın görüyor (favori, banko ya da ana seçim). İkinci tercih: uzman başka bir atı daha çok tutuyor, bunu arkasından getiriyor. \"2/4\", koşuya bakan 4 uzmandan 2\'si demektir. Bizim favorimiz uzmanların çoğunda ikinci tercihse, model ile uzmanlar ayrışıyor demektir. Uzmanların sadece kupona yazdığı atlar sayılmaz; yalnızca açıkça yorum yaptıkları atlar sayılır. Uzman desteği barı hepsinin özetidir (0–100, 50 ortada); az uzman varsa puan 50\'ye yakın tutulur.</string>
+    <string name="info_expert">Uzman konsensüsü: bu koşuyu değerlendiren uzmanların bu ata bakışı. Her uzman bir kez, verdiği en güçlü role göre sayılır. İlk tercih: banko, favori ya da yıldız. Güçlü aday: ilk sıralar için ciddi aday ama uzmanın ilk tercihi değil. İkinci tercih: uzman başka bir atı daha çok tutuyor, bunu arkasından getiriyor. Sürpriz: az beklenen ama şansı olan at. \"2/4\", koşuya bakan 4 uzmandan 2\'si demektir. Bizim favorimiz uzmanların çoğunda ikinci tercihse, model ile uzmanlar ayrışıyor demektir. Uzmanların sadece kupona yazdığı atlar sayılmaz. Uzman desteği barı hepsinin özetidir (0–100, 50 ortada); az uzman varsa puan 50\'ye yakın tutulur.</string>
     <string name="info_market">AGF değişimi: yarıştan önceki son 90 dakikada AGF\'nin nasıl değiştiği. 50\'nin üstü bu ata para geliyor, altı para çıkıyor demek. AGF yarış sabahı açıldığı için gece ve sabah erkenden veri yoktur.</string>
     <string name="info_field">Pist uyumu: atın bu pist türündeki (çim, kum, sentetik) geçmiş koşularına göre ne kadar iyi koştuğu. 50 ortalama, üstü bu pistte iyi. Az koşmuş atlarda veri olmayabilir.</string>
     <string name="info_form">Son yarışları: atın son 6 yarıştaki derecesi, soldan sağa eskiden yeniye. 5-2-5: önce 5., sonra 2., en son 5. olmuş. 10+: onuncu veya daha geride. Altın renk 1., yeşil 2. ve 3. derece.</string>
@@ -480,4 +480,12 @@
     <string name="race_expert_second_choice">İkinci tercih</string>
     <string name="race_expert_hero_first">%1$d/%2$d uzmanın ilk tercihi</string>
     <string name="race_expert_hero_second">%1$d uzmanın ikinci tercihi</string>
+    <string name="expert_row_strong">Güçlü aday</string>
+    <string name="expert_row_surprise">Sürpriz</string>
+    <string name="expert_row_avoid">Olumsuz</string>
+    <string name="expert_chip_favorite">Favori</string>
+    <string name="expert_chip_banko">Banko</string>
+    <string name="expert_chip_star">Yıldız</string>
+    <string name="expert_first_choice_info">İlk tercih: uzmanın bu atı banko, favori ya da yıldız olarak gösterdiği durumlar. Altındaki kutular kaç uzmanın hangisini dediğini gösterir. Bir uzman aynı ata hem favori hem banko demiş olabilir, bu yüzden kutuların toplamı ilk tercih sayısından fazla olabilir.</string>
+    <string name="race_expert_hero_strong">%1$d uzmana göre güçlü aday</string>
 </resources>

@@ -1624,13 +1624,20 @@ private fun expertSummary(
 
     val primary =
         e.primaryCount
-            ?: maxOf(e.bankoCount, e.favoriteCount, e.strongCount, e.starCount)
+            ?: maxOf(e.bankoCount, e.favoriteCount, e.starCount)
+
+    val strongOnly =
+        e.strongOnlyCount ?: e.strongCount
 
     val secondary =
         e.secondaryCount ?: e.rivalCount
 
     return buildString {
         append(strings.raceExpertHeroFirst(primary, total))
+
+        if (strongOnly > 0) {
+            append(" · ${strings.raceExpertHeroStrong(strongOnly)}")
+        }
 
         if (secondary > 0) {
             append(" · ${strings.raceExpertHeroSecond(secondary)}")
@@ -2189,7 +2196,10 @@ private fun ExpertConsensusSection(
 
         val primary =
             value.primaryCount
-                ?: maxOf(value.bankoCount, value.favoriteCount, value.strongCount, value.starCount)
+                ?: maxOf(value.bankoCount, value.favoriteCount, value.starCount)
+
+        val strongOnly =
+            value.strongOnlyCount ?: value.strongCount
 
         val secondary =
             value.secondaryCount ?: value.rivalCount
@@ -2197,23 +2207,52 @@ private fun ExpertConsensusSection(
         val surpriseOnly =
             value.surpriseOnlyCount ?: value.surpriseCount
 
-        val rows =
+        val firstChoiceChips =
             listOf(
-                Triple(strings.raceExpertFirstChoice, primary, Green),
-                Triple(strings.raceExpertSecondChoice, secondary, Green.copy(alpha = 0.55f)),
-                Triple(strings.raceCategorySurprise.replaceFirstChar { it.uppercase() }, surpriseOnly, Lavender),
-                Triple(strings.raceCategoryAvoid.replaceFirstChar { it.uppercase() }, value.avoidCount, Red)
+                strings.expertChipFavorite to value.favoriteCount,
+                strings.expertChipBanko to value.bankoCount,
+                strings.expertChipStar to value.starCount
             )
-                // First and second choice always show, so "0/4" says as
-                // much as "3/4"; the rarer roles only when present.
-                .filterIndexed { index, row -> index < 2 || row.second > 0 }
+                .filter { it.second > 0 }
 
-        rows.forEach { (label, count, color) ->
+        // The four roles always show, so "0/4" says as much as "3/4";
+        // negative only when an expert actually said it.
+        CategoryBar(
+            label = strings.raceExpertFirstChoice,
+            detail = strings.raceCategoryCountOf(primary, total),
+            percent = primary * 100.0 / total,
+            color = Green,
+            info = strings.expertFirstChoiceInfo,
+            chips = firstChoiceChips
+        )
+
+        CategoryBar(
+            label = strings.expertRowStrong,
+            detail = strings.raceCategoryCountOf(strongOnly, total),
+            percent = strongOnly * 100.0 / total,
+            color = Green.copy(alpha = 0.7f)
+        )
+
+        CategoryBar(
+            label = strings.raceExpertSecondChoice,
+            detail = strings.raceCategoryCountOf(secondary, total),
+            percent = secondary * 100.0 / total,
+            color = Gold
+        )
+
+        CategoryBar(
+            label = strings.expertRowSurprise,
+            detail = strings.raceCategoryCountOf(surpriseOnly, total),
+            percent = surpriseOnly * 100.0 / total,
+            color = Lavender
+        )
+
+        if (value.avoidCount > 0) {
             CategoryBar(
-                label = label,
-                detail = strings.raceCategoryCountOf(count, total),
-                percent = count * 100.0 / total,
-                color = color
+                label = strings.expertRowAvoid,
+                detail = strings.raceCategoryCountOf(value.avoidCount, total),
+                percent = value.avoidCount * 100.0 / total,
+                color = Red
             )
         }
 
