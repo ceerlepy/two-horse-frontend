@@ -424,4 +424,25 @@
     <string name="my_coupons_upgrade">Üyeliğe bak</string>
     <string name="home_day_over_coupons_body">Kaydettiğin kuponların sonuçları Kuponlarım\'da. Yarının programı TJK\'da yayınlanınca burada görünecek.</string>
     <string name="home_day_over_coupons_button">Kuponlarıma bak</string>
+    <string name="info_ok">Tamam</string>
+    <string name="info_open">Açıklama</string>
+    <string name="info_guven">Modelin bu ata ne kadar güvendiği. Uzman tahminleri, AGF ve HP birlikte hesaplanır. Yüksek olması atın kesin kazanacağı anlamına gelmez.</string>
+    <string name="info_agf">AGF (Altılı Ganyan Favorisi): altılı oynayanların yüzde kaçının bu atı seçtiği. TJK açıklar, %30 demek oynayanların %30\'u bu atı yazmış. Yarış günü sabah açılır.</string>
+    <string name="info_hp">HP (Handikap Puanı): TJK\'nın ata verdiği güç puanı. Aynı koşudaki atları karşılaştırmak içindir; yüksek HP genelde daha güçlü at demektir.</string>
+    <string name="info_uncertainty">Belirsizlik: yarışın ne kadar açık olduğu. Düşük: favori net. Çok yüksek: birçok at kazanabilir, kuponda bu ayağı geniş tutmak mantıklı.</string>
+    <string name="info_leader_margin">Favorinin farkı: model puanında 1. at ile 2. at arasındaki fark. Fark büyükse favori net önde, küçükse yarış çekişmeli.</string>
+    <string name="info_coupon_advice">Kupon önerisi: bu ayakta kaç at yazmanın mantıklı olduğu. Tek: tek at yeterli. Dar: 2-3 at. Dengeli: birkaç at. Geniş: çok at yaz, sürpriz çıkabilir.</string>
+    <string name="info_value_model">Değer modeli: kendi modelimizin bu ata verdiği kazanma ihtimali ile AGF\'nin karşılaştırması. Bizim ihtimalimiz AGF\'den belirgin yüksekse \"AGF\'nin hafife aldığı at\" etiketi çıkar. Bahis tavsiyesi değildir.</string>
+    <string name="info_expert">Uzman konsensüsü: takip ettiğimiz uzman sitelerinin bu at için tahminleri. Her bar, uzmanların yüzde kaçının atı o şekilde gösterdiğini söyler (favori, banko, sürpriz…). Uzman desteği barı hepsinin özeti: 50 kararsız, 100 hepsi destekliyor.</string>
+    <string name="info_market">AGF değişimi: yarıştan önceki son 90 dakikada AGF\'nin nasıl değiştiği. 50\'nin üstü bu ata para geliyor, altı para çıkıyor demek. AGF yarış sabahı açıldığı için gece ve sabah erkenden veri yoktur.</string>
+    <string name="info_field">Pist uyumu: atın bu pist türündeki (çim, kum, sentetik) geçmiş koşularına göre ne kadar iyi koştuğu. 50 ortalama, üstü bu pistte iyi. Az koşmuş atlarda veri olmayabilir.</string>
+    <string name="info_form">Son yarışları: atın son 6 yarıştaki derecesi, soldan sağa eskiden yeniye. 5-2-5: önce 5., sonra 2., en son 5. olmuş. 10+: onuncu veya daha geride. Altın renk 1., yeşil 2. ve 3. derece.</string>
+    <string name="race_category_avoid">olumsuz</string>
+    <string name="race_category_count">%1$d uzman</string>
+    <string name="race_market_no_data_hint">AGF yarış sabahı açılır; son 90 dakikadaki değişim burada görünür</string>
+    <string name="race_expert_none">Bu at için henüz uzman tahmini yok</string>
+    <string name="strategy_short_single">Tek</string>
+    <string name="strategy_short_compact">Dar</string>
+    <string name="strategy_short_spread">Geniş</string>
+    <string name="strategy_short_balanced">Dengeli</string>
 </resources>

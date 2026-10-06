@@ -867,4 +867,46 @@ interface Strings {
     val homeDayOverCouponsButton: String
     @Composable
     fun raceLeaderMarginValue(value: String): String
+    @get:Composable
+    val infoOk: String
+    @get:Composable
+    val infoOpen: String
+    @get:Composable
+    val infoGuven: String
+    @get:Composable
+    val infoAgf: String
+    @get:Composable
+    val infoHp: String
+    @get:Composable
+    val infoUncertainty: String
+    @get:Composable
+    val infoLeaderMargin: String
+    @get:Composable
+    val infoCouponAdvice: String
+    @get:Composable
+    val infoValueModel: String
+    @get:Composable
+    val infoExpert: String
+    @get:Composable
+    val infoMarket: String
+    @get:Composable
+    val infoField: String
+    @get:Composable
+    val infoForm: String
+    @get:Composable
+    val raceCategoryAvoid: String
+    @get:Composable
+    val raceMarketNoDataHint: String
+    @get:Composable
+    val raceExpertNone: String
+    @Composable
+    fun raceCategoryCount(n: Int): String
+    @get:Composable
+    val strategyShortSingle: String
+    @get:Composable
+    val strategyShortCompact: String
+    @get:Composable
+    val strategyShortSpread: String
+    @get:Composable
+    val strategyShortBalanced: String
 }

@@ -424,4 +424,25 @@
     <string name="my_coupons_upgrade">See plans</string>
     <string name="home_day_over_coupons_body">Results of your saved coupons are in My coupons. Tomorrow\'s card shows up here once TJK publishes it.</string>
     <string name="home_day_over_coupons_button">Open my coupons</string>
+    <string name="info_ok">OK</string>
+    <string name="info_open">Explanation</string>
+    <string name="info_guven">How confident the model is in this horse. Expert picks, AGF and HP are combined. A high value does not mean the horse will surely win.</string>
+    <string name="info_agf">AGF (Altılı Ganyan Favourite): the share of altılı players who picked this horse. Published by TJK; 30% means 30% of players picked it. Opens on race-day morning.</string>
+    <string name="info_hp">HP (Handicap Points): TJK\'s rating of the horse. Used to compare horses in the same race; higher HP usually means a stronger horse.</string>
+    <string name="info_uncertainty">Uncertainty: how open the race is. Low: clear favourite. Very high: many horses can win, so keep this leg wide on the coupon.</string>
+    <string name="info_leader_margin">Favourite\'s lead: the gap in model score between the 1st and 2nd horse. A big gap means a clear favourite, a small one a close race.</string>
+    <string name="info_coupon_advice">Coupon advice: how many horses it makes sense to pick in this leg. Single: one horse is enough. Narrow: 2-3 horses. Balanced: a few. Wide: pick many, an upset is possible.</string>
+    <string name="info_value_model">Value model: our own model\'s win probability for this horse compared with AGF. When ours is clearly higher, the \"underrated by AGF\" tag shows. Not betting advice.</string>
+    <string name="info_expert">Expert consensus: picks for this horse from the expert sites we follow. Each bar shows what share of experts named the horse that way (favourite, banker, upset…). The expert support bar sums them up: 50 undecided, 100 every expert backs it.</string>
+    <string name="info_market">AGF change: how AGF moved in the last 90 minutes before the race. Above 50 money is coming in, below 50 going out. AGF opens on race-day morning, so there is no data at night or early morning.</string>
+    <string name="info_field">Track fit: how well the horse ran on this surface (turf, dirt, synthetic) in past races. 50 is average, higher is good on this track. Horses with few runs may have no data.</string>
+    <string name="info_form">Recent runs: finishing position in the last 6 races, oldest on the left, newest on the right. 5-2-5: 5th, then 2nd, then 5th last time. 10+: tenth or worse. Gold is 1st, green 2nd and 3rd.</string>
+    <string name="race_category_avoid">negative</string>
+    <string name="race_category_count">%1$d experts</string>
+    <string name="race_market_no_data_hint">AGF opens on race-day morning; the change in the last 90 minutes shows here</string>
+    <string name="race_expert_none">No expert picks for this horse yet</string>
+    <string name="strategy_short_single">Single</string>
+    <string name="strategy_short_compact">Narrow</string>
+    <string name="strategy_short_spread">Wide</string>
+    <string name="strategy_short_balanced">Balanced</string>
 </resources>
