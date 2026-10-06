@@ -488,4 +488,7 @@
     <string name="expert_chip_star">Yıldız</string>
     <string name="expert_first_choice_info">İlk tercih: uzmanın bu atı banko, favori ya da yıldız olarak gösterdiği durumlar. Altındaki kutular kaç uzmanın hangisini dediğini gösterir. Bir uzman aynı ata hem favori hem banko demiş olabilir, bu yüzden kutuların toplamı ilk tercih sayısından fazla olabilir.</string>
     <string name="race_expert_hero_strong">%1$d uzmana göre güçlü aday</string>
+    <string name="account_billing_unavailable">Bu sürüm Google Play\'den yüklenmediği için satın alma şu an kapalı. Uygulamayı Play Store\'dan indirdiğinde planları buradan alabilirsin.</string>
+    <string name="account_billing_unavailable_button">Google Play\'den yüklenince açılır</string>
+    <string name="home_next_day_expert_horses">%1$d atta uzman tahmini var</string>
 </resources>

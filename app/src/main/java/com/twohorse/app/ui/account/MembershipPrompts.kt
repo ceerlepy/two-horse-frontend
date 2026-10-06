@@ -95,9 +95,15 @@ fun MembershipPrompts(
     }
 }
 
+/*
+ * Dialog card whose body scrolls while the buttons stay pinned at the
+ * bottom, kept clear of the status and navigation bars (the app draws
+ * edge to edge, so a tall dialog otherwise slides under the nav bar).
+ */
 @Composable
 private fun PromptShell(
     onDismiss: () -> Unit,
+    buttons: @Composable ColumnScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Dialog(
@@ -107,19 +113,28 @@ private fun PromptShell(
         Card(
             modifier =
                 Modifier
+                    .systemBarsPadding()
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 24.dp),
+                    .padding(horizontal = 18.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = CardTone),
             border = BorderStroke(1.dp, CardToneBorder),
             shape = RoundedCornerShape(22.dp)
         ) {
             Column(
-                modifier =
-                    Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(18.dp),
-                content = content
-            )
+                modifier = Modifier.padding(18.dp)
+            ) {
+                Column(
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = false)
+                            .verticalScroll(rememberScrollState()),
+                    content = content
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                buttons()
+            }
         }
     }
 }
@@ -135,7 +150,37 @@ private fun WelcomeDialog(
     val endDate =
         formatIsoDate(user.trialEndsAt, currentLanguage()) ?: ""
 
-    PromptShell(onDismiss = onStart) {
+    PromptShell(
+        onDismiss = onStart,
+        buttons = {
+            Button(
+                onClick = onStart,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Green)
+            ) {
+                Text(
+                    text = strings.welcomeStart,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            TextButton(
+                onClick = onPlans,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = strings.welcomePlans,
+                    color = Green,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    ) {
         Text(
             text = strings.welcomeTitle,
             color = Ink,
@@ -156,35 +201,6 @@ private fun WelcomeDialog(
         Spacer(modifier = Modifier.height(14.dp))
 
         PlanComparisonTable(currentTier = user.tier)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onStart,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Green)
-        ) {
-            Text(
-                text = strings.welcomeStart,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        TextButton(
-            onClick = onPlans,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = strings.welcomePlans,
-                color = Green,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
     }
 }
 
@@ -195,7 +211,37 @@ private fun TrialEndedDialog(
 ) {
     val strings = LocalStrings.current
 
-    PromptShell(onDismiss = onContinueFree) {
+    PromptShell(
+        onDismiss = onContinueFree,
+        buttons = {
+            Button(
+                onClick = onCompare,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Ink)
+            ) {
+                Text(
+                    text = strings.trialEndedCompare,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            TextButton(
+                onClick = onContinueFree,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = strings.trialEndedContinueFree,
+                    color = Muted,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    ) {
         Text(
             text = strings.trialEndedTitle,
             color = Ink,
@@ -227,35 +273,6 @@ private fun TrialEndedDialog(
             description = strings.accountPremiumDescription,
             accent = Green
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onCompare,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Ink)
-        ) {
-            Text(
-                text = strings.trialEndedCompare,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        TextButton(
-            onClick = onContinueFree,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = strings.trialEndedContinueFree,
-                color = Muted,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
     }
 }
 

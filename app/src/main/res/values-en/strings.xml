@@ -488,4 +488,7 @@
     <string name="expert_chip_star">Star</string>
     <string name="expert_first_choice_info">First choice: the expert marks this horse as banker, favourite or star. The boxes below show how many experts said which. One expert may call the same horse both favourite and banker, so the boxes can add up to more than the first-choice count.</string>
     <string name="race_expert_hero_strong">strong contender for %1$d experts</string>
+    <string name="account_billing_unavailable">Purchases are off because this copy was not installed from Google Play. Once you install the app from the Play Store you can buy a plan here.</string>
+    <string name="account_billing_unavailable_button">Available in the Play Store version</string>
+    <string name="home_next_day_expert_horses">Expert picks on %1$d horses</string>
 </resources>

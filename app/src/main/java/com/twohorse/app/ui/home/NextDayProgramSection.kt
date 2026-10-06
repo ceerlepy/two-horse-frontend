@@ -2,6 +2,15 @@ package com.twohorse.app.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Surface as M3Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -191,85 +200,145 @@ internal fun NextDayHeader(
     }
 }
 
+/*
+ * Same look as today's race cards on home (city/race chip, time,
+ * distance, arrow). Runners stay folded until the card is tapped, so
+ * tomorrow's program doesn't turn into one long list of every horse.
+ */
 @Composable
 internal fun NextDayRaceCard(
     race: Race
 ) {
     val strings = LocalStrings.current
 
+    var expanded by
+        rememberSaveable(race.city, race.number) { mutableStateOf(false) }
+
+    val expertHorses =
+        race.horses.count { it.expertPickCount > 0 }
+
     Card(
         modifier =
-            Modifier.fillMaxWidth(),
+            Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
         colors =
             CardDefaults.cardColors(
                 containerColor = Surface
             ),
         border =
-            BorderStroke(1.dp, Border),
+            CardDefaults.outlinedCardBorder(),
         shape =
-            RoundedCornerShape(18.dp)
+            RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier =
-                Modifier.padding(
-                    horizontal = 14.dp,
-                    vertical = 12.dp
-                )
+                Modifier.padding(16.dp)
         ) {
             Row(
                 verticalAlignment =
                     Alignment.CenterVertically
             ) {
+                M3Surface(
+                    color = PaleGreen,
+                    shape = RoundedCornerShape(9.dp)
+                ) {
+                    Text(
+                        text = "${race.city} · ${strings.homeCourseNumberCaps(race.number)}",
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 9.dp,
+                                vertical = 6.dp
+                            ),
+                        color = Green,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+
+                Spacer(
+                    Modifier.width(9.dp)
+                )
+
                 Text(
                     text = nextDayRaceTime(race),
                     color = Ink,
-                    fontSize = 17.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Black
                 )
 
-                Text(
-                    modifier =
-                        Modifier.padding(start = 10.dp),
-                    text = strings.homeCourseNumber(race.number),
-                    color = Green,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.ExtraBold
+                Spacer(
+                    Modifier.weight(1f)
                 )
 
-                Text(
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .padding(start = 10.dp),
-                    text =
-                        listOf(race.distance, race.surface)
-                            .filter { it.isNotBlank() }
-                            .joinToString(" · "),
-                    color = Muted,
-                    fontSize = 11.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = strings.homeNextDayRunnerCount(race.horses.size),
-                    color = Muted,
-                    fontSize = 11.sp
+                Icon(
+                    imageVector =
+                        if (expanded) Icons.Default.KeyboardArrowDown
+                        else Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Muted
                 )
             }
 
-            HorizontalDivider(
-                modifier =
-                    Modifier.padding(vertical = 8.dp),
-                color = Border
+            Spacer(
+                Modifier.height(8.dp)
             )
 
-            Column(
-                verticalArrangement =
-                    Arrangement.spacedBy(6.dp)
-            ) {
-                race.horses.forEach { horse ->
-                    NextDayRunnerRow(horse)
+            Text(
+                text =
+                    listOf(
+                        race.distance,
+                        race.surface,
+                        strings.homeNextDayRunnerCount(race.horses.size)
+                    )
+                        .filter { it.isNotBlank() }
+                        .joinToString(" · "),
+                color = Muted,
+                fontSize = 11.sp
+            )
+
+            if (race.title.isNotBlank()) {
+                Spacer(
+                    Modifier.height(7.dp)
+                )
+
+                Text(
+                    text = race.title,
+                    color = Ink,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (expertHorses > 0) {
+                Spacer(
+                    Modifier.height(7.dp)
+                )
+
+                Text(
+                    text = strings.homeNextDayExpertHorses(expertHorses),
+                    color = Green,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            if (expanded) {
+                HorizontalDivider(
+                    modifier =
+                        Modifier.padding(vertical = 10.dp),
+                    color = Border
+                )
+
+                Column(
+                    verticalArrangement =
+                        Arrangement.spacedBy(6.dp)
+                ) {
+                    race.horses.forEach { horse ->
+                        NextDayRunnerRow(horse)
+                    }
                 }
             }
         }
@@ -345,24 +414,6 @@ private fun NextDayRunnerRow(
                     color = Muted,
                     fontSize = 11.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            /*
-             * The backend's consensus sentence is Turkish (built from
-             * counts only); English users get the count pill alone.
-             */
-            if (
-                horse.expertPickCount > 0 &&
-                horse.expertSummary.isNotBlank() &&
-                currentLanguage() == Language.TR
-            ) {
-                Text(
-                    text = horse.expertSummary,
-                    color = Muted,
-                    fontSize = 10.sp,
-                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
