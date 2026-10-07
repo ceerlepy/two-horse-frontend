@@ -40,13 +40,15 @@ fun AnalyticsChip(
     text: String,
     strong: Boolean = false,
     danger: Boolean = false,
-    accent: Boolean = false
+    accent: Boolean = false,
+    warn: Boolean = false
 ) {
     Surface(
         color =
             when {
                 accent -> LavenderSurface
                 danger -> PaleRed
+                warn -> PaleGold
                 strong -> PaleGreen
                 else -> Color(0xFFF2F4F3)
             },
@@ -64,6 +66,7 @@ fun AnalyticsChip(
                 when {
                     accent -> Lavender
                     danger -> Red
+                    warn -> Gold
                     strong -> Green
                     else -> Muted
                 },

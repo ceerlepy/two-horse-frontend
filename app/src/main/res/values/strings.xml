@@ -222,6 +222,7 @@
     <string name="race_value_model_title">🔎 Değer modeli</string>
     <string name="race_value_underrated">AGF\'nin hafife aldığı at</string>
     <string name="race_value_overrated">AGF\'nin fazla önemsediği at</string>
+    <string name="race_value_still_favourite">Yine de favori</string>
     <string name="race_value_vs_agf">AGF %%%1$s, modelimiz %%%2$s</string>
     <string name="race_value_vs_ganyan">Ganyan %%%1$s, modelimiz %%%2$s</string>
     <string name="race_value_note">Uzman ve AGF skorundan ayrı görüş; bahis tavsiyesi değildir.</string>
