@@ -994,13 +994,7 @@ private fun RaceRiskCard(
 
             val summary =
                 listOfNotNull(
-                    uncertainty?.let {
-                        when {
-                            it.topMargin <= 3.0 -> strings.explanationClose
-                            it.topMargin <= 7.0 -> strings.explanationTop3Close
-                            else -> strings.explanationClearLeader
-                        }
-                    },
+                    uncertainty?.let { uncertaintyExplanation(it) },
                     strategy?.let {
                         when {
                             it.horseNumbers.size == 1 -> strings.strategyOneCandidate

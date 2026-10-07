@@ -943,6 +943,9 @@ object ResourceStrings : Strings {
     override val explanationClearLeader: String
         @Composable get() = stringResource(R.string.explanation_clear_leader)
 
+    override val explanationThinData: String
+        @Composable get() = stringResource(R.string.explanation_thin_data)
+
     @Composable
     override fun uncertaintyLine(level: String, explanation: String): String =
         stringResource(R.string.uncertainty_line, level, explanation)

@@ -287,6 +287,7 @@
     <string name="explanation_close">İlk adaylar birbirine çok yakın</string>
     <string name="explanation_top3_close">İlk 3 at birbirine yakın</string>
     <string name="explanation_clear_leader">Favori diğerlerinden belirgin şekilde önde</string>
+    <string name="explanation_thin_data">Favori önde ama bu yarış için elimizdeki bilgi az</string>
     <string name="uncertainty_line">BELİRSİZLİK %1$s · %2$s</string>
     <string name="strategy_single">TEK</string>
     <string name="strategy_compact">DAR KUPON</string>

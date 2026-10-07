@@ -233,6 +233,12 @@ private fun ForeignRaceCard(race: ForeignRace) {
 
     var expanded by rememberSaveable(race.raceNumber) { mutableStateOf(false) }
 
+    /* Our corrected figure picks the favourite, not AGF. */
+    val favourite =
+        race.runners
+            .filter { it.winProb != null }
+            .maxByOrNull { it.winProb ?: 0.0 }
+
     /* Same shell as the home and next-day race cards. */
     Card(
         modifier =
@@ -298,6 +304,61 @@ private fun ForeignRaceCard(race: ForeignRace) {
                 color = Muted,
                 fontSize = 11.sp
             )
+
+            /*
+             * The same favourite line the home cards carry, so a foreign
+             * card answers "who does it like?" without being opened. Our
+             * own figure picks it, not AGF, because that is the whole
+             * point of correcting AGF. Gold and up only: without winProb
+             * there is nothing of ours to show.
+             */
+            favourite?.let { pick ->
+                HorizontalDivider(color = CardToneBorder)
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = strings.homeModelFavorite,
+                            color = Muted,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "#${pick.number} ${pick.name}",
+                            color = Ink,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        pick.agfPercent?.let {
+                            Text(
+                                text = "AGF %${"%.0f".format(it)}",
+                                color = Muted,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    pick.winProb?.let {
+                        Surface(
+                            color = PaleGold,
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Text(
+                                text = strings.foreignWinProb(winProbLabel(it)),
+                                modifier =
+                                    Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                color = Gold,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         if (!expanded) {

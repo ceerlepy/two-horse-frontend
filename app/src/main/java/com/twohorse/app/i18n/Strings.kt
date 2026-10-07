@@ -599,6 +599,8 @@ interface Strings {
     val explanationTop3Close: String
     @get:Composable
     val explanationClearLeader: String
+    @get:Composable
+    val explanationThinData: String
     @Composable
     fun uncertaintyLine(level: String, explanation: String): String
     @get:Composable

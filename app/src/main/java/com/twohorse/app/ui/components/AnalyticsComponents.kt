@@ -254,16 +254,7 @@ fun RaceInsightSummary(
                 }
 
             val explanation =
-                when {
-                    it.topMargin <= 3.0 ->
-                        strings.explanationClose
-
-                    it.topMargin <= 7.0 ->
-                        strings.explanationTop3Close
-
-                    else ->
-                        strings.explanationClearLeader
-                }
+                uncertaintyExplanation(it)
 
             Text(
                 text =
@@ -356,6 +347,53 @@ fun componentTitle(
         "weight" -> strings.componentWeight
         "field" -> strings.componentField
         else -> key
+    }
+}
+
+/*
+ * The sentence under the uncertainty level has to agree with it.
+ * Two things can raise the level: the field being close, or our own
+ * inputs being thin. Reading closeness off the 0-100 score margin got
+ * both wrong -- the score squashes, so the same nine points covered a
+ * 37% favourite well clear of the field and an 18% one in a wide-open
+ * race, and a race called uncertain only because data was missing still
+ * read "the favourite is clearly ahead". So: the gap in probability
+ * where we have it, and the backend's own word on which one drove it.
+ */
+@Composable
+fun uncertaintyExplanation(
+    uncertainty: RaceUncertainty
+): String {
+    val strings = LocalStrings.current
+
+    val close =
+        uncertainty.probabilityGap
+            ?.let { gap ->
+                when {
+                    gap <= 0.05 -> strings.explanationClose
+                    gap <= 0.12 -> strings.explanationTop3Close
+                    else -> null
+                }
+            }
+            ?: when {
+                uncertainty.topMargin <= 3.0 ->
+                    strings.explanationClose
+
+                uncertainty.topMargin <= 7.0 ->
+                    strings.explanationTop3Close
+
+                else -> null
+            }
+
+    if (close != null) {
+        return close
+    }
+
+    /* The favourite is clear, so only thin data can still raise the level. */
+    return if (uncertainty.driver == "data") {
+        strings.explanationThinData
+    } else {
+        strings.explanationClearLeader
     }
 }
 
