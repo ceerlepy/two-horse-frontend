@@ -170,16 +170,20 @@
     <string name="foreign_subtitle">TJK card and AGF order</string>
     <string name="foreign_empty">There are no foreign races on today\'s TJK card.</string>
     <string name="foreign_load_failed">Foreign races could not be loaded.</string>
-    <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels are an AI prediction site\'s picks.</string>
+    <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels come from an alternative prediction source, not from our model.</string>
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
     <string name="foreign_win_prob">Win %1$s%%</string>
     <string name="foreign_win_prob_info_title">Win chance</string>
     <string name="foreign_win_prob_info">The green percentage is AGF: the share of money bet on that horse. The yellow \"Win\" figure is our own model. We trained it on past foreign races and tested it on later races it had never seen. Bettors make favourites look stronger and outsiders weaker than they are, and the model corrects that bias. It does not mean the horse will win.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
-    <string name="foreign_ai_top">Expert pick: %1$s</string>
+    <string name="foreign_ai_top">Alternative pick: %1$s</string>
     <string name="foreign_ai_selection">Coupon: %1$s</string>
-    <string name="foreign_ai_coupon_title">Expert altılı %1$d</string>
+    <string name="foreign_ai_coupon_title">Alternative altılı %1$d</string>
+    <string name="foreign_alt_coupon_note">An alternative altılı we take from outside. Not our model; it is here for comparison.</string>
+    <string name="foreign_model_coupon_title">Model altılı %1$d</string>
+    <string name="foreign_coupon_coverage">Coverage %1$s%%</string>
+    <string name="foreign_model_coupon_note">Built by our own model from its corrected win chances, on a 500 TL budget.</string>
     <string name="foreign_ai_coupon_start">Starts %1$s</string>
     <string name="foreign_ai_coupon_total">%1$d combinations · %2$s TL</string>
     <string name="foreign_ai_leg">Race %1$d: %2$s</string>
@@ -438,7 +442,7 @@
     <string name="info_uncertainty">Uncertainty: how open the race is. Low: clear favourite. Very high: many horses can win, so keep this leg wide on the coupon.</string>
     <string name="info_leader_margin">Favourite\'s lead: the gap in model score between the 1st and 2nd horse. A big gap means a clear favourite, a small one a close race.</string>
     <string name="info_coupon_advice">Coupon advice: how many horses it makes sense to pick in this leg. Single: one horse is enough. Narrow: 2-3 horses. Balanced: a few. Wide: pick many, an upset is possible.</string>
-    <string name="info_value_model">Value model: our own model\'s win probability for this horse compared with AGF. When ours is clearly higher, the \"underrated by AGF\" tag shows. Not betting advice.</string>
+    <string name="info_value_model">The value model is a separate learning model answering a different question: is the public pricing this horse correctly? It is far freer than the main score and can depart sharply from AGF when the horse\'s own data says otherwise; its job is not to find the winner but to catch the horse AGF has got wrong. When our probability is clearly above AGF the \"underrated by AGF\" tag shows, and clearly below it the \"overrated by AGF\" tag. Not betting advice.</string>
     <string name="info_expert">Expert consensus: how the experts covering this race see this horse. Each expert counts once, by the strongest role they gave. First choice: banker, favourite or star. Strong contender: a serious candidate for the top places but not the expert\'s first pick. Second choice: the expert prefers another horse and puts this one next. Surprise: less expected but has a chance. \"2/4\" means 2 of the 4 experts covering the race. If our favourite is mostly the experts\' second choice, the model and the experts disagree. Horses that only appear in an expert\'s coupon are not counted. The expert support bar sums them up (0–100, 50 is neutral); with few experts the score stays close to 50.</string>
     <string name="info_market">AGF change: how AGF moved in the last 90 minutes before the race. Above 50 money is coming in, below 50 going out. AGF opens on race-day morning, so there is no data at night or early morning.</string>
     <string name="info_field">Track fit: how well the horse ran on this surface (turf, dirt, synthetic) in past races. 50 is average, higher is good on this track. Horses with few runs may have no data.</string>
@@ -453,7 +457,7 @@
     <string name="strategy_short_balanced">Balanced</string>
     <string name="coupon_leg_race">Race %1$d</string>
     <string name="info_model_score_title">Model score</string>
-    <string name="info_model_score" formatted="false">Our own model calculates this score. It weighs the horse\'s AGF, expert views, recent races, handicap rating, AGF movement, carried weight and track fit together and gives each horse a single 0–100 score. A higher score means a stronger contender, but not a sure winner.</string>
+    <string name="info_model_score" formatted="false">Our own model calculates this score. It is a learning model built on the AGF foundation: it starts from the money players put on the horse, then corrects that foundation with what it learned from past races (speed figures, course and distance specialism, workout tempo, draw, jockey record, the gap between AGF and the win odds). We did not set the weights by hand; they were learned from thousands of past races. Each horse gets a single 0–100 score, where 50 is the average chance in that race. A higher score means a stronger contender, not a sure winner.</string>
     <string name="error_title">Oops, something went wrong</string>
     <string name="error_timeout">The server is slow to respond right now. Please try again in a moment.</string>
     <string name="error_no_internet">It looks like you\'re offline. Check your connection and try again.</string>

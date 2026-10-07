@@ -288,6 +288,22 @@ data class ForeignAiCoupon(
     val amountTl: Double?
 )
 
+/* Our own altılı for a foreign card, from the corrected win chances. */
+data class ForeignModelLeg(
+    val raceNumber: Int,
+    val selection: List<Int>,
+    val coverageProbability: Double?
+)
+
+data class ForeignModelCoupon(
+    val altili: Int,
+    val startTime: String?,
+    val legs: List<ForeignModelLeg>,
+    val combinations: Int?,
+    val amountTl: Double?,
+    val estimatedSurvivalProbability: Double?
+)
+
 data class ForeignRace(
     val raceNumber: Int,
     val time: String?,
@@ -301,7 +317,8 @@ data class ForeignMeeting(
     val city: String,
     val country: String?,
     val races: List<ForeignRace>,
-    val aiCoupons: List<ForeignAiCoupon> = emptyList()
+    val aiCoupons: List<ForeignAiCoupon> = emptyList(),
+    val modelCoupons: List<ForeignModelCoupon> = emptyList()
 )
 
 data class MembershipUser(

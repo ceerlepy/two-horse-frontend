@@ -691,6 +691,10 @@ class TwoHorseApi(
                             aiCoupons =
                                 parseForeignAiCoupons(
                                     meeting.optJSONArray("aiCoupons")
+                                ),
+                            modelCoupons =
+                                parseForeignModelCoupons(
+                                    meeting.optJSONArray("modelCoupons")
                                 )
                         )
                     )
@@ -966,6 +970,47 @@ class TwoHorseApi(
                             if (item.isNull("combinations")) null else item.optInt("combinations"),
                         amountTl =
                             if (item.isNull("amountTl")) null else item.optDouble("amountTl")
+                    )
+                )
+            }
+        }
+
+    private fun parseForeignModelCoupons(array: JSONArray?): List<ForeignModelCoupon> =
+        buildList {
+            if (array == null) return@buildList
+
+            for (i in 0 until array.length()) {
+                val item = array.getJSONObject(i)
+                val legsArray = item.optJSONArray("legs")
+
+                add(
+                    ForeignModelCoupon(
+                        altili = item.optInt("altili"),
+                        startTime =
+                            if (item.isNull("startTime")) null
+                            else item.optString("startTime").takeIf { it.isNotBlank() },
+                        legs =
+                            buildList {
+                                if (legsArray != null) {
+                                    for (j in 0 until legsArray.length()) {
+                                        val leg = legsArray.getJSONObject(j)
+                                        add(
+                                            ForeignModelLeg(
+                                                raceNumber = leg.optInt("raceNumber"),
+                                                selection = intList(leg.optJSONArray("selection")),
+                                                coverageProbability =
+                                                    leg.optionalDouble("coverageProbability")
+                                            )
+                                        )
+                                    }
+                                }
+                            },
+                        combinations =
+                            if (item.isNull("combinations")) null else item.optInt("combinations"),
+                        amountTl =
+                            if (item.isNull("amountTl")) null else item.optDouble("amountTl"),
+                        estimatedSurvivalProbability =
+                            item.optionalDouble("estimatedSurvivalProbability")
                     )
                 )
             }

@@ -379,6 +379,14 @@ interface Strings {
     fun foreignAiSelection(numbers: String): String
     @Composable
     fun foreignAiCouponTitle(number: Int): String
+    @get:Composable
+    val foreignAltCouponNote: String
+    @Composable
+    fun foreignModelCouponTitle(number: Int): String
+    @get:Composable
+    val foreignModelCouponNote: String
+    @Composable
+    fun foreignCouponCoverage(percent: String): String
     @Composable
     fun foreignAiCouponStart(time: String): String
     @Composable

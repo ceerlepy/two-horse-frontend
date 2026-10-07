@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.ForeignAiCoupon
+import com.twohorse.app.domain.model.ForeignModelCoupon
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
@@ -176,6 +177,17 @@ fun ForeignScreen(
                                 color = Muted,
                                 fontSize = 11.sp
                             )
+                        }
+                    }
+
+                    items(
+                        selected.modelCoupons,
+                        key = { "${selected.city}-model-${it.altili}" }
+                    ) { coupon ->
+                        Column(
+                            modifier = Modifier.padding(horizontal = 18.dp)
+                        ) {
+                            ForeignModelCouponCard(coupon)
                         }
                     }
 
@@ -515,6 +527,73 @@ private val ForeignAiBrush =
 private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
     val strings = LocalStrings.current
 
+    ForeignCouponCard(
+        title = strings.foreignAiCouponTitle(coupon.altili),
+        startTime = coupon.startTime,
+        legs = coupon.legs.map { it.raceNumber to it.selection },
+        combinations = coupon.combinations,
+        amountTl = coupon.amountTl,
+        coverageProbability = null,
+        note = strings.foreignAltCouponNote,
+        brush = ForeignAiBrush,
+        titleColor = ForeignAiTitle,
+        legLabelColor = Lavender,
+        noteColor = Lavender
+    )
+}
+
+/*
+ * Our own altılı, built from the corrected win chances. Green rather
+ * than the alternative coupon's lavender: the same brand colour the
+ * rest of the app uses for our own figures, so the two cards are never
+ * read as the same thing.
+ */
+private val ForeignModelBrush =
+    Brush.linearGradient(
+        listOf(
+            Color(0xFF0A4631),
+            Color(0xFF0E6B47),
+            Color(0xFF147A52)
+        )
+    )
+
+private val ForeignModelLegLabel = Color(0xFF9FD9BD)
+
+@Composable
+private fun ForeignModelCouponCard(coupon: ForeignModelCoupon) {
+    val strings = LocalStrings.current
+
+    ForeignCouponCard(
+        title = strings.foreignModelCouponTitle(coupon.altili),
+        startTime = coupon.startTime,
+        legs = coupon.legs.map { it.raceNumber to it.selection },
+        combinations = coupon.combinations,
+        amountTl = coupon.amountTl,
+        coverageProbability = coupon.estimatedSurvivalProbability,
+        note = strings.foreignModelCouponNote,
+        brush = ForeignModelBrush,
+        titleColor = PaleGold,
+        legLabelColor = ForeignModelLegLabel,
+        noteColor = ForeignModelLegLabel
+    )
+}
+
+@Composable
+private fun ForeignCouponCard(
+    title: String,
+    startTime: String?,
+    legs: List<Pair<Int, List<Int>>>,
+    combinations: Int?,
+    amountTl: Double?,
+    coverageProbability: Double?,
+    note: String,
+    brush: Brush,
+    titleColor: Color,
+    legLabelColor: Color,
+    noteColor: Color
+) {
+    val strings = LocalStrings.current
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -525,45 +604,45 @@ private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(ForeignAiBrush)
+                    .background(brush)
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = strings.foreignAiCouponTitle(coupon.altili),
+                    text = title,
                     modifier = Modifier.weight(1f),
-                    color = ForeignAiTitle,
+                    color = titleColor,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Black
                 )
-                coupon.startTime?.let {
+                startTime?.let {
                     Text(
                         text = strings.foreignAiCouponStart(it),
-                        color = Lavender,
+                        color = legLabelColor,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            coupon.legs.forEach { leg ->
+            legs.forEach { (raceNumber, selection) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(
                         color = Color.White.copy(alpha = 0.10f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "${leg.raceNumber}.K",
+                            text = "$raceNumber.K",
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                            color = Lavender,
+                            color = legLabelColor,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
                     Text(
-                        text = leg.selection.joinToString(" - "),
+                        text = selection.joinToString(" - "),
                         modifier = Modifier.padding(start = 10.dp),
                         color = Color.White,
                         fontSize = 14.sp,
@@ -572,24 +651,54 @@ private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
                 }
             }
 
-            if (coupon.combinations != null && coupon.amountTl != null) {
-                Surface(
-                    color = ForeignAiTitle,
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text(
-                        text =
-                            strings.foreignAiCouponTotal(
-                                coupon.combinations,
-                                "%.0f".format(coupon.amountTl)
-                            ),
-                        modifier = Modifier.padding(horizontal = 11.dp, vertical = 5.dp),
-                        color = Color(0xFF2B1D03),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (combinations != null && amountTl != null) {
+                    Surface(
+                        color = titleColor,
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            text =
+                                strings.foreignAiCouponTotal(
+                                    combinations,
+                                    "%.0f".format(amountTl)
+                                ),
+                            modifier = Modifier.padding(horizontal = 11.dp, vertical = 5.dp),
+                            color = Color(0xFF2B1D03),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
+
+                coverageProbability?.let { coverage ->
+                    Surface(
+                        color = Color.White.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            text =
+                                strings.foreignCouponCoverage(
+                                    "%.1f".format(coverage * 100)
+                                ),
+                            modifier = Modifier.padding(horizontal = 11.dp, vertical = 5.dp),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
                 }
             }
+
+            Text(
+                text = note,
+                color = noteColor,
+                fontSize = 11.sp,
+                lineHeight = 15.sp
+            )
         }
     }
 }
