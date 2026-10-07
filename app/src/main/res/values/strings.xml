@@ -170,16 +170,20 @@
     <string name="foreign_subtitle">TJK programı ve AGF sırası</string>
     <string name="foreign_empty">Bugün TJK programında yurt dışı koşu yok.</string>
     <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
-    <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler bir yapay zeka tahmin sitesinin seçimleri.</string>
+    <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler alternatif bir tahmin kaynağından geliyor, bizim modelimiz değil.</string>
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
     <string name="foreign_win_prob">Kazanma %%%1$s</string>
     <string name="foreign_win_prob_info_title">Kazanma %</string>
     <string name="foreign_win_prob_info">Yeşil yüzde AGF\'dir: oyuncuların o ata yatırdığı paranın oranı. Sarı \"Kazanma %\" ise bizim modelimizin tahminidir. Modeli geçmiş yurt dışı koşularla eğittik ve modelin hiç görmediği sonraki koşularda sınadık. Bahis oyuncuları favoriyi olduğundan güçlü, dışarıdaki atı olduğundan zayıf gösterir; model bu sapmayı düzeltir. Kesin kazanır anlamına gelmez.</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
-    <string name="foreign_ai_top">Uzman tahmini: %1$s</string>
+    <string name="foreign_ai_top">Alternatif tahmin: %1$s</string>
     <string name="foreign_ai_selection">Kupon: %1$s</string>
-    <string name="foreign_ai_coupon_title">Uzman altılısı %1$d</string>
+    <string name="foreign_ai_coupon_title">Alternatif altılı %1$d</string>
+    <string name="foreign_alt_coupon_note">Dışarıdan aldığımız alternatif bir altılı. Bizim modelimiz değil, karşılaştırman için duruyor.</string>
+    <string name="foreign_model_coupon_title">Model altılısı %1$d</string>
+    <string name="foreign_coupon_coverage">Kapsama %%%1$s</string>
+    <string name="foreign_model_coupon_note">Bizim modelimizin düzeltilmiş kazanma ihtimallerinden kurduğu altılı. Bütçe 500 TL üzerinden hesaplanır.</string>
     <string name="foreign_ai_coupon_start">Başlangıç %1$s</string>
     <string name="foreign_ai_coupon_total">%1$d kombinasyon · %2$s TL</string>
     <string name="foreign_ai_leg">%1$d. Koşu: %2$s</string>
@@ -438,7 +442,7 @@
     <string name="info_uncertainty">Belirsizlik: yarışın ne kadar açık olduğu. Düşük: favori net. Çok yüksek: birçok at kazanabilir, kuponda bu ayağı geniş tutmak mantıklı.</string>
     <string name="info_leader_margin">Favorinin farkı: model puanında 1. at ile 2. at arasındaki fark. Fark büyükse favori net önde, küçükse yarış çekişmeli.</string>
     <string name="info_coupon_advice">Kupon önerisi: bu ayakta kaç at yazmanın mantıklı olduğu. Tek: tek at yeterli. Dar: 2-3 at. Dengeli: birkaç at. Geniş: çok at yaz, sürpriz çıkabilir.</string>
-    <string name="info_value_model">Değer modeli: kendi modelimizin bu ata verdiği kazanma ihtimali ile AGF\'nin karşılaştırması. Bizim ihtimalimiz AGF\'den belirgin yüksekse \"AGF\'nin hafife aldığı at\" etiketi çıkar. Bahis tavsiyesi değildir.</string>
+    <string name="info_value_model">Değer modeli ayrı bir öğrenme modelidir ve başka bir soruya cevap verir: halk bu atı doğru mu fiyatlıyor? Ana puandan çok daha serbesttir; atın kendi verisi AGF\'nin aksini söylüyorsa AGF\'den belirgin şekilde ayrılabilir, işi kazananı bulmak değil AGF\'nin yanıldığı atı yakalamaktır. Bizim ihtimalimiz AGF\'den belirgin yüksekse \"AGF\'nin hafife aldığı at\", belirgin düşükse \"AGF\'nin fazla önemsediği at\" etiketi çıkar. Bahis tavsiyesi değildir.</string>
     <string name="info_expert">Uzman konsensüsü: bu koşuyu değerlendiren uzmanların bu ata bakışı. Her uzman bir kez, verdiği en güçlü role göre sayılır. İlk tercih: banko, favori ya da yıldız. Güçlü aday: ilk sıralar için ciddi aday ama uzmanın ilk tercihi değil. İkinci tercih: uzman başka bir atı daha çok tutuyor, bunu arkasından getiriyor. Sürpriz: az beklenen ama şansı olan at. \"2/4\", koşuya bakan 4 uzmandan 2\'si demektir. Bizim favorimiz uzmanların çoğunda ikinci tercihse, model ile uzmanlar ayrışıyor demektir. Uzmanların sadece kupona yazdığı atlar sayılmaz. Uzman desteği barı hepsinin özetidir (0–100, 50 ortada); az uzman varsa puan 50\'ye yakın tutulur.</string>
     <string name="info_market">AGF değişimi: yarıştan önceki son 90 dakikada AGF\'nin nasıl değiştiği. 50\'nin üstü bu ata para geliyor, altı para çıkıyor demek. AGF yarış sabahı açıldığı için gece ve sabah erkenden veri yoktur.</string>
     <string name="info_field">Pist uyumu: atın bu pist türündeki (çim, kum, sentetik) geçmiş koşularına göre ne kadar iyi koştuğu. 50 ortalama, üstü bu pistte iyi. Az koşmuş atlarda veri olmayabilir.</string>
@@ -453,7 +457,7 @@
     <string name="strategy_short_balanced">Dengeli</string>
     <string name="coupon_leg_race">%1$d. Koşu</string>
     <string name="info_model_score_title">Model puanı</string>
-    <string name="info_model_score" formatted="false">Bu puanı kendi geliştirdiğimiz model hesaplar. Model; atın AGF\'si, uzman görüşleri, son yarışları, handikap puanı, AGF\'deki değişim, taşıdığı kilo ve pist uyumu gibi bilgileri birlikte değerlendirip her ata 0–100 arası tek bir puan verir. Puanı yüksek olan at daha güçlü adaydır; ancak kesin kazanır anlamına gelmez.</string>
+    <string name="info_model_score" formatted="false">Bu puanı kendi modelimiz hesaplar. Model AGF temelinde kurulmuş bir öğrenme modelidir: oyuncuların bu ata yatırdığı parayı başlangıç noktası alır, sonra geçmiş yarışlardan öğrendikleriyle (hız derecesi, pist ve mesafe uzmanlığı, idman tempoları, kulvar, jokey başarısı, AGF ile ganyan arasındaki fark) bu temeli düzeltir. Katsayıları biz elle vermedik, binlerce geçmiş yarıştan öğrenildi. Her ata 0–100 arası tek bir puan verir; 50 o yarışın ortalama şansı demektir. Yüksek puan daha güçlü aday demektir, kesin kazanır anlamına gelmez.</string>
     <string name="error_title">Hay aksi, bir şeyler ters gitti</string>
     <string name="error_timeout">Sunucu şu an geç cevap veriyor. Birazdan tekrar dener misin?</string>
     <string name="error_no_internet">İnternet bağlantısı yok gibi görünüyor. Bağlantını kontrol edip tekrar dene.</string>

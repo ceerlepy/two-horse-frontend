@@ -584,6 +584,20 @@ object ResourceStrings : Strings {
     override fun foreignAiCouponTitle(number: Int): String =
         stringResource(R.string.foreign_ai_coupon_title, number)
 
+    override val foreignAltCouponNote: String
+        @Composable get() = stringResource(R.string.foreign_alt_coupon_note)
+
+    @Composable
+    override fun foreignModelCouponTitle(number: Int): String =
+        stringResource(R.string.foreign_model_coupon_title, number)
+
+    override val foreignModelCouponNote: String
+        @Composable get() = stringResource(R.string.foreign_model_coupon_note)
+
+    @Composable
+    override fun foreignCouponCoverage(percent: String): String =
+        stringResource(R.string.foreign_coupon_coverage, percent)
+
     @Composable
     override fun foreignAiCouponStart(time: String): String =
         stringResource(R.string.foreign_ai_coupon_start, time)
