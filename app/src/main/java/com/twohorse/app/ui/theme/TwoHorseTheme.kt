@@ -29,6 +29,14 @@ val PaleGold = Color(0xFFFFF3D9)
 val Red = Color(0xFFB64A3A)
 val PaleRed = Color(0xFFFFECE8)
 
+/*
+ * Gold already means "our corrected win chance" on the foreign cards,
+ * so a tag that qualifies a warning gets its own orange. Dark enough
+ * on PaleOrange to read at chip size (4.3:1, the red chip's 4.5:1).
+ */
+val Orange = Color(0xFFB0551A)
+val PaleOrange = Color(0xFFFDEBDD)
+
 val Border = Color(0xFFE1E7E3)
 
 /*

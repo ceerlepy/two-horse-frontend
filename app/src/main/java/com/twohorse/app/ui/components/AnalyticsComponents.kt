@@ -48,7 +48,7 @@ fun AnalyticsChip(
             when {
                 accent -> LavenderSurface
                 danger -> PaleRed
-                warn -> PaleGold
+                warn -> PaleOrange
                 strong -> PaleGreen
                 else -> Color(0xFFF2F4F3)
             },
@@ -66,7 +66,7 @@ fun AnalyticsChip(
                 when {
                     accent -> Lavender
                     danger -> Red
-                    warn -> Gold
+                    warn -> Orange
                     strong -> Green
                     else -> Muted
                 },
