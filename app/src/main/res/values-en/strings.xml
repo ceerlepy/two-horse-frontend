@@ -287,6 +287,7 @@
     <string name="explanation_close">The top contenders are very close</string>
     <string name="explanation_top3_close">The top 3 horses are close</string>
     <string name="explanation_clear_leader">The favourite is clearly ahead of the rest</string>
+    <string name="explanation_thin_data">The favourite is ahead, but we know little about this race</string>
     <string name="uncertainty_line">UNCERTAINTY %1$s · %2$s</string>
     <string name="strategy_single">SINGLE</string>
     <string name="strategy_compact">NARROW COUPON</string>

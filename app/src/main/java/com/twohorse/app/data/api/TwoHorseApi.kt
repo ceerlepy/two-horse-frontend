@@ -1641,6 +1641,18 @@ class TwoHorseApi(
                         it.optNullableDouble(
                             "secondScore"
                         ),
+                    topProbability =
+                        it.optNullableDouble(
+                            "topProbability"
+                        ),
+                    probabilityGap =
+                        it.optNullableDouble(
+                            "probabilityGap"
+                        ),
+                    driver =
+                        it.optString(
+                            "driver"
+                        ).ifBlank { null },
                     expansionPressure =
                         it.optDouble(
                             "expansionPressure",

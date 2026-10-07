@@ -58,6 +58,11 @@ data class RaceUncertainty(
     val topMargin: Double,
     val leaderScore: Double,
     val secondScore: Double?,
+    /* Null on an older backend, or when the race kept the weighted score. */
+    val topProbability: Double? = null,
+    val probabilityGap: Double? = null,
+    /* "margin" when the field is close, "data" when our own inputs are thin. */
+    val driver: String? = null,
     val expansionPressure: Double
 )
 
