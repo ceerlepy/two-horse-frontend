@@ -222,6 +222,7 @@
     <string name="race_value_model_title">🔎 Value model</string>
     <string name="race_value_underrated">Underrated by AGF</string>
     <string name="race_value_overrated">Overrated by AGF</string>
+    <string name="race_value_still_favourite">Still the favourite</string>
     <string name="race_value_vs_agf">AGF %%%1$s, our model %%%2$s</string>
     <string name="race_value_vs_ganyan">Win odds %%%1$s, our model %%%2$s</string>
     <string name="race_value_note">A separate opinion from the expert and AGF score; not betting advice.</string>

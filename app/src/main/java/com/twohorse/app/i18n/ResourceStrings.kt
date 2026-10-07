@@ -728,6 +728,9 @@ object ResourceStrings : Strings {
     override val raceValueOverrated: String
         @Composable get() = stringResource(R.string.race_value_overrated)
 
+    override val raceValueStillFavourite: String
+        @Composable get() = stringResource(R.string.race_value_still_favourite)
+
     @Composable
     override fun raceValueVsAgf(market: String, model: String): String =
         stringResource(R.string.race_value_vs_agf, market, model)

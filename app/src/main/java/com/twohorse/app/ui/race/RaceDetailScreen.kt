@@ -1857,7 +1857,8 @@ private fun HorseCard(
 
             ValueModelSection(
                 horse.valueModel,
-                horse.agfPercent
+                horse.agfPercent,
+                isModelFavourite = rank == 1
             )
 
             ExpertConsensusSection(
@@ -2399,7 +2400,8 @@ private fun MarketSection(
 @Composable
 private fun ValueModelSection(
     value: ValueModelOpinion?,
-    agfPercent: Double?
+    agfPercent: Double?,
+    isModelFavourite: Boolean
 ) {
     val strings = LocalStrings.current
 
@@ -2413,18 +2415,44 @@ private fun ValueModelSection(
         title = strings.raceValueModelTitle,
         info = strings.infoValueModel,
         trailing = {
-            when (value.label) {
-                "underrated" ->
-                    AnalyticsChip(
-                        strings.raceValueUnderrated,
-                        accent = true
-                    )
+            /*
+             * Two chips do not fit beside the title on a narrow phone,
+             * so they wrap rather than ellipsize.
+             */
+            FlowRow(
+                horizontalArrangement =
+                    Arrangement.spacedBy(5.dp),
+                verticalArrangement =
+                    Arrangement.spacedBy(4.dp)
+            ) {
+                when (value.label) {
+                    "underrated" ->
+                        AnalyticsChip(
+                            strings.raceValueUnderrated,
+                            accent = true
+                        )
 
-                "overrated" ->
-                    AnalyticsChip(
-                        strings.raceValueOverrated,
-                        danger = true
-                    )
+                    "overrated" -> {
+                        AnalyticsChip(
+                            strings.raceValueOverrated,
+                            danger = true
+                        )
+
+                        /*
+                         * "Too heavily backed" and "still the one most
+                         * likely to win" are both true of the same
+                         * horse, and seeing only the first next to our
+                         * own top pick reads as the app contradicting
+                         * itself.
+                         */
+                        if (isModelFavourite) {
+                            AnalyticsChip(
+                                strings.raceValueStillFavourite,
+                                warn = true
+                            )
+                        }
+                    }
+                }
             }
         }
     ) {

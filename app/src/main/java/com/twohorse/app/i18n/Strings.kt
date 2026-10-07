@@ -465,6 +465,8 @@ interface Strings {
     val raceValueUnderrated: String
     @get:Composable
     val raceValueOverrated: String
+    @get:Composable
+    val raceValueStillFavourite: String
     @Composable
     fun raceValueVsAgf(market: String, model: String): String
     @Composable
