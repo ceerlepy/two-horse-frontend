@@ -177,9 +177,9 @@
     <string name="foreign_win_prob_info">The green percentage is AGF: the share of money bet on that horse. The yellow \"Win\" figure is our own model. We trained it on past foreign races and tested it on later races it had never seen. Bettors make favourites look stronger and outsiders weaker than they are, and the model corrects that bias. It does not mean the horse will win.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
-    <string name="foreign_ai_top">AI pick: %1$s</string>
+    <string name="foreign_ai_top">Expert pick: %1$s</string>
     <string name="foreign_ai_selection">Coupon: %1$s</string>
-    <string name="foreign_ai_coupon_title">AI altılı %1$d</string>
+    <string name="foreign_ai_coupon_title">Expert altılı %1$d</string>
     <string name="foreign_ai_coupon_start">Starts %1$s</string>
     <string name="foreign_ai_coupon_total">%1$d combinations · %2$s TL</string>
     <string name="foreign_ai_leg">Race %1$d: %2$s</string>
