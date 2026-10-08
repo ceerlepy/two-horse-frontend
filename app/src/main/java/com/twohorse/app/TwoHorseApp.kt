@@ -289,6 +289,13 @@ fun TwoHorseApp() {
                                     foreign =
                                         true
                                 )
+                        },
+
+                        currentUser =
+                            currentUser,
+
+                        onUpgradeClick = {
+                            screen = AppScreen.Account
                         }
                     )
                 }

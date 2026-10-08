@@ -184,10 +184,11 @@ class TwoHorseRepository(
         city: String,
         raceNumber: Int,
         question: String,
-        language: String
+        language: String,
+        foreign: Boolean = false
     ): Result<AskAnswer> =
         runCatching {
-            api.ask(city, raceNumber, question, language)
+            api.ask(city, raceNumber, question, language, foreign)
         }
 
     suspend fun foreignMeetings():

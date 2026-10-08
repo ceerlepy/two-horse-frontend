@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -32,8 +33,10 @@ import com.twohorse.app.domain.model.ForeignModelCoupon
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
+import com.twohorse.app.ui.race.AskAiSheet
 import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
 
@@ -46,7 +49,9 @@ private sealed interface ForeignLoadState {
 @Composable
 fun ForeignScreen(
     onBack: () -> Unit,
-    onOpenCoupons: (String) -> Unit = {}
+    onOpenCoupons: (String) -> Unit = {},
+    currentUser: MembershipUser? = null,
+    onUpgradeClick: () -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
@@ -66,6 +71,12 @@ fun ForeignScreen(
     var selectedCity by
         remember {
             mutableStateOf<String?>(null)
+        }
+
+    /* The race whose "AI'ya sor" sheet is open, if any. */
+    var askRaceNumber by
+        remember {
+            mutableStateOf<Int?>(null)
         }
 
     LaunchedEffect(Unit) {
@@ -234,12 +245,44 @@ fun ForeignScreen(
                         Column(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
-                            ForeignRaceCard(race)
+                            ForeignRaceCard(
+                                race = race,
+                                onAskAi = { askRaceNumber = race.raceNumber }
+                            )
                         }
                     }
                 }
             }
         }
+    }
+
+    /* The same meeting the list is showing, including its first-load default. */
+    val askMeeting =
+        (state as? ForeignLoadState.Loaded)
+            ?.meetings
+            ?.let { meetings ->
+                meetings.firstOrNull { it.city == selectedCity }
+                    ?: meetings.firstOrNull()
+            }
+
+    val askRace = askRaceNumber
+
+    if (askMeeting != null && askRace != null) {
+        AskAiSheet(
+            city = askMeeting.city,
+            raceNumber = askRace,
+            raceDate = askMeeting.raceDate,
+            isPremium = currentUser?.tier == "premium",
+            repository = repository,
+            onUpgradeClick = {
+                askRaceNumber = null
+                onUpgradeClick()
+            },
+            onDismiss = {
+                askRaceNumber = null
+            },
+            foreign = true
+        )
     }
 }
 
@@ -258,7 +301,10 @@ private fun ForeignNotice(text: String) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ForeignRaceCard(race: ForeignRace) {
+private fun ForeignRaceCard(
+    race: ForeignRace,
+    onAskAi: () -> Unit = {}
+) {
     val strings = LocalStrings.current
 
     val ordered =
@@ -321,6 +367,14 @@ private fun ForeignRaceCard(race: ForeignRace) {
                     title = strings.foreignWinProbInfoTitle,
                     body = strings.foreignWinProbInfo
                 )
+
+                IconButton(onClick = onAskAi) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = strings.askAiTitle,
+                        tint = Green
+                    )
+                }
 
                 Icon(
                     imageVector =
