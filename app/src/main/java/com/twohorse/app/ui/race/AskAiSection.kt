@@ -77,8 +77,13 @@ private object AskAiHistory {
     private const val MAX_RACES = 10
     private const val MAX_AGE_MILLIS = 3L * 24 * 60 * 60 * 1000
 
-    fun raceKey(race: Race): String =
-        "${race.raceDate.orEmpty()}|${race.city}|${race.number}"
+    fun raceKey(
+        raceDate: String?,
+        city: String,
+        raceNumber: Int,
+        foreign: Boolean
+    ): String =
+        "${raceDate.orEmpty()}|${if (foreign) "yd|" else ""}$city|$raceNumber"
 
     private fun read(context: Context): JSONObject =
         runCatching {
@@ -182,6 +187,33 @@ fun AskAiSheet(
     onUpgradeClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    AskAiSheet(
+        city = race.city,
+        raceNumber = race.number,
+        raceDate = race.raceDate,
+        isPremium = isPremium,
+        repository = repository,
+        onUpgradeClick = onUpgradeClick,
+        onDismiss = onDismiss
+    )
+}
+
+/*
+ * The same sheet for a foreign meeting: only the race's identity and
+ * the foreign flag differ, and the server answers from that card's own
+ * numbers (see ask/service.ts).
+ */
+@Composable
+fun AskAiSheet(
+    city: String,
+    raceNumber: Int,
+    raceDate: String?,
+    isPremium: Boolean,
+    repository: TwoHorseRepository,
+    onUpgradeClick: () -> Unit,
+    onDismiss: () -> Unit,
+    foreign: Boolean = false
+) {
     val strings = LocalStrings.current
 
     ModalBottomSheet(
@@ -212,7 +244,7 @@ fun AskAiSheet(
                     )
 
                     Text(
-                        text = strings.raceCityAndNumber(race.city, race.number),
+                        text = strings.raceCityAndNumber(city, raceNumber),
                         color = Muted,
                         fontSize = 12.sp
                     )
@@ -233,7 +265,10 @@ fun AskAiSheet(
 
             if (isPremium) {
                 AskAiChat(
-                    race = race,
+                    city = city,
+                    raceNumber = raceNumber,
+                    raceDate = raceDate,
+                    foreign = foreign,
                     repository = repository
                 )
             } else {
@@ -275,13 +310,16 @@ fun AskAiSheet(
 
 @Composable
 private fun ColumnScope.AskAiChat(
-    race: Race,
+    city: String,
+    raceNumber: Int,
+    raceDate: String?,
+    foreign: Boolean,
     repository: TwoHorseRepository
 ) {
     val strings = LocalStrings.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val key = AskAiHistory.raceKey(race)
+    val key = AskAiHistory.raceKey(raceDate, city, raceNumber, foreign)
 
     var question by remember(key) { mutableStateOf("") }
     var loading by remember(key) { mutableStateOf(false) }
@@ -315,7 +353,7 @@ private fun ColumnScope.AskAiChat(
 
         scope.launch {
             repository
-                .ask(race.city, race.number, trimmed, currentLanguage().code)
+                .ask(city, raceNumber, trimmed, currentLanguage().code, foreign)
                 .onSuccess {
                     exchanges.add(AskExchange(trimmed, it.answer))
                     AskAiHistory.save(context, key, exchanges)

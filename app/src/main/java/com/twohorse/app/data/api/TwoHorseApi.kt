@@ -701,7 +701,9 @@ class TwoHorseApi(
                             modelCoupons =
                                 parseForeignModelCoupons(
                                     meeting.optJSONArray("modelCoupons")
-                                )
+                                ),
+                            raceDate =
+                                json.optionalString("date")
                         )
                     )
                 }
@@ -879,7 +881,8 @@ class TwoHorseApi(
         city: String,
         raceNumber: Int,
         question: String,
-        language: String
+        language: String,
+        foreign: Boolean = false
     ): AskAnswer =
         withContext(
             Dispatchers.IO
@@ -896,6 +899,7 @@ class TwoHorseApi(
                                 .put("raceNumber", raceNumber)
                                 .put("question", question)
                                 .put("language", language)
+                                .put("foreign", foreign)
                                 .toString()
                                 .toRequestBody(
                                     JSON_MEDIA_TYPE

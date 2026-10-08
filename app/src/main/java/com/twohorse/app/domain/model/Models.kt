@@ -318,7 +318,9 @@ data class ForeignMeeting(
     val country: String?,
     val races: List<ForeignRace>,
     val aiCoupons: List<ForeignAiCoupon> = emptyList(),
-    val modelCoupons: List<ForeignModelCoupon> = emptyList()
+    val modelCoupons: List<ForeignModelCoupon> = emptyList(),
+    /* The card's own race date, as the server reports it. */
+    val raceDate: String? = null
 )
 
 data class MembershipUser(
