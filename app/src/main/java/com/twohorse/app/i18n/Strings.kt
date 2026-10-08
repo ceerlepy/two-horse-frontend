@@ -384,6 +384,12 @@ interface Strings {
     @Composable
     fun foreignModelCouponTitle(number: Int): String
     @get:Composable
+    val foreignCouponButton: String
+    @get:Composable
+    val foreignAltCouponExpand: String
+    @get:Composable
+    val foreignAltCouponCollapse: String
+    @get:Composable
     val foreignModelCouponNote: String
     @Composable
     fun foreignCouponCoverage(percent: String): String

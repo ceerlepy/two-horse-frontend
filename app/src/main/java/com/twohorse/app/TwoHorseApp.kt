@@ -49,7 +49,9 @@ private sealed interface AppScreen {
     data class Coupons(
         val cities: List<String>,
         val selectedCity: String?,
-        val returnRace: Race? = null
+        val returnRace: Race? = null,
+        /* A foreign meeting's altılı; back goes to the foreign screen. */
+        val foreign: Boolean = false
     ) :
         AppScreen
 
@@ -126,7 +128,8 @@ fun TwoHorseApp() {
                         it
                     )
                 }
-                ?: AppScreen.Home
+                ?: if (coupons.foreign) AppScreen.Foreign
+                   else AppScreen.Home
     }
 
     BackHandler(
@@ -270,6 +273,22 @@ fun TwoHorseApp() {
                         onBack = {
                             screen =
                                 AppScreen.Home
+                        },
+
+                        onOpenCoupons = {
+                            city ->
+
+                            screen =
+                                AppScreen.Coupons(
+                                    cities =
+                                        listOf(
+                                            city
+                                        ),
+                                    selectedCity =
+                                        city,
+                                    foreign =
+                                        true
+                                )
                         }
                     )
                 }
@@ -336,6 +355,9 @@ fun TwoHorseApp() {
 
                         currentUser =
                             currentUser,
+
+                        foreign =
+                            current.foreign,
 
                         onBack = {
                             couponBack(
