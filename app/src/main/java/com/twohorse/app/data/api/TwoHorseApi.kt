@@ -270,7 +270,8 @@ class TwoHorseApi(
         budgetTl: Double,
         sixfold: Int = 1,
         multiplier: Int = 1,
-        pool: String = "sixfold"
+        pool: String = "sixfold",
+        foreign: Boolean = false
     ): CouponResult =
         withContext(
             Dispatchers.IO
@@ -305,6 +306,11 @@ class TwoHorseApi(
                         "pool",
                         pool
                     )
+                    .apply {
+                        if (foreign) {
+                            addQueryParameter("foreign", "1")
+                        }
+                    }
                     .build()
 
             val json =

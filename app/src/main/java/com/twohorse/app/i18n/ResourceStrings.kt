@@ -591,6 +591,15 @@ object ResourceStrings : Strings {
     override fun foreignModelCouponTitle(number: Int): String =
         stringResource(R.string.foreign_model_coupon_title, number)
 
+    override val foreignCouponButton: String
+        @Composable get() = stringResource(R.string.foreign_coupon_button)
+
+    override val foreignAltCouponExpand: String
+        @Composable get() = stringResource(R.string.foreign_alt_coupon_expand)
+
+    override val foreignAltCouponCollapse: String
+        @Composable get() = stringResource(R.string.foreign_alt_coupon_collapse)
+
     override val foreignModelCouponNote: String
         @Composable get() = stringResource(R.string.foreign_model_coupon_note)
 

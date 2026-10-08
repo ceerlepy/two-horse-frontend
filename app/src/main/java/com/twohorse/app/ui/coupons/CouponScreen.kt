@@ -73,6 +73,12 @@ fun CouponScreen(
     cities: List<String>,
     initialCity: String?,
     currentUser: MembershipUser?,
+    /*
+     * A foreign meeting: TJK runs only Altılı Ganyan there, and its
+     * races are not in /api/today, so the pool choice and the
+     * already-started warning do not apply.
+     */
+    foreign: Boolean = false,
     onBack: () -> Unit,
     onUpgradeClick: () -> Unit = {},
     onOpenHistory: () -> Unit = {},
@@ -118,7 +124,9 @@ fun CouponScreen(
             mutableStateOf<List<Race>>(emptyList())
         }
 
-    LaunchedEffect(selectedCity) {
+    LaunchedEffect(selectedCity, foreign) {
+        if (foreign) return@LaunchedEffect
+
         repository.today()
             .onSuccess { today ->
                 todayRaces =
@@ -256,7 +264,9 @@ fun CouponScreen(
                 multiplier =
                     1,
                 pool =
-                    requestPool
+                    requestPool,
+                foreign =
+                    foreign
             )
 
         if (
@@ -542,6 +552,7 @@ fun CouponScreen(
             }
         }
 
+        if (!foreign) {
         item {
             Column(
                 modifier =
@@ -590,6 +601,7 @@ fun CouponScreen(
                     )
                 }
             }
+        }
         }
 
         item {
@@ -826,7 +838,12 @@ fun CouponScreen(
                         tierIndex = index + 1,
                         tierCount = visibleCoupons.size,
                         onSave =
-                            if (canGenerateCoupons) {
+                            /*
+                             * No saving on a foreign card: we take no
+                             * results feed for those meetings, so a
+                             * saved coupon could never be scored.
+                             */
+                            if (canGenerateCoupons && !foreign) {
                                 { repository.saveMyCoupon(couponResult, coupon) }
                             } else {
                                 null

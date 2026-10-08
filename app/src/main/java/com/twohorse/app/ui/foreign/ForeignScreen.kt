@@ -45,7 +45,8 @@ private sealed interface ForeignLoadState {
 
 @Composable
 fun ForeignScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenCoupons: (String) -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
@@ -188,6 +189,30 @@ fun ForeignScreen(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
                             ForeignModelCouponCard(coupon)
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 18.dp)
+                        ) {
+                            Button(
+                                onClick = { onOpenCoupons(selected.city) },
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(min = 50.dp),
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = Green
+                                    ),
+                                shape = RoundedCornerShape(15.dp)
+                            ) {
+                                Text(
+                                    text = strings.foreignCouponButton,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
                         }
                     }
 
@@ -538,7 +563,9 @@ private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
         brush = ForeignAiBrush,
         titleColor = ForeignAiTitle,
         legLabelColor = Lavender,
-        noteColor = Lavender
+        noteColor = Lavender,
+        /* Ours is the one to read first, so this one opens on a tap. */
+        collapsible = true
     )
 }
 
@@ -590,9 +617,12 @@ private fun ForeignCouponCard(
     brush: Brush,
     titleColor: Color,
     legLabelColor: Color,
-    noteColor: Color
+    noteColor: Color,
+    collapsible: Boolean = false
 ) {
     val strings = LocalStrings.current
+
+    var expanded by remember(title) { mutableStateOf(!collapsible) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -605,6 +635,13 @@ private fun ForeignCouponCard(
                 Modifier
                     .fillMaxWidth()
                     .background(brush)
+                    .then(
+                        if (collapsible) {
+                            Modifier.clickable { expanded = !expanded }
+                        } else {
+                            Modifier
+                        }
+                    )
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -624,7 +661,20 @@ private fun ForeignCouponCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
+                if (collapsible) {
+                    Text(
+                        text =
+                            if (expanded) strings.foreignAltCouponCollapse
+                            else strings.foreignAltCouponExpand,
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = titleColor,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+
+            if (expanded) {
 
             legs.forEach { (raceNumber, selection) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -699,6 +749,8 @@ private fun ForeignCouponCard(
                 fontSize = 11.sp,
                 lineHeight = 15.sp
             )
+
+            }
         }
     }
 }

@@ -232,7 +232,8 @@ class TwoHorseRepository(
         budgetTl: Double,
         sixfold: Int,
         multiplier: Int = 1,
-        pool: String = "sixfold"
+        pool: String = "sixfold",
+        foreign: Boolean = false
     ): Result<CouponResult> =
         runCatching {
             api.getCoupons(
@@ -249,7 +250,10 @@ class TwoHorseRepository(
                     multiplier,
 
                 pool =
-                    pool
+                    pool,
+
+                foreign =
+                    foreign
             )
         }
 }
