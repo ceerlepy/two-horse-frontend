@@ -389,6 +389,10 @@ object ResourceStrings : Strings {
         @Composable get() = stringResource(R.string.coupon_coverage_info)
 
     @Composable
+    override val couponLegCoverageInfoTitle: String
+        @Composable get() = stringResource(R.string.coupon_leg_coverage_info_title)
+    override val couponLegCoverageInfo: String
+        @Composable get() = stringResource(R.string.coupon_leg_coverage_info)
     override fun couponLegCoverage(pct: String): String =
         stringResource(R.string.coupon_leg_coverage, pct)
 
@@ -577,8 +581,6 @@ object ResourceStrings : Strings {
         stringResource(R.string.foreign_ai_top, horse)
 
     @Composable
-    override fun foreignAiSelection(numbers: String): String =
-        stringResource(R.string.foreign_ai_selection, numbers)
 
     @Composable
     override fun foreignAiCouponTitle(number: Int): String =

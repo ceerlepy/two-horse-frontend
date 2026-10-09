@@ -1579,18 +1579,30 @@ private fun CouponLegRow(
                 }
             }
 
-            Text(
-                text =
-                    strings.couponLegCoverage(
-                        probabilityText(
-                            leg.coverageProbability
-                        )
-                    ),
-                color =
-                    Muted,
-                fontSize =
-                    10.sp
-            )
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+                Text(
+                    text =
+                        strings.couponLegCoverage(
+                            probabilityText(
+                                leg.coverageProbability
+                            )
+                        ),
+                    color =
+                        Muted,
+                    fontSize =
+                        10.sp
+                )
+
+                InfoButton(
+                    title =
+                        strings.couponLegCoverageInfoTitle,
+                    body =
+                        strings.couponLegCoverageInfo
+                )
+            }
         }
     }
 }
