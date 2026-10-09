@@ -170,7 +170,7 @@
     <string name="home_open_foreign">Open international races</string>
     <string name="foreign_title">International Races</string>
     <string name="foreign_subtitle">TJK card and AGF order</string>
-    <string name="foreign_empty">There are no international races on today\'s TJK card.</string>
+    <string name="foreign_empty">No international races left right now.</string>
     <string name="foreign_load_failed">International races could not be loaded.</string>
     <string name="foreign_agf_note">Horses are ordered by AGF. Purple boxes contain an alternative prediction.</string>
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>

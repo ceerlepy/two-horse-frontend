@@ -170,7 +170,7 @@
     <string name="home_open_foreign">Yurt dışı koşuları aç</string>
     <string name="foreign_title">Yurt Dışı Koşular</string>
     <string name="foreign_subtitle">TJK programı ve AGF sırası</string>
-    <string name="foreign_empty">Bugün TJK programında yurt dışı koşu yok.</string>
+    <string name="foreign_empty">Şu an kalan yurt dışı koşu yok.</string>
     <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
     <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor kutucuklar alternatif bir tahmin içermektedir.</string>
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
