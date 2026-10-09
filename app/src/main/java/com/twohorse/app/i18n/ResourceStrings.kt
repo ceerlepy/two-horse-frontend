@@ -600,6 +600,21 @@ object ResourceStrings : Strings {
     override val askAiPickRace: String
         @Composable get() = stringResource(R.string.ask_ai_pick_race)
 
+    @Composable
+    override fun askAiWholeMeeting(city: String): String =
+        stringResource(R.string.ask_ai_whole_meeting, city)
+
+    override val homeNextDayExpertFavorite: String
+        @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
+
+    @Composable
+    override fun homeNextDayExpertCount(count: Int): String =
+        stringResource(R.string.home_next_day_expert_count, count)
+
+    @Composable
+    override fun couponNextDayNotice(date: String): String =
+        stringResource(R.string.coupon_next_day_notice, date)
+
     override val foreignAltCouponExpand: String
         @Composable get() = stringResource(R.string.foreign_alt_coupon_expand)
 

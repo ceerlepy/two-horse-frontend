@@ -389,6 +389,14 @@ interface Strings {
     val foreignResultTitle: String
     @get:Composable
     val askAiPickRace: String
+    @Composable
+    fun askAiWholeMeeting(city: String): String
+    @get:Composable
+    val homeNextDayExpertFavorite: String
+    @Composable
+    fun homeNextDayExpertCount(count: Int): String
+    @Composable
+    fun couponNextDayNotice(date: String): String
     @get:Composable
     val foreignAltCouponExpand: String
     @get:Composable

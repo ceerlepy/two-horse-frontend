@@ -51,7 +51,12 @@ private sealed interface AppScreen {
         val selectedCity: String?,
         val returnRace: Race? = null,
         /* A foreign meeting's altılı; back goes to the foreign screen. */
-        val foreign: Boolean = false
+        val foreign: Boolean = false,
+        /*
+         * Today is over and home shows tomorrow's card: the same cities
+         * are listed, and the screen says when their coupons open.
+         */
+        val pendingDateLabel: String? = null
     ) :
         AppScreen
 
@@ -223,7 +228,8 @@ fun TwoHorseApp() {
 
                         onSixFoldClick = {
                             cities,
-                            selectedCity ->
+                            selectedCity,
+                            pendingDateLabel ->
 
                             screen =
                                 AppScreen.Coupons(
@@ -232,7 +238,9 @@ fun TwoHorseApp() {
                                     selectedCity =
                                         selectedCity,
                                     returnRace =
-                                        null
+                                        null,
+                                    pendingDateLabel =
+                                        pendingDateLabel
                                 )
                         },
 
@@ -365,6 +373,9 @@ fun TwoHorseApp() {
 
                         foreign =
                             current.foreign,
+
+                        pendingDateLabel =
+                            current.pendingDateLabel,
 
                         onBack = {
                             couponBack(

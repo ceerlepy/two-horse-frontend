@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -79,6 +80,8 @@ fun CouponScreen(
      * beşli there, like a domestic card.
      */
     foreign: Boolean = false,
+    /* Tomorrow's cities, listed before their AGF exists; nothing to build yet. */
+    pendingDateLabel: String? = null,
     onBack: () -> Unit,
     onUpgradeClick: () -> Unit = {},
     onOpenHistory: () -> Unit = {},
@@ -379,10 +382,19 @@ fun CouponScreen(
 
     val scope = rememberCoroutineScope()
 
+    val listState = rememberLazyListState()
+
+    /* Freshly generated coupons scroll into view under the form. */
+    LaunchedEffect(result) {
+        if (result != null) {
+            listState.animateScrollToItem(GENERATED_SUMMARY_INDEX)
+        }
+    }
+
     Scaffold(
         containerColor = Bg,
         bottomBar = {
-            Surface(
+            if (pendingDateLabel == null) Surface(
                 color = Bg
             ) {
                 if (canGenerateCoupons) {
@@ -469,6 +481,7 @@ fun CouponScreen(
         }
     ) { innerPadding ->
         LazyColumn(
+            state = listState,
             modifier =
                 Modifier
                     .fillMaxSize()
@@ -551,6 +564,27 @@ fun CouponScreen(
                 }
             }
         }
+
+        if (pendingDateLabel != null) {
+            item {
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp),
+                    color = PaleGold,
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        text = strings.couponNextDayNotice(pendingDateLabel),
+                        modifier = Modifier.padding(14.dp),
+                        color = Ink,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        } else {
 
         item {
             Column(
@@ -853,8 +887,12 @@ fun CouponScreen(
                 )
             }
         }
+        }
     }
 }
+
+/* Header, intro, city title, cities, pool, window, budget come first. */
+private const val GENERATED_SUMMARY_INDEX = 7
 
 @Composable
 private fun CouponHeader(

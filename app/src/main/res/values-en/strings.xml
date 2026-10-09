@@ -173,8 +173,8 @@
     <string name="foreign_agf_note">Horses are ordered by AGF. Lavender labels come from an alternative prediction source, not from our model.</string>
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
     <string name="foreign_win_prob">Win %1$s%%</string>
-    <string name="foreign_win_prob_info_title">Win chance</string>
-    <string name="foreign_win_prob_info">The green percentage is AGF: the share of money bet on that horse. The yellow \"Win\" figure is our own model. We trained it on past foreign races and tested it on later races it had never seen. Bettors make favourites look stronger and outsiders weaker than they are, and the model corrects that bias. It does not mean the horse will win.</string>
+    <string name="foreign_win_prob_info_title">AGF and win chance</string>
+    <string name="foreign_win_prob_info">The green AGF tag is the share of money bet on that horse. The yellow \"Win %\" tag is our own model\'s estimate of its chance to win; it does not mean the horse will win. Foreign races have no value label.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
     <string name="foreign_ai_top">Alternative pick: %1$s</string>
@@ -185,6 +185,10 @@
     <string name="foreign_coupon_coverage">Coverage %1$s%%</string>
     <string name="foreign_coupon_button">Create a coupon for this meeting</string>
     <string name="foreign_result_title">Result</string>
+    <string name="ask_ai_whole_meeting">%1$s · all races</string>
+    <string name="home_next_day_expert_favorite">EXPERT FAVORITE</string>
+    <string name="home_next_day_expert_count">%1$d experts</string>
+    <string name="coupon_next_day_notice">Today\'s races are over. Tomorrow\'s (%1$s) coupons are built on race morning once AGF opens; our model does not build a coupon without AGF.</string>
     <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>
     <string name="foreign_alt_coupon_collapse">Hide</string>

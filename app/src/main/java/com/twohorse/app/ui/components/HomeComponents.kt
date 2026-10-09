@@ -37,6 +37,7 @@ import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.race.AskAiCardButton
 import com.twohorse.app.ui.theme.*
 
 @Composable
@@ -608,7 +609,9 @@ fun RaceCard(
     race: Race,
     countdown: String,
     time: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    /* "AI'ya sor" about this race, from the card itself. */
+    onAskAi: (() -> Unit)? = null
 ) {
     val strings = LocalStrings.current
 
@@ -697,6 +700,10 @@ fun RaceCard(
                 Spacer(
                     Modifier.weight(1f)
                 )
+
+                onAskAi?.let {
+                    AskAiCardButton(onClick = it)
+                }
 
                 Icon(
                     imageVector =

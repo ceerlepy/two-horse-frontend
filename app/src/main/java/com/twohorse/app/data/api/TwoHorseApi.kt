@@ -893,7 +893,8 @@ class TwoHorseApi(
         raceNumber: Int,
         question: String,
         language: String,
-        foreign: Boolean = false
+        foreign: Boolean = false,
+        raceDate: String? = null
     ): AskAnswer =
         withContext(
             Dispatchers.IO
@@ -911,6 +912,9 @@ class TwoHorseApi(
                                 .put("question", question)
                                 .put("language", language)
                                 .put("foreign", foreign)
+                                .apply {
+                                    raceDate?.let { put("raceDate", it) }
+                                }
                                 .toString()
                                 .toRequestBody(
                                     JSON_MEDIA_TYPE

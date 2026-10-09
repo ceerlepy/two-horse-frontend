@@ -44,6 +44,7 @@ import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.domain.model.TodayData
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.i18n.currentLanguage
 import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.AutoRefreshEffect
 import com.twohorse.app.ui.components.CityChip
@@ -60,6 +61,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Stars
+import com.twohorse.app.ui.race.AskAiSheet
 import com.twohorse.app.ui.theme.PaleGreen
 import com.twohorse.app.ui.theme.Gold
 import com.twohorse.app.ui.theme.Green
@@ -74,7 +76,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(
     onRaceClick: (Race) -> Unit,
-    onSixFoldClick: (List<String>, String?) -> Unit = { _, _ -> },
+    /* Cities, selected city, and tomorrow's date label once today is over. */
+    onSixFoldClick: (List<String>, String?, String?) -> Unit = { _, _, _ -> },
     onHistoryClick: () -> Unit = {},
     onAccountClick: () -> Unit = {},
     onForeignClick: () -> Unit = {},
@@ -86,6 +89,12 @@ fun HomeScreen(
     val repository =
         remember {
             TwoHorseRepository(context)
+        }
+
+    /* The race whose "AI'ya sor" sheet is open from its home card. */
+    var askRace by
+        remember {
+            mutableStateOf<Race?>(null)
         }
 
     val lifecycleOwner =
@@ -597,12 +606,31 @@ fun HomeScreen(
                             horizontal = 18.dp
                         )
                 ) {
+                    /*
+                     * The coupon screen lists exactly the cities home is
+                     * showing: today's still-running meetings, or
+                     * tomorrow's once today is over (9 Oct: home showed
+                     * Ankara while the coupon screen offered finished
+                     * Bursa and İstanbul).
+                     */
                     SixFoldEntryCard(
                         onClick = {
-                            onSixFoldClick(
-                                cities,
-                                selectedCity
-                            )
+                            if (nextDay != null) {
+                                onSixFoldClick(
+                                    nextDay.meetings.map { it.city },
+                                    nextDayCity,
+                                    nextDayDateLabel(
+                                        nextDay.date,
+                                        currentLanguage().code
+                                    )
+                                )
+                            } else {
+                                onSixFoldClick(
+                                    upcomingCities.ifEmpty { cities },
+                                    selectedCity,
+                                    null
+                                )
+                            }
                         }
                     )
                 }
@@ -686,6 +714,9 @@ fun HomeScreen(
                                 onRaceClick(
                                     race
                                 )
+                            },
+                            onAskAi = {
+                                askRace = race
                             }
                         )
                     }
@@ -750,6 +781,9 @@ fun HomeScreen(
                                     onRaceClick(
                                         race
                                     )
+                                },
+                                onAskAi = {
+                                    askRace = race
                                 }
                             )
                         }
@@ -766,6 +800,21 @@ fun HomeScreen(
                     )
             )
         }
+    }
+
+    askRace?.let { race ->
+        AskAiSheet(
+            race = race,
+            isPremium = user?.tier == "premium",
+            repository = repository,
+            onUpgradeClick = {
+                askRace = null
+                onAccountClick()
+            },
+            onDismiss = {
+                askRace = null
+            }
+        )
     }
 }
 
