@@ -56,7 +56,9 @@ private sealed interface AppScreen {
          * Today is over and home shows tomorrow's card: the same cities
          * are listed, and the screen says when their coupons open.
          */
-        val pendingDateLabel: String? = null
+        val pendingDateLabel: String? = null,
+        /* A foreign card's own date (yesterday's late American card). */
+        val foreignRaceDate: String? = null
     ) :
         AppScreen
 
@@ -284,7 +286,8 @@ fun TwoHorseApp() {
                         },
 
                         onOpenCoupons = {
-                            city ->
+                            city,
+                            raceDate ->
 
                             screen =
                                 AppScreen.Coupons(
@@ -295,8 +298,23 @@ fun TwoHorseApp() {
                                     selectedCity =
                                         city,
                                     foreign =
-                                        true
+                                        true,
+                                    foreignRaceDate =
+                                        raceDate
                                 )
+                        },
+
+                        onHistoryClick = {
+                            screen =
+                                if (Config.SHOW_MODEL_PERFORMANCE)
+                                    AppScreen.History
+                                else
+                                    AppScreen.MyCoupons(null)
+                        },
+
+                        onAccountClick = {
+                            screen =
+                                AppScreen.Account
                         },
 
                         currentUser =
@@ -376,6 +394,8 @@ fun TwoHorseApp() {
 
                         pendingDateLabel =
                             current.pendingDateLabel,
+                        foreignRaceDate =
+                            current.foreignRaceDate,
 
                         onBack = {
                             couponBack(

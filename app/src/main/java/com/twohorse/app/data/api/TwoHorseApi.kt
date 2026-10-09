@@ -271,7 +271,8 @@ class TwoHorseApi(
         sixfold: Int = 1,
         multiplier: Int = 1,
         pool: String = "sixfold",
-        foreign: Boolean = false
+        foreign: Boolean = false,
+        raceDate: String? = null
     ): CouponResult =
         withContext(
             Dispatchers.IO
@@ -309,6 +310,7 @@ class TwoHorseApi(
                     .apply {
                         if (foreign) {
                             addQueryParameter("foreign", "1")
+                            raceDate?.let { addQueryParameter("raceDate", it) }
                         }
                     }
                     .build()
@@ -706,8 +708,10 @@ class TwoHorseApi(
                                 parseForeignModelCoupons(
                                     meeting.optJSONArray("modelCoupons")
                                 ),
+                            /* A late American card carries yesterday's date. */
                             raceDate =
-                                json.optionalString("date")
+                                meeting.optionalString("raceDate")
+                                    ?: json.optionalString("date")
                         )
                     )
                 }

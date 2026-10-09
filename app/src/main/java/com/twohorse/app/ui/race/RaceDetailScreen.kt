@@ -167,9 +167,8 @@ fun RaceDetailScreen(
                     }
             )
 
-    /* Before AGF opens the order is not the model's, so no hero. */
     val favorite =
-        if (currentRace.agfPending) null else horses.firstOrNull()
+        horses.firstOrNull()
 
     val rival =
         horses.getOrNull(1)
@@ -213,6 +212,12 @@ fun RaceDetailScreen(
             )
         }
 
+        if (currentRace.agfPending) {
+            item {
+                AgfPendingNotice()
+            }
+        }
+
         error?.let { raceError ->
             item {
                 Notice(
@@ -246,13 +251,6 @@ fun RaceDetailScreen(
             }
         }
 
-        if (currentRace.agfPending) {
-            item {
-                Notice(
-                    text = strings.raceAgfPendingNote
-                )
-            }
-        } else {
         item {
             Column(
                 modifier =
@@ -301,7 +299,6 @@ fun RaceDetailScreen(
                     )
                 }
             }
-        }
         }
 
         if (

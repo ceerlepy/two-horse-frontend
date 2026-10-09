@@ -84,6 +84,8 @@ fun CouponScreen(
     foreign: Boolean = false,
     /* Tomorrow's cities, listed before their AGF exists; nothing to build yet. */
     pendingDateLabel: String? = null,
+    /* Foreign card date when it is yesterday's late card. */
+    foreignRaceDate: String? = null,
     onBack: () -> Unit,
     onUpgradeClick: () -> Unit = {},
     onOpenHistory: () -> Unit = {},
@@ -271,7 +273,9 @@ fun CouponScreen(
                 pool =
                     requestPool,
                 foreign =
-                    foreign
+                    foreign,
+                raceDate =
+                    foreignRaceDate
             )
 
         if (

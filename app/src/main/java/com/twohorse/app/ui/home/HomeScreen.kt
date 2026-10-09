@@ -49,6 +49,7 @@ import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.AutoRefreshEffect
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
+import com.twohorse.app.ui.components.AgfPendingNotice
 import com.twohorse.app.ui.components.RegionTabs
 import com.twohorse.app.ui.components.NextRaceHero
 import com.twohorse.app.ui.components.RaceCard
@@ -414,6 +415,13 @@ fun HomeScreen(
                 foreignSelected = false,
                 onSelect = { foreign -> if (foreign) onForeignClick() }
             )
+        }
+
+        /* Overnight, before TJK opens AGF: one notice above all the cards. */
+        if (allRaces.any { it.agfPending }) {
+            item {
+                AgfPendingNotice()
+            }
         }
 
         // Keeps the trial's end in sight, so the switch to Free on

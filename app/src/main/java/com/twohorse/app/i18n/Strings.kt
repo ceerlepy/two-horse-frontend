@@ -396,8 +396,6 @@ interface Strings {
     @get:Composable
     val raceAgfPendingNote: String
     @get:Composable
-    val couponErrorAgfNotOpen: String
-    @get:Composable
     val regionTabTurkey: String
     @get:Composable
     val regionTabForeign: String
