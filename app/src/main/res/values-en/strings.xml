@@ -187,7 +187,6 @@
     <string name="foreign_result_title">Result</string>
     <string name="ask_ai_whole_meeting">%1$s · all races</string>
     <string name="home_next_day_expert_favorite">EXPERT FAVORITE</string>
-    <string name="home_next_day_expert_count">%1$d experts</string>
     <string name="coupon_next_day_notice">Today\'s races are over. Tomorrow\'s (%1$s) coupons are built on race morning once AGF opens; our model does not build a coupon without AGF.</string>
     <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>

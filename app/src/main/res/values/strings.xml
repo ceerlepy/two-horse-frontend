@@ -187,7 +187,6 @@
     <string name="foreign_result_title">Sonuç</string>
     <string name="ask_ai_whole_meeting">%1$s · tüm koşular</string>
     <string name="home_next_day_expert_favorite">UZMAN FAVORİSİ</string>
-    <string name="home_next_day_expert_count">%1$d uzman</string>
     <string name="coupon_next_day_notice">Bugünün yarışları bitti. Yarının (%1$s) kuponları yarış sabahı AGF açılınca hazırlanır; modelimiz AGF olmadan kupon kurmaz.</string>
     <string name="ask_ai_pick_race">Hangi koşuyu soracaksın?</string>
     <string name="foreign_alt_coupon_expand">Göster</string>

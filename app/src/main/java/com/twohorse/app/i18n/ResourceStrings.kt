@@ -608,10 +608,6 @@ object ResourceStrings : Strings {
         @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
 
     @Composable
-    override fun homeNextDayExpertCount(count: Int): String =
-        stringResource(R.string.home_next_day_expert_count, count)
-
-    @Composable
     override fun couponNextDayNotice(date: String): String =
         stringResource(R.string.coupon_next_day_notice, date)
 
