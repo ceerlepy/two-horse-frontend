@@ -393,6 +393,8 @@ interface Strings {
     fun askAiWholeMeeting(city: String): String
     @get:Composable
     val homeNextDayExpertFavorite: String
+    @get:Composable
+    val couponShowGenerated: String
     @Composable
     fun couponNextDayNotice(date: String): String
     @get:Composable

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.twohorse.app.ui.coupons
 
 import androidx.activity.compose.BackHandler
@@ -385,11 +387,23 @@ fun CouponScreen(
     val listState = rememberLazyListState()
 
     /* Freshly generated coupons scroll into view under the form. */
+    var showResults by remember { mutableStateOf(false) }
+
     LaunchedEffect(result) {
-        if (result != null) {
-            listState.animateScrollToItem(GENERATED_SUMMARY_INDEX)
-        }
+        showResults = result != null
     }
+
+    val windowStartMillis =
+        result?.startRace?.let { raceNumber ->
+            todayRaces
+                .firstOrNull { it.number == raceNumber }
+                ?.let(::couponRaceStartMillis)
+        }
+
+    val windowStarted =
+        windowStartMillis != null &&
+        System.currentTimeMillis() >= windowStartMillis
+
 
     Scaffold(
         containerColor = Bg,
@@ -753,12 +767,68 @@ fun CouponScreen(
             }
         }
 
-        if (
-            result != null &&
-            lastGeneratedCity != null &&
-            lastGeneratedSixfold != null &&
-            lastGeneratedBudget != null
+        val generated = result
+
+        if (generated != null && windowStarted) {
+            item {
+                ErrorCard(
+                    message =
+                        strings.couponWindowStarted(
+                            poolLabel(lastGeneratedPool ?: generated.pool)
+                        )
+                )
+            }
+        } else if (generated != null && !showResults) {
+            item {
+                OutlinedButton(
+                    onClick = { showResults = true },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        text = strings.couponShowGenerated,
+                        color = Green,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+            item {
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+            }
+        }
+        }
+    }
+
+    val generated = result
+
+    /* Generated coupons open in their own scrollable sheet, like AI'ya sor. */
+    if (generated != null && showResults && !windowStarted) {
+        ModalBottomSheet(
+            onDismissRequest = { showResults = false },
+            sheetState =
+                rememberModalBottomSheetState(
+                    skipPartiallyExpanded = true
+                ),
+            containerColor = CardTone
         ) {
+            LazyColumn(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.92f),
+                verticalArrangement =
+                    Arrangement.spacedBy(12.dp),
+                contentPadding =
+                    PaddingValues(bottom = 24.dp)
+            ) {
+            generated.let { couponResult ->
             item {
                 Surface(
                     modifier =
@@ -799,30 +869,6 @@ fun CouponScreen(
                     )
                 }
             }
-        }
-
-        val windowStartMillis =
-            result?.startRace?.let { raceNumber ->
-                todayRaces
-                    .firstOrNull { it.number == raceNumber }
-                    ?.let(::couponRaceStartMillis)
-            }
-
-        val windowStarted =
-            windowStartMillis != null &&
-            System.currentTimeMillis() >= windowStartMillis
-
-        result?.let { couponResult ->
-            if (windowStarted) {
-                item {
-                    ErrorCard(
-                        message =
-                            strings.couponWindowStarted(
-                                poolLabel(lastGeneratedPool ?: couponResult.pool)
-                            )
-                    )
-                }
-            } else {
 
             if (couponResult.coupons.isEmpty()) {
                 item {
@@ -879,20 +925,10 @@ fun CouponScreen(
                 }
             }
             }
-        }
-
-            item {
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
             }
-        }
         }
     }
 }
-
-/* Header, intro, city title, cities, pool, window, budget come first. */
-private const val GENERATED_SUMMARY_INDEX = 7
 
 @Composable
 private fun CouponHeader(

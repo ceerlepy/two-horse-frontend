@@ -607,6 +607,9 @@ object ResourceStrings : Strings {
     override val homeNextDayExpertFavorite: String
         @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
 
+    override val couponShowGenerated: String
+        @Composable get() = stringResource(R.string.coupon_show_generated)
+
     @Composable
     override fun couponNextDayNotice(date: String): String =
         stringResource(R.string.coupon_next_day_notice, date)
