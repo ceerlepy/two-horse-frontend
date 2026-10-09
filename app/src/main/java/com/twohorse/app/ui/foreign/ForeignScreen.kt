@@ -101,7 +101,7 @@ fun ForeignScreen(
             repository
                 .foreignMeetings()
                 .fold(
-                    onSuccess = { ForeignLoadState.Loaded(it) },
+                    onSuccess = { ForeignLoadState.Loaded(it.withoutFinishedRaces()) },
                     onFailure = { ForeignLoadState.Failed }
                 )
         refreshing = false
@@ -448,32 +448,6 @@ private fun ForeignRaceCard(
                     }
                 }
             }
-
-            /* TJK's official top three, once the race is run. */
-            if (race.result.isNotEmpty()) {
-                HorizontalDivider(color = CardToneBorder)
-
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(
-                        text = strings.foreignResultTitle,
-                        color = Muted,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    race.result.forEach { placed ->
-                        Text(
-                            text = "${placed.position}. #${placed.number} ${placed.name}",
-                            color = Ink,
-                            fontSize = 13.sp,
-                            fontWeight =
-                                if (placed.position == 1) FontWeight.Black else FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-            }
         }
 
         if (!expanded) {
@@ -486,19 +460,6 @@ private fun ForeignRaceCard(
             modifier = Modifier.padding(15.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            race.aiPick?.let { pick ->
-                val top = pick.ranked.firstOrNull()
-
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    top?.let {
-                        LavenderLabel(strings.foreignAiTop("${it.number}-${it.name}"))
-                    }
-                }
-            }
-
             ordered.forEachIndexed { index, runner ->
                 val leading = index < 3
 
@@ -590,24 +551,6 @@ private fun ForeignRaceCard(
 private fun winProbLabel(prob: Double): String {
     val percent = prob * 100
     return if (percent < 1.0) "<1" else "%.0f".format(percent)
-}
-
-@Composable
-private fun LavenderLabel(text: String) {
-    Surface(
-        color = LavenderSurface,
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            color = Color.White,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
 }
 
 /* Gold title on deep lavender, white bold picks, gold total pill. */
@@ -798,3 +741,15 @@ private fun ForeignCouponCard(
         }
     }
 }
+
+/*
+ * A race leaves the list once TJK posts its result, and a meeting
+ * whose races are all run leaves with it: the screen only shows
+ * what is still to come.
+ */
+private fun List<ForeignMeeting>.withoutFinishedRaces(): List<ForeignMeeting> =
+    mapNotNull { meeting ->
+        val upcoming = meeting.races.filter { it.result.isEmpty() }
+
+        if (upcoming.isEmpty()) null else meeting.copy(races = upcoming)
+    }
