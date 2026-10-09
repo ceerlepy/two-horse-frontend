@@ -20,6 +20,7 @@ sealed interface CouponError {
     data object NoInternet : CouponError
     data object Timeout : CouponError
     data object Generic : CouponError
+    data object AgfNotOpen : CouponError
     data object CitySelectFailed : CouponError
     data object UnexpectedWindow : CouponError
     data object BudgetExceeded : CouponError
@@ -76,6 +77,9 @@ fun couponErrorText(
         CouponError.Generic ->
             strings.couponErrorGeneric
 
+        CouponError.AgfNotOpen ->
+            strings.couponErrorAgfNotOpen
+
         CouponError.CitySelectFailed ->
             strings.couponCitySelectFailed
 
@@ -117,6 +121,9 @@ fun couponErrorFromThrowable(throwable: Throwable): CouponError {
 
         "COUPON_DAILY_LIMIT_REACHED" ->
             CouponError.DailyLimitReached
+
+        "AGF_NOT_OPEN" ->
+            CouponError.AgfNotOpen
 
         "AUTH_REQUIRED" ->
             CouponError.AuthRequired

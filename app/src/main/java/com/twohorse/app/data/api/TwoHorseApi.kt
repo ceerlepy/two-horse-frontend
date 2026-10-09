@@ -1868,6 +1868,12 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
             expertSourceCount =
                 json.firstInt(
                     "expertSourceCount"
+                ),
+
+            agfPending =
+                json.optBoolean(
+                    "agfPending",
+                    false
                 )
         )
     }

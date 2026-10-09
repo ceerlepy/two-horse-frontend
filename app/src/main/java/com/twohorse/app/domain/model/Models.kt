@@ -128,7 +128,9 @@ data class Race(
     val couponStrategy: RaceCouponStrategy? = null,
     val raceDate: String? = null,
     /* Distinct expert sources with any pick in this race (paid tiers). */
-    val expertSourceCount: Int? = null
+    val expertSourceCount: Int? = null,
+    /* TJK has not opened AGF yet: no model score, advice or coupon. */
+    val agfPending: Boolean = false
 )
 
 data class Meeting(

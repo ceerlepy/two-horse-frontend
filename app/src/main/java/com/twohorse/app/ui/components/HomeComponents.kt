@@ -375,8 +375,8 @@ fun NextRaceHero(
             )
 
             val leader =
-                rankedHorses(race)
-                    .firstOrNull()
+                if (race.agfPending) null
+                else rankedHorses(race).firstOrNull()
 
             leader?.let {
                 Spacer(
@@ -619,8 +619,9 @@ fun RaceCard(
     val ranked =
         rankedHorses(race)
 
+    /* No favourite before AGF: the order would be the old score. */
     val favorite =
-        ranked.firstOrNull()
+        if (race.agfPending) null else ranked.firstOrNull()
 
     val surprise =
         ranked
