@@ -380,7 +380,6 @@ interface Strings {
     @Composable
     fun foreignAiTop(horse: String): String
     @Composable
-    @Composable
     fun foreignAiCouponTitle(number: Int): String
     @get:Composable
     val foreignAltCouponNote: String
