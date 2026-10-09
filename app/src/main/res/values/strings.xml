@@ -184,6 +184,8 @@
     <string name="foreign_model_coupon_title">Model altılısı %1$d</string>
     <string name="foreign_coupon_coverage">Kapsama %%%1$s</string>
     <string name="foreign_coupon_button">Bu yarış için kupon oluştur</string>
+    <string name="foreign_result_title">Sonuç</string>
+    <string name="ask_ai_pick_race">Hangi koşuyu soracaksın?</string>
     <string name="foreign_alt_coupon_expand">Göster</string>
     <string name="foreign_alt_coupon_collapse">Gizle</string>
     <string name="foreign_model_coupon_note">Bizim modelimizin düzeltilmiş kazanma ihtimallerinden kurduğu altılı. Bütçe 500 TL üzerinden hesaplanır.</string>

@@ -310,7 +310,15 @@ data class ForeignRace(
     val distanceMeters: Int?,
     val track: String?,
     val runners: List<ForeignRunner>,
-    val aiPick: ForeignAiPick? = null
+    val aiPick: ForeignAiPick? = null,
+    /* TJK's official top three once the race is run. */
+    val result: List<ForeignResultRunner> = emptyList()
+)
+
+data class ForeignResultRunner(
+    val number: Int,
+    val name: String,
+    val position: Int
 )
 
 data class ForeignMeeting(

@@ -594,6 +594,12 @@ object ResourceStrings : Strings {
     override val foreignCouponButton: String
         @Composable get() = stringResource(R.string.foreign_coupon_button)
 
+    override val foreignResultTitle: String
+        @Composable get() = stringResource(R.string.foreign_result_title)
+
+    override val askAiPickRace: String
+        @Composable get() = stringResource(R.string.ask_ai_pick_race)
+
     override val foreignAltCouponExpand: String
         @Composable get() = stringResource(R.string.foreign_alt_coupon_expand)
 

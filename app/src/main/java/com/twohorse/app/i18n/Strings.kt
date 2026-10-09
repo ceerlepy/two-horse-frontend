@@ -386,6 +386,10 @@ interface Strings {
     @get:Composable
     val foreignCouponButton: String
     @get:Composable
+    val foreignResultTitle: String
+    @get:Composable
+    val askAiPickRace: String
+    @get:Composable
     val foreignAltCouponExpand: String
     @get:Composable
     val foreignAltCouponCollapse: String

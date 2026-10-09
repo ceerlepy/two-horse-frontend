@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -36,6 +35,7 @@ import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
+import com.twohorse.app.ui.race.AskAiFab
 import com.twohorse.app.ui.race.AskAiSheet
 import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
@@ -89,9 +89,26 @@ fun ForeignScreen(
                 )
     }
 
+    /* The same meeting the list is showing, including its first-load default. */
+    val shownMeeting =
+        (state as? ForeignLoadState.Loaded)
+            ?.meetings
+            ?.let { meetings ->
+                meetings.firstOrNull { it.city == selectedCity }
+                    ?: meetings.firstOrNull()
+            }
+
+    /* Race picker under the "AI'ya sor" button. */
+    var askPickerOpen by
+        remember {
+            mutableStateOf(false)
+        }
+
+    Box(modifier = Modifier.fillMaxSize()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 34.dp),
+        /* Room under the last card for the "AI'ya sor" button. */
+        contentPadding = PaddingValues(bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
@@ -245,10 +262,7 @@ fun ForeignScreen(
                         Column(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
-                            ForeignRaceCard(
-                                race = race,
-                                onAskAi = { askRaceNumber = race.raceNumber }
-                            )
+                            ForeignRaceCard(race = race)
                         }
                     }
                 }
@@ -256,15 +270,68 @@ fun ForeignScreen(
         }
     }
 
-    /* The same meeting the list is showing, including its first-load default. */
-    val askMeeting =
-        (state as? ForeignLoadState.Loaded)
-            ?.meetings
-            ?.let { meetings ->
-                meetings.firstOrNull { it.city == selectedCity }
-                    ?: meetings.firstOrNull()
-            }
+    /*
+     * "AI'ya sor" sits bottom-right like on a domestic race screen. One
+     * screen holds the whole foreign card here, so the button first asks
+     * which race.
+     */
+    val askRaces = shownMeeting?.races.orEmpty()
 
+    if (askRaces.isNotEmpty()) {
+        Box(
+            modifier =
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .navigationBarsPadding()
+                    .padding(end = 18.dp, bottom = 18.dp)
+        ) {
+            AskAiFab(
+                onClick = {
+                    if (askRaces.size == 1) {
+                        askRaceNumber = askRaces.first().raceNumber
+                    } else {
+                        askPickerOpen = true
+                    }
+                }
+            )
+
+            DropdownMenu(
+                expanded = askPickerOpen,
+                onDismissRequest = { askPickerOpen = false }
+            ) {
+                Text(
+                    text = strings.askAiPickRace,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = Muted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                askRaces.forEach { race ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text =
+                                    listOfNotNull(
+                                        strings.homeCourseNumberCaps(race.raceNumber),
+                                        race.time
+                                    ).joinToString(" · "),
+                                color = Ink,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        onClick = {
+                            askPickerOpen = false
+                            askRaceNumber = race.raceNumber
+                        }
+                    )
+                }
+            }
+        }
+    }
+    }
+
+    val askMeeting = shownMeeting
     val askRace = askRaceNumber
 
     if (askMeeting != null && askRace != null) {
@@ -302,8 +369,7 @@ private fun ForeignNotice(text: String) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ForeignRaceCard(
-    race: ForeignRace,
-    onAskAi: () -> Unit = {}
+    race: ForeignRace
 ) {
     val strings = LocalStrings.current
 
@@ -367,14 +433,6 @@ private fun ForeignRaceCard(
                     title = strings.foreignWinProbInfoTitle,
                     body = strings.foreignWinProbInfo
                 )
-
-                IconButton(onClick = onAskAi) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Chat,
-                        contentDescription = strings.askAiTitle,
-                        tint = Green
-                    )
-                }
 
                 Icon(
                     imageVector =
@@ -447,6 +505,32 @@ private fun ForeignRaceCard(
                                 fontSize = 13.sp
                             )
                         }
+                    }
+                }
+            }
+
+            /* TJK's official top three, once the race is run. */
+            if (race.result.isNotEmpty()) {
+                HorizontalDivider(color = CardToneBorder)
+
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(
+                        text = strings.foreignResultTitle,
+                        color = Muted,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    race.result.forEach { placed ->
+                        Text(
+                            text = "${placed.position}. #${placed.number} ${placed.name}",
+                            color = Ink,
+                            fontSize = 13.sp,
+                            fontWeight =
+                                if (placed.position == 1) FontWeight.Black else FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }

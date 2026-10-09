@@ -13,7 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -166,8 +166,9 @@ fun AskAiFab(
         containerColor = Green,
         contentColor = Color.White
     ) {
+        /* Sparkles: the usual "AI" mark, not a chat bubble. */
         Icon(
-            Icons.AutoMirrored.Filled.Chat,
+            Icons.Filled.AutoAwesome,
             contentDescription = strings.askAiOpen,
             modifier = Modifier.size(26.dp)
         )
