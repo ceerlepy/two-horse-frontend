@@ -37,9 +37,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetPasswordOption
+import androidx.credentials.PasswordCredential
+import androidx.credentials.exceptions.CreateCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -289,7 +293,7 @@ fun LoginScreen(
         error = null
 
         scope.launch {
-            handleAuthResult(
+            val result =
                 if (registerMode)
                     repository.register(
                         email.trim(),
@@ -301,7 +305,54 @@ fun LoginScreen(
                         email.trim(),
                         password
                     )
-            )
+
+            /*
+             * Offer to keep the password in the phone's password
+             * manager, like other apps do; declining changes nothing.
+             */
+            if (result.isSuccess) {
+                try {
+                    credentialManager.createCredential(
+                        context,
+                        CreatePasswordRequest(
+                            email.trim(),
+                            password
+                        )
+                    )
+                } catch (e: CreateCredentialException) {
+                    // Declined or no password manager: sign in anyway.
+                }
+            }
+
+            handleAuthResult(result)
+        }
+    }
+
+    /*
+     * A password saved earlier is offered once when the screen opens;
+     * picking it fills the form and signs in. Nothing saved means no
+     * sheet at all.
+     */
+    LaunchedEffect(Unit) {
+        val saved =
+            try {
+                credentialManager
+                    .getCredential(
+                        context,
+                        GetCredentialRequest(
+                            listOf(GetPasswordOption())
+                        )
+                    )
+                    .credential as? PasswordCredential
+            } catch (e: GetCredentialException) {
+                null
+            }
+
+        if (saved != null && !loading) {
+            registerMode = false
+            email = saved.id
+            password = saved.password
+            submitEmailForm()
         }
     }
 
