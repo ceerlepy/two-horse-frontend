@@ -49,7 +49,7 @@ import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.AutoRefreshEffect
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
-import com.twohorse.app.ui.components.ForeignEntryCard
+import com.twohorse.app.ui.components.RegionTabs
 import com.twohorse.app.ui.components.NextRaceHero
 import com.twohorse.app.ui.components.RaceCard
 import com.twohorse.app.ui.components.RemainingRacesToggle
@@ -409,6 +409,13 @@ fun HomeScreen(
             )
         }
 
+        item {
+            RegionTabs(
+                foreignSelected = false,
+                onSelect = { foreign -> if (foreign) onForeignClick() }
+            )
+        }
+
         // Keeps the trial's end in sight, so the switch to Free on
         // day 8 is never a surprise.
         if (
@@ -632,19 +639,6 @@ fun HomeScreen(
                                 )
                             }
                         }
-                    )
-                }
-            }
-
-            item {
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 18.dp
-                        )
-                ) {
-                    ForeignEntryCard(
-                        onClick = onForeignClick
                     )
                 }
             }

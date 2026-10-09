@@ -394,6 +394,10 @@ interface Strings {
     @get:Composable
     val homeNextDayExpertFavorite: String
     @get:Composable
+    val regionTabTurkey: String
+    @get:Composable
+    val regionTabForeign: String
+    @get:Composable
     val couponShowGenerated: String
     @Composable
     fun couponNextDayNotice(date: String): String

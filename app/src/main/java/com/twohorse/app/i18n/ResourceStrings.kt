@@ -607,6 +607,12 @@ object ResourceStrings : Strings {
     override val homeNextDayExpertFavorite: String
         @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
 
+    override val regionTabTurkey: String
+        @Composable get() = stringResource(R.string.region_tab_turkey)
+
+    override val regionTabForeign: String
+        @Composable get() = stringResource(R.string.region_tab_foreign)
+
     override val couponShowGenerated: String
         @Composable get() = stringResource(R.string.coupon_show_generated)
 
