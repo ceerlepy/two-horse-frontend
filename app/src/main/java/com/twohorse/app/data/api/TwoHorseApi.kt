@@ -676,7 +676,11 @@ class TwoHorseApi(
                                             runners,
                                         aiPick =
                                             race.optJSONObject("aiPick")
-                                                ?.let(::parseForeignAiPick)
+                                                ?.let(::parseForeignAiPick),
+                                        result =
+                                            parseForeignResult(
+                                                race.optJSONArray("result")
+                                            )
                                     )
                                 )
                             }
@@ -849,6 +853,13 @@ class TwoHorseApi(
                                 .put("totalTl", coupon.totalTl)
                                 .put("combinations", coupon.combinations)
                                 .put("legs", legs)
+                                /*
+                                 * The card's own date: an American card
+                                 * runs past midnight but keeps its date.
+                                 */
+                                .apply {
+                                    result.date?.let { put("raceDate", it) }
+                                }
                                 .toString()
                                 .toRequestBody(
                                     JSON_MEDIA_TYPE
@@ -989,7 +1000,26 @@ class TwoHorseApi(
      * The foreign parser's optionalDouble is local to that block; this
      * one is a top-level function, so it reads its own doubles.
      */
-    private fun JSONObject.doubleOrNull(key: String): Double? =
+    private fun parseForeignResult(
+    array: JSONArray?
+): List<ForeignResultRunner> {
+    if (array == null) return emptyList()
+
+    return buildList {
+        for (i in 0 until array.length()) {
+            val item = array.optJSONObject(i) ?: continue
+            val number = item.optInt("number")
+            val position = item.optInt("position")
+            val name = item.optString("name").trim()
+
+            if (number > 0 && position > 0 && name.isNotEmpty()) {
+                add(ForeignResultRunner(number = number, name = name, position = position))
+            }
+        }
+    }.sortedBy { it.position }
+}
+
+private fun JSONObject.doubleOrNull(key: String): Double? =
         if (!has(key) || isNull(key)) null
         else optDouble(key).takeIf { !it.isNaN() }
 

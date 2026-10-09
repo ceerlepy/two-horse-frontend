@@ -74,9 +74,9 @@ fun CouponScreen(
     initialCity: String?,
     currentUser: MembershipUser?,
     /*
-     * A foreign meeting: TJK runs only Altılı Ganyan there, and its
-     * races are not in /api/today, so the pool choice and the
-     * already-started warning do not apply.
+     * A foreign meeting: its races are not in /api/today, so the
+     * already-started warning does not apply. TJK runs both altılı and
+     * beşli there, like a domestic card.
      */
     foreign: Boolean = false,
     onBack: () -> Unit,
@@ -552,7 +552,6 @@ fun CouponScreen(
             }
         }
 
-        if (!foreign) {
         item {
             Column(
                 modifier =
@@ -601,7 +600,6 @@ fun CouponScreen(
                     )
                 }
             }
-        }
         }
 
         item {
@@ -838,12 +836,7 @@ fun CouponScreen(
                         tierIndex = index + 1,
                         tierCount = visibleCoupons.size,
                         onSave =
-                            /*
-                             * No saving on a foreign card: we take no
-                             * results feed for those meetings, so a
-                             * saved coupon could never be scored.
-                             */
-                            if (canGenerateCoupons && !foreign) {
+                            if (canGenerateCoupons) {
                                 { repository.saveMyCoupon(couponResult, coupon) }
                             } else {
                                 null

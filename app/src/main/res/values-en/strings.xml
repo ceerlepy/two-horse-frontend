@@ -184,6 +184,8 @@
     <string name="foreign_model_coupon_title">Model altılı %1$d</string>
     <string name="foreign_coupon_coverage">Coverage %1$s%%</string>
     <string name="foreign_coupon_button">Create a coupon for this meeting</string>
+    <string name="foreign_result_title">Result</string>
+    <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>
     <string name="foreign_alt_coupon_collapse">Hide</string>
     <string name="foreign_model_coupon_note">Built by our own model from its corrected win chances, on a 500 TL budget.</string>
