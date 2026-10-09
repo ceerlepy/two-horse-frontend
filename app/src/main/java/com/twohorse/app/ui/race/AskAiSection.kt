@@ -175,6 +175,25 @@ fun AskAiFab(
     }
 }
 
+/* Small sparkles button on a race card: asks about that race only. */
+@Composable
+fun AskAiCardButton(
+    onClick: () -> Unit
+) {
+    val strings = LocalStrings.current
+
+    IconButton(onClick = onClick) {
+        Icon(
+            Icons.Filled.AutoAwesome,
+            contentDescription = strings.askAiOpen,
+            tint = Green
+        )
+    }
+}
+
+/* Asks about every race of a foreign meeting instead of one. */
+const val WHOLE_MEETING = 0
+
 /*
  * "AI'ya sor" chat for one race, in a sheet over the race screen.
  * Premium members ask free-text questions answered from our own data;
@@ -244,8 +263,11 @@ fun AskAiSheet(
                         fontWeight = FontWeight.Black
                     )
 
+                    /* Race 0 is the whole meeting (the screen's own button). */
                     Text(
-                        text = strings.raceCityAndNumber(city, raceNumber),
+                        text =
+                            if (raceNumber == WHOLE_MEETING) strings.askAiWholeMeeting(city)
+                            else strings.raceCityAndNumber(city, raceNumber),
                         color = Muted,
                         fontSize = 12.sp
                     )
@@ -354,7 +376,7 @@ private fun ColumnScope.AskAiChat(
 
         scope.launch {
             repository
-                .ask(city, raceNumber, trimmed, currentLanguage().code, foreign)
+                .ask(city, raceNumber, trimmed, currentLanguage().code, foreign, raceDate)
                 .onSuccess {
                     exchanges.add(AskExchange(trimmed, it.answer))
                     AskAiHistory.save(context, key, exchanges)

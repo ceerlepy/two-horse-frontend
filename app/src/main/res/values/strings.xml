@@ -173,8 +173,8 @@
     <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor etiketler alternatif bir tahmin kaynağından geliyor, bizim modelimiz değil.</string>
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
     <string name="foreign_win_prob">Kazanma %%%1$s</string>
-    <string name="foreign_win_prob_info_title">Kazanma %</string>
-    <string name="foreign_win_prob_info">Yeşil yüzde AGF\'dir: oyuncuların o ata yatırdığı paranın oranı. Sarı \"Kazanma %\" ise bizim modelimizin tahminidir. Modeli geçmiş yurt dışı koşularla eğittik ve modelin hiç görmediği sonraki koşularda sınadık. Bahis oyuncuları favoriyi olduğundan güçlü, dışarıdaki atı olduğundan zayıf gösterir; model bu sapmayı düzeltir. Kesin kazanır anlamına gelmez.</string>
+    <string name="foreign_win_prob_info_title">AGF ve kazanma tahmini</string>
+    <string name="foreign_win_prob_info">Yeşil etiketteki AGF, oyuncuların o ata yatırdığı paranın payıdır. Sarı \"Kazanma %\" etiketi ise kendi modelimizin o atın kazanma ihtimali için tahminidir; kesin kazanır anlamına gelmez. Yurt dışı koşularda değer etiketi yoktur.</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
     <string name="foreign_ai_top">Alternatif tahmin: %1$s</string>
@@ -185,6 +185,9 @@
     <string name="foreign_coupon_coverage">Kapsama %%%1$s</string>
     <string name="foreign_coupon_button">Bu yarış için kupon oluştur</string>
     <string name="foreign_result_title">Sonuç</string>
+    <string name="ask_ai_whole_meeting">%1$s · tüm koşular</string>
+    <string name="home_next_day_expert_favorite">UZMAN FAVORİSİ</string>
+    <string name="coupon_next_day_notice">Bugünün yarışları bitti. Yarının (%1$s) kuponları yarış sabahı AGF açılınca hazırlanır; modelimiz AGF olmadan kupon kurmaz.</string>
     <string name="ask_ai_pick_race">Hangi koşuyu soracaksın?</string>
     <string name="foreign_alt_coupon_expand">Göster</string>
     <string name="foreign_alt_coupon_collapse">Gizle</string>

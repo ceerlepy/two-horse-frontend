@@ -28,15 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.ForeignAiCoupon
-import com.twohorse.app.domain.model.ForeignModelCoupon
 import com.twohorse.app.domain.model.ForeignMeeting
 import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
+import com.twohorse.app.ui.components.SixFoldEntryCard
+import com.twohorse.app.ui.race.AskAiCardButton
 import com.twohorse.app.ui.race.AskAiFab
 import com.twohorse.app.ui.race.AskAiSheet
+import com.twohorse.app.ui.race.WHOLE_MEETING
 import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
 
@@ -97,12 +99,6 @@ fun ForeignScreen(
                 meetings.firstOrNull { it.city == selectedCity }
                     ?: meetings.firstOrNull()
             }
-
-    /* Race picker under the "AI'ya sor" button. */
-    var askPickerOpen by
-        remember {
-            mutableStateOf(false)
-        }
 
     Box(modifier = Modifier.fillMaxSize()) {
     LazyColumn(
@@ -209,38 +205,18 @@ fun ForeignScreen(
                         }
                     }
 
-                    items(
-                        selected.modelCoupons,
-                        key = { "${selected.city}-model-${it.altili}" }
-                    ) { coupon ->
-                        Column(
-                            modifier = Modifier.padding(horizontal = 18.dp)
-                        ) {
-                            ForeignModelCouponCard(coupon)
-                        }
-                    }
-
+                    /*
+                     * Our coupon is built on the coupon screen at the
+                     * member's own budget, entered from the same card as
+                     * on home; nothing is pre-built here.
+                     */
                     item {
                         Column(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
-                            Button(
-                                onClick = { onOpenCoupons(selected.city) },
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .heightIn(min = 50.dp),
-                                colors =
-                                    ButtonDefaults.buttonColors(
-                                        containerColor = Green
-                                    ),
-                                shape = RoundedCornerShape(15.dp)
-                            ) {
-                                Text(
-                                    text = strings.foreignCouponButton,
-                                    fontWeight = FontWeight.Black
-                                )
-                            }
+                            SixFoldEntryCard(
+                                onClick = { onOpenCoupons(selected.city) }
+                            )
                         }
                     }
 
@@ -262,7 +238,10 @@ fun ForeignScreen(
                         Column(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
-                            ForeignRaceCard(race = race)
+                            ForeignRaceCard(
+                                race = race,
+                                onAskAi = { askRaceNumber = race.raceNumber }
+                            )
                         }
                     }
                 }
@@ -271,63 +250,18 @@ fun ForeignScreen(
     }
 
     /*
-     * "AI'ya sor" sits bottom-right like on a domestic race screen. One
-     * screen holds the whole foreign card here, so the button first asks
-     * which race.
+     * "AI'ya sor" sits bottom-right like on a domestic race screen and
+     * asks about the whole meeting; each race card has its own button.
      */
-    val askRaces = shownMeeting?.races.orEmpty()
-
-    if (askRaces.isNotEmpty()) {
-        Box(
+    if (shownMeeting?.races?.isNotEmpty() == true) {
+        AskAiFab(
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
                     .navigationBarsPadding()
-                    .padding(end = 18.dp, bottom = 18.dp)
-        ) {
-            AskAiFab(
-                onClick = {
-                    if (askRaces.size == 1) {
-                        askRaceNumber = askRaces.first().raceNumber
-                    } else {
-                        askPickerOpen = true
-                    }
-                }
-            )
-
-            DropdownMenu(
-                expanded = askPickerOpen,
-                onDismissRequest = { askPickerOpen = false }
-            ) {
-                Text(
-                    text = strings.askAiPickRace,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = Muted,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                askRaces.forEach { race ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text =
-                                    listOfNotNull(
-                                        strings.homeCourseNumberCaps(race.raceNumber),
-                                        race.time
-                                    ).joinToString(" · "),
-                                color = Ink,
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        onClick = {
-                            askPickerOpen = false
-                            askRaceNumber = race.raceNumber
-                        }
-                    )
-                }
-            }
-        }
+                    .padding(end = 18.dp, bottom = 18.dp),
+            onClick = { askRaceNumber = WHOLE_MEETING }
+        )
     }
     }
 
@@ -369,7 +303,8 @@ private fun ForeignNotice(text: String) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ForeignRaceCard(
-    race: ForeignRace
+    race: ForeignRace,
+    onAskAi: () -> Unit = {}
 ) {
     val strings = LocalStrings.current
 
@@ -433,6 +368,9 @@ private fun ForeignRaceCard(
                     title = strings.foreignWinProbInfoTitle,
                     body = strings.foreignWinProbInfo
                 )
+
+                /* This race only; the bottom-right button asks about the whole meeting. */
+                AskAiCardButton(onClick = onAskAi)
 
                 Icon(
                     imageVector =
@@ -713,36 +651,6 @@ private fun ForeignAiCouponCard(coupon: ForeignAiCoupon) {
  * rest of the app uses for our own figures, so the two cards are never
  * read as the same thing.
  */
-private val ForeignModelBrush =
-    Brush.linearGradient(
-        listOf(
-            Color(0xFF0A4631),
-            Color(0xFF0E6B47),
-            Color(0xFF147A52)
-        )
-    )
-
-private val ForeignModelLegLabel = Color(0xFF9FD9BD)
-
-@Composable
-private fun ForeignModelCouponCard(coupon: ForeignModelCoupon) {
-    val strings = LocalStrings.current
-
-    ForeignCouponCard(
-        title = strings.foreignModelCouponTitle(coupon.altili),
-        startTime = coupon.startTime,
-        legs = coupon.legs.map { it.raceNumber to it.selection },
-        combinations = coupon.combinations,
-        amountTl = coupon.amountTl,
-        coverageProbability = coupon.estimatedSurvivalProbability,
-        note = strings.foreignModelCouponNote,
-        brush = ForeignModelBrush,
-        titleColor = PaleGold,
-        legLabelColor = ForeignModelLegLabel,
-        noteColor = ForeignModelLegLabel
-    )
-}
-
 @Composable
 private fun ForeignCouponCard(
     title: String,

@@ -73,7 +73,7 @@ import java.util.Locale
 
 private val TurkeyZone: ZoneId = ZoneId.of("Europe/Istanbul")
 
-private fun nextDayDateLabel(
+internal fun nextDayDateLabel(
     isoDate: String,
     localeCode: String
 ): String =
@@ -215,8 +215,18 @@ internal fun NextDayRaceCard(
     var expanded by
         rememberSaveable(race.city, race.number) { mutableStateOf(false) }
 
-    val expertHorses =
-        race.horses.count { it.expertPickCount > 0 }
+    /*
+     * Tomorrow has no AGF or model score until race morning, so the
+     * favourite row of today's card is filled from the early expert
+     * consensus instead: the horse most experts already name.
+     */
+    val expertFavorite =
+        race.horses
+            .filter { it.expertPickCount > 0 }
+            .maxWithOrNull(
+                compareBy<Horse> { it.expertPickCount }
+                    .thenByDescending { it.number }
+            )
 
     Card(
         modifier =
@@ -316,17 +326,60 @@ internal fun NextDayRaceCard(
                 )
             }
 
-            if (expertHorses > 0) {
+            expertFavorite?.let { horse ->
                 Spacer(
-                    Modifier.height(7.dp)
+                    Modifier.height(13.dp)
                 )
 
-                Text(
-                    text = strings.homeNextDayExpertHorses(expertHorses),
-                    color = Green,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                HorizontalDivider(
+                    color = Border
                 )
+
+                Spacer(
+                    Modifier.height(11.dp)
+                )
+
+                Row(
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = strings.homeNextDayExpertFavorite,
+                            color = Muted,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "#${horse.number} ${horse.name}",
+                            color = Ink,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    M3Surface(
+                        color = PaleGreen,
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            text = strings.homeNextDayExpertCount(horse.expertPickCount),
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 5.dp
+                                ),
+                            color = Green,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Black
+                        )
+                    }
+                }
             }
 
             if (expanded) {
