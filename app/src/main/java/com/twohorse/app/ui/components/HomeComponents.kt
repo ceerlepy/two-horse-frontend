@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -1326,6 +1327,55 @@ fun AppErrorState(
                 text = strings.homeRetryButton,
                 fontWeight = FontWeight.Bold
             )
+        }
+    }
+}
+
+/*
+ * "Türkiye | Yurt dışı" switch at the top of the home and foreign
+ * screens, like browser tabs: one tap moves between the two cards.
+ */
+@Composable
+fun RegionTabs(
+    foreignSelected: Boolean,
+    onSelect: (foreign: Boolean) -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp),
+        color = CardTone,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, CardToneBorder)
+    ) {
+        Row(
+            modifier = Modifier.padding(4.dp)
+        ) {
+            listOf(false to strings.regionTabTurkey, true to strings.regionTabForeign)
+                .forEach { (foreign, label) ->
+                    val selected = foreign == foreignSelected
+
+                    Surface(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .clickable(enabled = !selected) { onSelect(foreign) },
+                        color = if (selected) Green else Color.Transparent,
+                        shape = RoundedCornerShape(11.dp)
+                    ) {
+                        Text(
+                            text = label,
+                            modifier = Modifier.padding(vertical = 10.dp),
+                            color = if (selected) Color.White else Ink,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
         }
     }
 }
