@@ -378,11 +378,16 @@ fun uncertaintyExplanation(
                     else -> null
                 }
             }
+            /*
+             * Old weighted score (no AGF yet): the level counts a margin
+             * under 25 points as uncertain, so the sentence uses the same
+             * scale (6.25 and 15 match the 0.05 and 0.12 gaps above).
+             */
             ?: when {
-                uncertainty.topMargin <= 3.0 ->
+                uncertainty.topMargin <= 6.25 ->
                     strings.explanationClose
 
-                uncertainty.topMargin <= 7.0 ->
+                uncertainty.topMargin <= 15.0 ->
                     strings.explanationTop3Close
 
                 else -> null

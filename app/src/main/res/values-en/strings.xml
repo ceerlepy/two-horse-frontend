@@ -187,6 +187,7 @@
     <string name="foreign_result_title">Result</string>
     <string name="ask_ai_whole_meeting">%1$s · all races</string>
     <string name="home_next_day_expert_favorite">EXPERT FAVORITE</string>
+    <string name="race_agf_pending_note">AGF and some other data usually arrive on race morning. The model scores you see now are built on missing data and are not fully accurate yet; they update once AGF opens in the morning.</string>
     <string name="region_tab_turkey">Turkey</string>
     <string name="region_tab_foreign">International</string>
     <string name="coupon_show_generated">Show generated coupons</string>

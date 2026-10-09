@@ -35,6 +35,7 @@ import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.RegionTabs
+import com.twohorse.app.ui.components.TwoHorseHeader
 import com.twohorse.app.ui.components.SixFoldEntryCard
 import com.twohorse.app.ui.race.AskAiCardButton
 import com.twohorse.app.ui.race.AskAiFab
@@ -52,7 +53,9 @@ private sealed interface ForeignLoadState {
 @Composable
 fun ForeignScreen(
     onBack: () -> Unit,
-    onOpenCoupons: (String) -> Unit = {},
+    onOpenCoupons: (city: String, raceDate: String?) -> Unit = { _, _ -> },
+    onHistoryClick: () -> Unit = {},
+    onAccountClick: () -> Unit = {},
     currentUser: MembershipUser? = null,
     onUpgradeClick: () -> Unit = {}
 ) {
@@ -82,7 +85,18 @@ fun ForeignScreen(
             mutableStateOf<Int?>(null)
         }
 
-    LaunchedEffect(Unit) {
+    var refreshKey by
+        remember {
+            mutableStateOf(0)
+        }
+
+    var refreshing by
+        remember {
+            mutableStateOf(false)
+        }
+
+    LaunchedEffect(refreshKey) {
+        refreshing = true
         state =
             repository
                 .foreignMeetings()
@@ -90,6 +104,7 @@ fun ForeignScreen(
                     onSuccess = { ForeignLoadState.Loaded(it) },
                     onFailure = { ForeignLoadState.Failed }
                 )
+        refreshing = false
     }
 
     /* The same meeting the list is showing, including its first-load default. */
@@ -108,35 +123,14 @@ fun ForeignScreen(
         contentPadding = PaddingValues(bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        /* Same top as home: the tabs, not a back arrow, switch screens. */
         item {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = strings.foreignBack
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = strings.foreignTitle,
-                        color = Ink,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                    Text(
-                        text = strings.foreignSubtitle,
-                        color = Muted,
-                        fontSize = 11.sp
-                    )
-                }
-            }
+            TwoHorseHeader(
+                refreshing = refreshing,
+                onRefresh = { if (!refreshing) refreshKey++ },
+                onHistory = onHistoryClick,
+                onAccount = onAccountClick
+            )
         }
 
         item {
@@ -223,7 +217,7 @@ fun ForeignScreen(
                             modifier = Modifier.padding(horizontal = 18.dp)
                         ) {
                             SixFoldEntryCard(
-                                onClick = { onOpenCoupons(selected.city) }
+                                onClick = { onOpenCoupons(selected.city, selected.raceDate) }
                             )
                         }
                     }

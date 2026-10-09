@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.History
@@ -1376,6 +1377,47 @@ fun RegionTabs(
                         )
                     }
                 }
+        }
+    }
+}
+
+/*
+ * One notice above the cards while TJK has not opened AGF (overnight
+ * until race morning): the scores below are built on missing data.
+ */
+@Composable
+fun AgfPendingNotice() {
+    val strings = LocalStrings.current
+
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp),
+        color = PaleRed,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, Red.copy(alpha = 0.25f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                Icons.Default.ErrorOutline,
+                contentDescription = null,
+                tint = Red,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(Modifier.width(10.dp))
+
+            Text(
+                text = strings.raceAgfPendingNote,
+                color = Red,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 18.sp
+            )
         }
     }
 }

@@ -212,6 +212,12 @@ fun RaceDetailScreen(
             )
         }
 
+        if (currentRace.agfPending) {
+            item {
+                AgfPendingNotice()
+            }
+        }
+
         error?.let { raceError ->
             item {
                 Notice(
