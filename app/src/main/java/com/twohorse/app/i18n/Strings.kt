@@ -261,6 +261,10 @@ interface Strings {
     val couponCoverageInfo: String
     @Composable
     fun couponLegCoverage(pct: String): String
+    @get:Composable
+    val couponLegCoverageInfoTitle: String
+    @get:Composable
+    val couponLegCoverageInfo: String
     @Composable
     fun couponWindowOrdinal(number: Int, poolLabel: String): String
 
@@ -375,8 +379,6 @@ interface Strings {
     fun foreignRaceTitle(number: String): String
     @Composable
     fun foreignAiTop(horse: String): String
-    @Composable
-    fun foreignAiSelection(numbers: String): String
     @Composable
     fun foreignAiCouponTitle(number: Int): String
     @get:Composable

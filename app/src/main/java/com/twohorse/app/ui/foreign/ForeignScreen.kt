@@ -496,10 +496,6 @@ private fun ForeignRaceCard(
                     top?.let {
                         LavenderLabel(strings.foreignAiTop("${it.number}-${it.name}"))
                     }
-
-                    if (pick.selection.isNotEmpty()) {
-                        LavenderLabel(strings.foreignAiSelection(pick.selection.joinToString("-")))
-                    }
                 }
             }
 
