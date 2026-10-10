@@ -928,6 +928,69 @@ fun CouponScreen(
                     )
                 }
             }
+
+            val riskCoupons =
+                couponResult.riskLoverCoupons
+                    .filter {
+                        coupon ->
+                        coupon.totalTl >=
+                            0.0 &&
+                        coupon.totalTl <=
+                            couponResult.budgetTl +
+                            0.01
+                    }
+
+            if (riskCoupons.isNotEmpty()) {
+                item {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        Text(
+                            text = strings.couponRiskSectionTitle,
+                            color = Ink,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
+
+                        Text(
+                            text = strings.couponRiskSectionBody,
+                            color = Muted,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                itemsIndexed(
+                    riskCoupons
+                ) { index, coupon ->
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            )
+                    ) {
+                        CouponCard(
+                            coupon = coupon,
+                            tierIndex = index + 1,
+                            tierCount = riskCoupons.size,
+                            riskLover = true,
+                            onSave =
+                                if (canGenerateCoupons) {
+                                    { repository.saveMyCoupon(couponResult, coupon) }
+                                } else {
+                                    null
+                                }
+                        )
+                    }
+                }
+            }
             }
             }
         }
@@ -1279,6 +1342,7 @@ private fun CouponCard(
     coupon: Coupon,
     tierIndex: Int,
     tierCount: Int,
+    riskLover: Boolean = false,
     onSave: (suspend () -> Result<Long>)?
 ) {
     val strings = LocalStrings.current
@@ -1306,9 +1370,15 @@ private fun CouponCard(
     ) {
         CouponCardHeader(
             title =
-                strings.couponAmountLabel(coupon.budgetTl.toInt()),
+                if (riskLover) {
+                    strings.couponRiskTitle(coupon.budgetTl.toInt())
+                } else {
+                    strings.couponAmountLabel(coupon.budgetTl.toInt())
+                },
             subtitle =
                 strings.couponTierLabel(tierIndex, tierCount),
+            brush =
+                if (riskLover) CouponRiskBrush else CouponHeaderBrush,
             trailing = {
                 CouponPill(
                     text = "${coupon.totalTl.toInt()} TL"

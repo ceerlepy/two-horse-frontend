@@ -183,6 +183,8 @@ data class CouponResult(
     val endRace: Int?,
     val budgetTl: Double,
     val coupons: List<Coupon>,
+    /* Same price tiers, built with the value model and its surprises. */
+    val riskLoverCoupons: List<Coupon> = emptyList(),
     val date: String? = null,
     val unitPriceTl: Double? = null,
     val multiplier: Int = 1,

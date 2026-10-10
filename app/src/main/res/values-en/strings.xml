@@ -116,6 +116,9 @@
     <string name="coupon_ladder_footer">Each budget tier is prepared separately within its own limit.</string>
     <string name="coupon_tier_label">Tier %1$s / %2$s</string>
     <string name="coupon_amount_label">%1$s TL Coupon</string>
+    <string name="coupon_risk_title">Risk-taker · %1$s TL</string>
+    <string name="coupon_risk_section_title">Risk-taker coupons</string>
+    <string name="coupon_risk_section_body">Same prices, with room for surprise horses. They may hit less often; when a surprise wins, the payout is bigger.</string>
     <string name="coupon_metric_combinations">Combinations</string>
     <string name="coupon_metric_coverage">Coverage</string>
     <string name="coupon_coverage_info_title">Coverage</string>

@@ -275,6 +275,12 @@ interface Strings {
     fun couponTierLabel(index: Int, total: Int): String
     @Composable
     fun couponAmountLabel(amount: Int): String
+    @Composable
+    fun couponRiskTitle(amount: Int): String
+    @get:Composable
+    val couponRiskSectionTitle: String
+    @get:Composable
+    val couponRiskSectionBody: String
     @get:Composable
     val couponMetricCombinations: String
     @get:Composable
