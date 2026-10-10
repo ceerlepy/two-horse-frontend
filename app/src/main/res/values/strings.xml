@@ -189,6 +189,9 @@
     <string name="ask_ai_whole_meeting">%1$s · tüm koşular</string>
     <string name="home_next_day_expert_favorite">UZMAN FAVORİSİ</string>
     <string name="race_agf_pending_note">AGF ve bazı veriler genelde yarış sabahı gelir. Bu yüzden şu an gördüğün model puanları eksik veriyle hesaplandı ve tam doğru değil; sabah AGF açılınca güncellenir.</string>
+    <string name="race_tab_race">Koşu</string>
+    <string name="race_tab_training">İdman</string>
+    <string name="race_tab_form">Son yarışlar</string>
     <string name="region_tab_turkey">Türkiye</string>
     <string name="region_tab_foreign">Yurt dışı</string>
     <string name="coupon_show_generated">Oluşturulan kuponları göster</string>

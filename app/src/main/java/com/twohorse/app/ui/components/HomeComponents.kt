@@ -1343,6 +1343,20 @@ fun RegionTabs(
 ) {
     val strings = LocalStrings.current
 
+    SegmentTabs(
+        labels = listOf(strings.regionTabTurkey, strings.regionTabForeign),
+        selectedIndex = if (foreignSelected) 1 else 0,
+        onSelect = { onSelect(it == 1) }
+    )
+}
+
+/* Sand pill row with one green selected tab, shared by the top tab bars. */
+@Composable
+fun SegmentTabs(
+    labels: List<String>,
+    selectedIndex: Int,
+    onSelect: (index: Int) -> Unit
+) {
     Surface(
         modifier =
             Modifier
@@ -1355,28 +1369,28 @@ fun RegionTabs(
         Row(
             modifier = Modifier.padding(4.dp)
         ) {
-            listOf(false to strings.regionTabTurkey, true to strings.regionTabForeign)
-                .forEach { (foreign, label) ->
-                    val selected = foreign == foreignSelected
+            labels.forEachIndexed { index, label ->
+                val selected = index == selectedIndex
 
-                    Surface(
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .clickable(enabled = !selected) { onSelect(foreign) },
-                        color = if (selected) Green else Color.Transparent,
-                        shape = RoundedCornerShape(11.dp)
-                    ) {
-                        Text(
-                            text = label,
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            color = if (selected) Color.White else Ink,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                Surface(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .clickable(enabled = !selected) { onSelect(index) },
+                    color = if (selected) Green else Color.Transparent,
+                    shape = RoundedCornerShape(11.dp)
+                ) {
+                    Text(
+                        text = label,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        color = if (selected) Color.White else Ink,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
+                    )
                 }
+            }
         }
     }
 }

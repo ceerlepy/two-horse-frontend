@@ -636,6 +636,15 @@ object ResourceStrings : Strings {
     override val raceAgfPendingNote: String
         @Composable get() = stringResource(R.string.race_agf_pending_note)
 
+    override val raceTabRace: String
+        @Composable get() = stringResource(R.string.race_tab_race)
+
+    override val raceTabTraining: String
+        @Composable get() = stringResource(R.string.race_tab_training)
+
+    override val raceTabForm: String
+        @Composable get() = stringResource(R.string.race_tab_form)
+
     override val regionTabTurkey: String
         @Composable get() = stringResource(R.string.region_tab_turkey)
 
