@@ -1400,6 +1400,76 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
             )
         }
 
+    /* "Şifremi unuttum": mails a 6-digit code; unknown emails get the same ok. */
+    suspend fun requestPasswordReset(
+        email: String,
+        lang: String
+    ) {
+        withContext(
+            Dispatchers.IO
+        ) {
+            execute(
+                Request.Builder()
+                    .url(
+                        "$baseUrl/api/auth/password-reset/request"
+                    )
+                    .post(
+                        JSONObject()
+                            .put("email", email)
+                            .put("lang", lang)
+                            .toString()
+                            .toRequestBody(
+                                JSON_MEDIA_TYPE
+                            )
+                    )
+                    .build()
+            )
+        }
+    }
+
+    /* The right code sets the new password and signs the member in. */
+    suspend fun confirmPasswordReset(
+        email: String,
+        code: String,
+        newPassword: String
+    ): AuthResult =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val json =
+                execute(
+                    Request.Builder()
+                        .url(
+                            "$baseUrl/api/auth/password-reset/confirm"
+                        )
+                        .post(
+                            JSONObject()
+                                .put("email", email)
+                                .put("code", code)
+                                .put("newPassword", newPassword)
+                                .toString()
+                                .toRequestBody(
+                                    JSON_MEDIA_TYPE
+                                )
+                        )
+                        .build()
+                )
+
+            AuthResult(
+                token =
+                    json.getString(
+                        "token"
+                    ),
+
+                user =
+                    parseMembershipUser(
+                        json.getJSONObject(
+                            "user"
+                        )
+                    )
+            )
+        }
+
     suspend fun authRegister(
         email: String,
         password: String,

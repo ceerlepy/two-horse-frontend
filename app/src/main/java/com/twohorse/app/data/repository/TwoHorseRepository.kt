@@ -89,6 +89,37 @@ class TwoHorseRepository(
             result.user
         }
 
+    suspend fun requestPasswordReset(
+        email: String,
+        lang: String
+    ): Result<Unit> =
+        runCatching {
+            api.requestPasswordReset(
+                email,
+                lang
+            )
+        }
+
+    suspend fun confirmPasswordReset(
+        email: String,
+        code: String,
+        newPassword: String
+    ): Result<MembershipUser> =
+        runCatching {
+            val result =
+                api.confirmPasswordReset(
+                    email,
+                    code,
+                    newPassword
+                )
+
+            sessionStore.saveToken(
+                result.token
+            )
+
+            result.user
+        }
+
     suspend fun deleteAccount(): Result<Unit> =
         runCatching {
             api.deleteAccount()

@@ -37,9 +37,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetPasswordOption
+import androidx.credentials.PasswordCredential
+import androidx.credentials.exceptions.CreateCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -289,7 +293,7 @@ fun LoginScreen(
         error = null
 
         scope.launch {
-            handleAuthResult(
+            val result =
                 if (registerMode)
                     repository.register(
                         email.trim(),
@@ -301,11 +305,88 @@ fun LoginScreen(
                         email.trim(),
                         password
                     )
-            )
+
+            /*
+             * Offer to keep the password in the phone's password
+             * manager, like other apps do; declining changes nothing.
+             */
+            if (result.isSuccess) {
+                try {
+                    credentialManager.createCredential(
+                        context,
+                        CreatePasswordRequest(
+                            email.trim(),
+                            password
+                        )
+                    )
+                } catch (e: CreateCredentialException) {
+                    // Declined or no password manager: sign in anyway.
+                }
+            }
+
+            handleAuthResult(result)
+        }
+    }
+
+    /*
+     * A password saved earlier is offered once when the screen opens;
+     * picking it fills the form and signs in. Nothing saved means no
+     * sheet at all.
+     */
+    LaunchedEffect(Unit) {
+        val saved =
+            try {
+                credentialManager
+                    .getCredential(
+                        context,
+                        GetCredentialRequest(
+                            listOf(GetPasswordOption())
+                        )
+                    )
+                    .credential as? PasswordCredential
+            } catch (e: GetCredentialException) {
+                null
+            }
+
+        if (saved != null && !loading) {
+            registerMode = false
+            email = saved.id
+            password = saved.password
+            submitEmailForm()
         }
     }
 
     var passwordVisible by remember { mutableStateOf(false) }
+    var showReset by remember { mutableStateOf(false) }
+
+    if (showReset) {
+        PasswordResetDialog(
+            repository = repository,
+            initialEmail = email.trim(),
+            onDismiss = { showReset = false },
+            onSignedIn = { resetEmail, newPassword, user ->
+                showReset = false
+                email = resetEmail
+                password = newPassword
+
+                scope.launch {
+                    try {
+                        credentialManager.createCredential(
+                            context,
+                            CreatePasswordRequest(
+                                resetEmail,
+                                newPassword
+                            )
+                        )
+                    } catch (e: CreateCredentialException) {
+                        // Declined or no password manager: sign in anyway.
+                    }
+
+                    onLoginSuccess(user)
+                }
+            }
+        )
+    }
 
     Scaffold(
         containerColor = Bg
@@ -553,6 +634,20 @@ fun LoginScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
+                        if (!registerMode) {
+                            TextButton(
+                                onClick = { showReset = true },
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text(
+                                    text = strings.loginForgotPassword,
+                                    color = Green,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(14.dp))
 
                         error?.let { loginError ->
@@ -764,4 +859,197 @@ private fun LanguageToggleOption(
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+/*
+ * "Şifremi unuttum": first the email gets a 6-digit code, then the
+ * code and a new password sign the member straight in.
+ */
+@Composable
+private fun PasswordResetDialog(
+    repository: TwoHorseRepository,
+    initialEmail: String,
+    onDismiss: () -> Unit,
+    onSignedIn: (String, String, MembershipUser) -> Unit
+) {
+    val strings = LocalStrings.current
+    val scope = rememberCoroutineScope()
+
+    var email by remember { mutableStateOf(initialEmail) }
+    var code by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var codeSent by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
+
+    val sendFailed = strings.resetSendFailed
+    val invalidCode = strings.resetInvalidCode
+    val weakPassword = strings.loginErrorWeakPassword
+    val genericError = strings.loginErrorGeneric
+
+    fun sendCode() {
+        if (busy || email.isBlank()) return
+        busy = true
+        message = null
+
+        scope.launch {
+            repository
+                .requestPasswordReset(
+                    email.trim(),
+                    currentLanguage().code
+                )
+                .onSuccess { codeSent = true }
+                .onFailure { message = sendFailed }
+
+            busy = false
+        }
+    }
+
+    fun confirm() {
+        if (busy) return
+
+        if (newPassword.length < PASSWORD_MIN_LENGTH) {
+            message = weakPassword
+            return
+        }
+
+        busy = true
+        message = null
+
+        scope.launch {
+            repository
+                .confirmPasswordReset(
+                    email.trim(),
+                    code.trim(),
+                    newPassword
+                )
+                .onSuccess { user ->
+                    onSignedIn(email.trim(), newPassword, user)
+                }
+                .onFailure { throwable ->
+                    message =
+                        when ((throwable as? TwoHorseApiException)?.apiCode) {
+                            "INVALID_RESET_CODE" -> invalidCode
+                            "WEAK_PASSWORD" -> weakPassword
+                            else -> genericError
+                        }
+                }
+
+            busy = false
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = { if (!busy) onDismiss() },
+        containerColor = CardTone,
+        title = {
+            Text(
+                text = strings.resetTitle,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = if (codeSent) strings.resetCodeSent else strings.resetEmailStep,
+                    color = Muted,
+                    fontSize = 13.sp
+                )
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text(strings.loginEmailLabel) },
+                    singleLine = true,
+                    enabled = !codeSent,
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Done
+                        ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (codeSent) {
+                    OutlinedTextField(
+                        value = code,
+                        onValueChange = { value -> code = value.filter { it.isDigit() }.take(6) },
+                        label = { Text(strings.resetCodeLabel) },
+                        singleLine = true,
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.NumberPassword,
+                                imeAction = ImeAction.Next
+                            ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text(strings.resetNewPasswordLabel) },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done
+                            ),
+                        keyboardActions =
+                            KeyboardActions(
+                                onDone = { confirm() }
+                            ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    TextButton(
+                        onClick = { sendCode() },
+                        enabled = !busy
+                    ) {
+                        Text(
+                            text = strings.resetResend,
+                            color = Green,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+
+                message?.let {
+                    Text(
+                        text = it,
+                        color = Red,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (codeSent) confirm() else sendCode() },
+                enabled = !busy && email.isNotBlank() && (!codeSent || code.length == 6),
+                colors = ButtonDefaults.buttonColors(containerColor = Green)
+            ) {
+                if (busy) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(if (codeSent) strings.resetConfirm else strings.resetSendCode)
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !busy
+            ) {
+                Text(
+                    text = strings.resetCancel,
+                    color = Muted
+                )
+            }
+        }
+    )
 }

@@ -71,6 +71,30 @@ object ResourceStrings : Strings {
 
     override val loginPasswordHint: String
         @Composable get() = stringResource(R.string.login_password_hint)
+    override val loginForgotPassword: String
+        @Composable get() = stringResource(R.string.login_forgot_password)
+    override val resetTitle: String
+        @Composable get() = stringResource(R.string.reset_title)
+    override val resetEmailStep: String
+        @Composable get() = stringResource(R.string.reset_email_step)
+    override val resetSendCode: String
+        @Composable get() = stringResource(R.string.reset_send_code)
+    override val resetCodeSent: String
+        @Composable get() = stringResource(R.string.reset_code_sent)
+    override val resetCodeLabel: String
+        @Composable get() = stringResource(R.string.reset_code_label)
+    override val resetNewPasswordLabel: String
+        @Composable get() = stringResource(R.string.reset_new_password_label)
+    override val resetConfirm: String
+        @Composable get() = stringResource(R.string.reset_confirm)
+    override val resetResend: String
+        @Composable get() = stringResource(R.string.reset_resend)
+    override val resetInvalidCode: String
+        @Composable get() = stringResource(R.string.reset_invalid_code)
+    override val resetSendFailed: String
+        @Composable get() = stringResource(R.string.reset_send_failed)
+    override val resetCancel: String
+        @Composable get() = stringResource(R.string.reset_cancel)
 
     override val loginLegalNotice: String
         @Composable get() = stringResource(R.string.login_legal_notice)

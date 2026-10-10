@@ -514,4 +514,16 @@
     <string name="account_billing_unavailable">Bu sürüm Google Play\'den yüklenmediği için satın alma şu an kapalı. Uygulamayı Play Store\'dan indirdiğinde planları buradan alabilirsin.</string>
     <string name="account_billing_unavailable_button">Google Play\'den yüklenince açılır</string>
     <string name="home_next_day_expert_horses">%1$d atta uzman tahmini var</string>
+    <string name="login_forgot_password">Şifremi unuttum</string>
+    <string name="reset_title">Şifreni sıfırla</string>
+    <string name="reset_email_step">E-posta adresini yaz, sana 6 haneli bir kod gönderelim.</string>
+    <string name="reset_send_code">Kod gönder</string>
+    <string name="reset_code_sent">Bu adresle bir hesap varsa kodu gönderdik. Gelmediyse spam klasörüne de bak.</string>
+    <string name="reset_code_label">6 haneli kod</string>
+    <string name="reset_new_password_label">Yeni şifre (en az 8 karakter)</string>
+    <string name="reset_confirm">Şifreyi değiştir</string>
+    <string name="reset_resend">Kodu tekrar gönder</string>
+    <string name="reset_invalid_code">Kod hatalı ya da süresi dolmuş.</string>
+    <string name="reset_send_failed">Kod gönderilemedi, biraz sonra tekrar dene.</string>
+    <string name="reset_cancel">Vazgeç</string>
 </resources>
