@@ -53,6 +53,30 @@ interface Strings {
     @get:Composable
     val loginPasswordHint: String
     @get:Composable
+    val loginForgotPassword: String
+    @get:Composable
+    val resetTitle: String
+    @get:Composable
+    val resetEmailStep: String
+    @get:Composable
+    val resetSendCode: String
+    @get:Composable
+    val resetCodeSent: String
+    @get:Composable
+    val resetCodeLabel: String
+    @get:Composable
+    val resetNewPasswordLabel: String
+    @get:Composable
+    val resetConfirm: String
+    @get:Composable
+    val resetResend: String
+    @get:Composable
+    val resetInvalidCode: String
+    @get:Composable
+    val resetSendFailed: String
+    @get:Composable
+    val resetCancel: String
+    @get:Composable
     val loginLegalNotice: String
     @get:Composable
     val loginErrorEmailTaken: String

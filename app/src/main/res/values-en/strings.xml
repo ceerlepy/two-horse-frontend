@@ -514,4 +514,16 @@
     <string name="account_billing_unavailable">Purchases are off because this copy was not installed from Google Play. Once you install the app from the Play Store you can buy a plan here.</string>
     <string name="account_billing_unavailable_button">Available in the Play Store version</string>
     <string name="home_next_day_expert_horses">Expert picks on %1$d horses</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="reset_title">Reset your password</string>
+    <string name="reset_email_step">Enter your email and we will send you a 6-digit code.</string>
+    <string name="reset_send_code">Send code</string>
+    <string name="reset_code_sent">If an account uses this address, we sent the code. Check your spam folder if you do not see it.</string>
+    <string name="reset_code_label">6-digit code</string>
+    <string name="reset_new_password_label">New password (at least 8 characters)</string>
+    <string name="reset_confirm">Change password</string>
+    <string name="reset_resend">Send the code again</string>
+    <string name="reset_invalid_code">The code is wrong or has expired.</string>
+    <string name="reset_send_failed">Could not send the code, please try again shortly.</string>
+    <string name="reset_cancel">Cancel</string>
 </resources>
