@@ -422,6 +422,12 @@ interface Strings {
     @get:Composable
     val raceAgfPendingNote: String
     @get:Composable
+    val raceTabRace: String
+    @get:Composable
+    val raceTabTraining: String
+    @get:Composable
+    val raceTabForm: String
+    @get:Composable
     val regionTabTurkey: String
     @get:Composable
     val regionTabForeign: String

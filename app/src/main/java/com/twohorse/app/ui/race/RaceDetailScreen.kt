@@ -99,6 +99,12 @@ fun RaceDetailScreen(
             mutableStateOf(false)
         }
 
+    /* 0 = race analysis, 1 = training gallops, 2 = recent runs. */
+    var selectedTab by
+        rememberSaveable(race.city, race.number) {
+            mutableIntStateOf(0)
+        }
+
     LaunchedEffect(
         refreshKey,
         race.city,
@@ -233,7 +239,58 @@ fun RaceDetailScreen(
             }
         }
 
-        favorite?.let {
+        item {
+            SegmentTabs(
+                labels =
+                    listOf(
+                        strings.raceTabRace,
+                        strings.raceTabTraining,
+                        strings.raceTabForm
+                    ),
+                selectedIndex = selectedTab,
+                onSelect = { selectedTab = it }
+            )
+        }
+
+        if (selectedTab == 1) {
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    RaceTrainingSection(
+                        raceDate = currentRace.raceDate,
+                        city = currentRace.city,
+                        raceNumber = currentRace.number,
+                        repository = repository,
+                        alwaysOpen = true
+                    )
+                }
+            }
+        }
+
+        if (selectedTab == 2) {
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    RaceFormSection(
+                        raceDate = currentRace.raceDate,
+                        city = currentRace.city,
+                        raceNumber = currentRace.number,
+                        repository = repository,
+                        alwaysOpen = true
+                    )
+                }
+            }
+        }
+
+        if (selectedTab == 0) favorite?.let {
             item {
                 Column(
                     modifier =
@@ -251,7 +308,7 @@ fun RaceDetailScreen(
             }
         }
 
-        item {
+        if (selectedTab == 0) item {
             Column(
                 modifier =
                     Modifier.padding(
@@ -264,7 +321,7 @@ fun RaceDetailScreen(
             }
         }
 
-        item {
+        if (selectedTab == 0) item {
             Column(
                 modifier =
                     Modifier.padding(
@@ -302,6 +359,7 @@ fun RaceDetailScreen(
         }
 
         if (
+            selectedTab == 0 &&
             horses.isNotEmpty()
         ) {
             item {
@@ -353,39 +411,7 @@ fun RaceDetailScreen(
             }
         }
 
-        item {
-            Column(
-                modifier =
-                    Modifier.padding(
-                        horizontal = 18.dp
-                    )
-            ) {
-                RaceTrainingSection(
-                    raceDate = currentRace.raceDate,
-                    city = currentRace.city,
-                    raceNumber = currentRace.number,
-                    repository = repository
-                )
-            }
-        }
-
-        item {
-            Column(
-                modifier =
-                    Modifier.padding(
-                        horizontal = 18.dp
-                    )
-            ) {
-                RaceFormSection(
-                    raceDate = currentRace.raceDate,
-                    city = currentRace.city,
-                    raceNumber = currentRace.number,
-                    repository = repository
-                )
-            }
-        }
-
-        if (Config.SHOW_MODEL_DIAGNOSTICS) item {
+        if (selectedTab == 0 && Config.SHOW_MODEL_DIAGNOSTICS) item {
             Column(
                 modifier =
                     Modifier.padding(
@@ -404,6 +430,7 @@ fun RaceDetailScreen(
         }
 
         if (
+            selectedTab == 0 &&
             Config.SHOW_MODEL_DIAGNOSTICS &&
             deepExpanded
         ) {
@@ -1103,7 +1130,9 @@ private fun RaceTrainingSection(
     raceDate: String?,
     city: String,
     raceNumber: Int,
-    repository: TwoHorseRepository
+    repository: TwoHorseRepository,
+    /* Shown as its own tab: open at once, no fold header. */
+    alwaysOpen: Boolean = false
 ) {
     val strings = LocalStrings.current
     val context = LocalContext.current
@@ -1111,7 +1140,7 @@ private fun RaceTrainingSection(
 
     var expanded by
         remember(city, raceNumber) {
-            mutableStateOf(false)
+            mutableStateOf(alwaysOpen)
         }
 
     var state by
@@ -1143,8 +1172,30 @@ private fun RaceTrainingSection(
         }
     }
 
+    LaunchedEffect(alwaysOpen, city, raceNumber) {
+        if (alwaysOpen && state == TrainingLoadState.Idle) {
+            load()
+        }
+    }
+
     ToneCard {
-        ExpandableToneHeader(
+        if (alwaysOpen) {
+            Column(
+                modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 4.dp)
+            ) {
+                Text(
+                    text = strings.raceTrainingTitle,
+                    color = Ink,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = strings.raceTrainingSubtitle,
+                    color = Muted,
+                    fontSize = 13.sp
+                )
+            }
+        } else ExpandableToneHeader(
             title = strings.raceTrainingTitle,
             subtitle = strings.raceTrainingSubtitle,
             expanded = expanded,
@@ -1353,14 +1404,16 @@ private fun RaceFormSection(
     raceDate: String?,
     city: String,
     raceNumber: Int,
-    repository: TwoHorseRepository
+    repository: TwoHorseRepository,
+    /* Shown as its own tab: open at once, no fold header. */
+    alwaysOpen: Boolean = false
 ) {
     val strings = LocalStrings.current
     val scope = rememberCoroutineScope()
 
     var expanded by
         remember(city, raceNumber) {
-            mutableStateOf(false)
+            mutableStateOf(alwaysOpen)
         }
 
     var state by
@@ -1385,8 +1438,30 @@ private fun RaceFormSection(
         }
     }
 
+    LaunchedEffect(alwaysOpen, city, raceNumber) {
+        if (alwaysOpen && state == FormLoadState.Idle) {
+            load()
+        }
+    }
+
     ToneCard {
-        ExpandableToneHeader(
+        if (alwaysOpen) {
+            Column(
+                modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 4.dp)
+            ) {
+                Text(
+                    text = strings.raceFormTitle,
+                    color = Ink,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = strings.raceFormSubtitle,
+                    color = Muted,
+                    fontSize = 13.sp
+                )
+            }
+        } else ExpandableToneHeader(
             title = strings.raceFormTitle,
             subtitle = strings.raceFormSubtitle,
             expanded = expanded,
