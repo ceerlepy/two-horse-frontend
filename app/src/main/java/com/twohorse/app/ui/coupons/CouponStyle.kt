@@ -40,6 +40,16 @@ internal val CouponWinBrush =
         )
     )
 
+/* Header for a "Risk sever" coupon (value model + surprises). */
+internal val CouponRiskBrush =
+    Brush.linearGradient(
+        listOf(
+            Color(0xFF2E2445),
+            Color(0xFF4B3A78),
+            Color(0xFF6A54A8)
+        )
+    )
+
 internal val CouponHeaderSubtle = Color(0xFFCFE9DC)
 
 @Composable

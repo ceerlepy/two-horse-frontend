@@ -400,6 +400,16 @@ object ResourceStrings : Strings {
     override fun couponAmountLabel(amount: Int): String =
         stringResource(R.string.coupon_amount_label, amount)
 
+    @Composable
+    override fun couponRiskTitle(amount: Int): String =
+        stringResource(R.string.coupon_risk_title, amount)
+
+    override val couponRiskSectionTitle: String
+        @Composable get() = stringResource(R.string.coupon_risk_section_title)
+
+    override val couponRiskSectionBody: String
+        @Composable get() = stringResource(R.string.coupon_risk_section_body)
+
     override val couponMetricCombinations: String
         @Composable get() = stringResource(R.string.coupon_metric_combinations)
 

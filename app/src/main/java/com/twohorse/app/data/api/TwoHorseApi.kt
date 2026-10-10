@@ -447,6 +447,24 @@ class TwoHorseApi(
                 coupons =
                     coupons,
 
+                riskLoverCoupons =
+                    buildList {
+                        val array =
+                            json.optJSONArray(
+                                "riskLoverCoupons"
+                            )
+
+                        if (array != null) {
+                            for (i in 0 until array.length()) {
+                                add(
+                                    parseCoupon(
+                                        array.getJSONObject(i)
+                                    )
+                                )
+                            }
+                        }
+                    },
+
                 date =
                     json.firstString(
                         "date"
