@@ -129,6 +129,8 @@ data class Race(
     val raceDate: String? = null,
     /* Distinct expert sources with any pick in this race (paid tiers). */
     val expertSourceCount: Int? = null,
+    /* Value-model surprise: an outsider (not AGF top 3) AGF underrates. */
+    val surpriseNumber: Int? = null,
     /* TJK has not opened AGF yet: no model score, advice or coupon. */
     val agfPending: Boolean = false
 )

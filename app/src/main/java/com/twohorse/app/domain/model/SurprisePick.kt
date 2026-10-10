@@ -8,15 +8,32 @@ package com.twohorse.app.domain.model
  * races at an average AGF of 8.3% (actual/expected 1.03), while horses
  * experts call "sürpriz" won 0.78x what their AGF implied.
  *
+ * When the server names a value-model surprise ([preferredNumber]: an
+ * outsider the value model says AGF underrates), that horse wins, unless
+ * it is already our favourite or rival.
+ *
  * [ranked] is the race sorted by model score, best first. Until AGF is
  * published (race morning) there is no public ranking, so the third
  * horse by score is kept.
  */
 fun pickSurprise(
-    ranked: List<Horse>
+    ranked: List<Horse>,
+    preferredNumber: Int? = null
 ): Horse? {
     if (ranked.size < 3) {
         return null
+    }
+
+    val favorite = ranked[0].number
+    val rival = ranked[1].number
+
+    if (
+        preferredNumber != null &&
+        preferredNumber != favorite &&
+        preferredNumber != rival
+    ) {
+        ranked.firstOrNull { it.number == preferredNumber }
+            ?.let { return it }
     }
 
     if (ranked.any { it.agfPercent == null }) {
@@ -35,9 +52,6 @@ fun pickSurprise(
             .take(3)
             .map { it.number }
             .toSet()
-
-    val favorite = ranked[0].number
-    val rival = ranked[1].number
 
     return ranked.firstOrNull {
         it.number !in agfTopThree &&
