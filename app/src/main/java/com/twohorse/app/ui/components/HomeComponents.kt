@@ -38,6 +38,7 @@ import com.twohorse.app.R
 import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.domain.model.Horse
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.domain.model.pickSurprise
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.race.AskAiCardButton
 import com.twohorse.app.ui.theme.*
@@ -624,9 +625,7 @@ fun RaceCard(
         ranked.firstOrNull()
 
     val surprise =
-        ranked
-            .drop(2)
-            .firstOrNull()
+        pickSurprise(ranked)
 
     Card(
         modifier =
