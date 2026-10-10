@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher icon foreground: the in-app logo, inset so the two horses sit
+  inside the adaptive icon's 66dp safe circle on any launcher mask.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/two_horse_logo"
+    android:inset="20dp" />

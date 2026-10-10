@@ -180,7 +180,7 @@ fun RaceDetailScreen(
         horses.getOrNull(1)
 
     val surprise =
-        pickSurprise(horses)
+        pickSurprise(horses, currentRace.surpriseNumber)
 
     var askOpen by
         rememberSaveable(

@@ -625,7 +625,7 @@ fun RaceCard(
         ranked.firstOrNull()
 
     val surprise =
-        pickSurprise(ranked)
+        pickSurprise(ranked, race.surpriseNumber)
 
     Card(
         modifier =

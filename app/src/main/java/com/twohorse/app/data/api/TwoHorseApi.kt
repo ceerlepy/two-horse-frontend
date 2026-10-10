@@ -1944,6 +1944,11 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
                     "expertSourceCount"
                 ),
 
+            surpriseNumber =
+                json.firstInt(
+                    "surpriseNumber"
+                ),
+
             agfPending =
                 json.optBoolean(
                     "agfPending",
