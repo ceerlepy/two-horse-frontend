@@ -407,6 +407,12 @@ object ResourceStrings : Strings {
     override val couponRiskSectionTitle: String
         @Composable get() = stringResource(R.string.coupon_risk_section_title)
 
+    override val couponTabMain: String
+        @Composable get() = stringResource(R.string.coupon_tab_main)
+
+    override val couponTabRisk: String
+        @Composable get() = stringResource(R.string.coupon_tab_risk)
+
     override val couponRiskSectionBody: String
         @Composable get() = stringResource(R.string.coupon_risk_section_body)
 
