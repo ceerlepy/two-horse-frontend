@@ -998,6 +998,10 @@ interface Strings {
     @Composable
     fun couponLegRace(n: Int): String
     @get:Composable
+    val racePrevious: String
+    @get:Composable
+    val raceNext: String
+    @get:Composable
     val infoModelScoreTitle: String
     @get:Composable
     val infoModelScore: String

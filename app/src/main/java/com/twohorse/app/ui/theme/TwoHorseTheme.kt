@@ -31,6 +31,10 @@ val PaleGreen = Color(0xFFE6EFFC)
 val SignalGreen = Color(0xFF0E6B47)
 val PaleSignalGreen = Color(0xFFE5F4EC)
 
+/* Yellowish orange: race chips, home score badge, waiting legs and results. */
+val Amber = Color(0xFFB86B00)
+val PaleAmber = Color(0xFFFFEFD2)
+
 val Gold = Color(0xFFD89B2B)
 val PaleGold = Color(0xFFFFF3D9)
 

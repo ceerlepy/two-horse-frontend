@@ -74,9 +74,10 @@ object CouponNotifications {
         )
     }
 
-    internal fun bookReminder(context: Context, couponId: Long, delay: Duration) {
+    /* One booked check per start time: coupons of the same altılı share it. */
+    internal fun bookReminder(context: Context, start: Instant, delay: Duration) {
         WorkManager.getInstance(context).enqueueUniqueWork(
-            "coupon-reminder-$couponId",
+            "coupon-reminder-${start.epochSecond}",
             ExistingWorkPolicy.KEEP,
             OneTimeWorkRequestBuilder<CouponWatchWorker>()
                 .setInitialDelay(delay.toMillis(), TimeUnit.MILLISECONDS)
@@ -172,41 +173,59 @@ class CouponWatchWorker(
         val now = Instant.now()
         val today = LocalDate.now(ISTANBUL)
 
-        for (coupon in coupons) {
-            val key = coupon.id.toString()
-
-            if (coupon.allLegsHit == true && key !in won) {
+        /*
+         * Several saved coupons of the same altılı start together: one
+         * notification per altılı, not one per coupon (11 Oct: six
+         * identical "birazdan başlıyor" for six İstanbul 1. Altılı coupons).
+         * The id comes from the altılı, so a repeat run replaces it.
+         */
+        val freshWins =
+            coupons.filter { coupon ->
+                val key = coupon.id.toString()
+                if (coupon.allLegsHit != true || key in won) return@filter false
                 won += key
                 // Only fresh wins: an app update must not announce last week's coupon.
                 val raceDay = runCatching { LocalDate.parse(coupon.raceDate) }.getOrNull()
-                if (raceDay != null && !raceDay.isBefore(today.minusDays(1))) {
-                    CouponNotifications.show(
-                        context,
-                        notificationId = WON_BASE + (coupon.id % ID_SPAN).toInt(),
-                        title = context.getString(R.string.notification_coupon_won_title),
-                        body = context.getString(R.string.notification_coupon_won_body, label(coupon), coupon.legCount),
-                        openMyCoupons = true
-                    )
-                }
+                raceDay != null && !raceDay.isBefore(today.minusDays(1))
             }
 
+        freshWins.groupBy(::groupKey).forEach { (group, members) ->
+            val first = members.first()
+            CouponNotifications.show(
+                context,
+                notificationId = WON_BASE + Math.floorMod(group.hashCode(), ID_SPAN),
+                title = context.getString(R.string.notification_coupon_won_title),
+                body = withCount(context.getString(R.string.notification_coupon_won_body, label(first), first.legCount), members.size),
+                openMyCoupons = true
+            )
+        }
+
+        val dueReminders = mutableListOf<Pair<MyCoupon, Instant>>()
+
+        for (coupon in coupons) {
+            val key = coupon.id.toString()
             val start = coupon.startsAt?.let { runCatching { Instant.parse(it) }.getOrNull() } ?: continue
             if (key in reminded || !now.isBefore(start)) continue
 
             val due = start.minus(CouponNotifications.REMINDER_LEAD)
             if (!now.isBefore(due)) {
                 reminded += key
-                val minutes = ((Duration.between(now, start).toMillis() + 59_999) / 60_000).toInt().coerceAtLeast(1)
-                CouponNotifications.show(
-                    context,
-                    notificationId = REMINDER_BASE + (coupon.id % ID_SPAN).toInt(),
-                    title = context.getString(R.string.notification_coupon_soon_title),
-                    body = context.getString(R.string.notification_coupon_soon_body, label(coupon), minutes),
-                    openMyCoupons = false
-                )
+                dueReminders += coupon to start
             } else if (Duration.between(now, due) <= CouponNotifications.BOOK_AHEAD) {
-                CouponNotifications.bookReminder(context, coupon.id, Duration.between(now, due))
+                CouponNotifications.bookReminder(context, start, Duration.between(now, due))
             }
+        }
+
+        dueReminders.groupBy { groupKey(it.first) }.forEach { (group, members) ->
+            val (first, start) = members.first()
+            val minutes = ((Duration.between(now, start).toMillis() + 59_999) / 60_000).toInt().coerceAtLeast(1)
+            CouponNotifications.show(
+                context,
+                notificationId = REMINDER_BASE + Math.floorMod(group.hashCode(), ID_SPAN),
+                title = context.getString(R.string.notification_coupon_soon_title),
+                body = withCount(context.getString(R.string.notification_coupon_soon_body, label(first), minutes), members.size),
+                openMyCoupons = false
+            )
         }
 
         // Forget coupons that left the list so the sets stay small.
@@ -218,6 +237,12 @@ class CouponWatchWorker(
 
         return Result.success()
     }
+
+    private fun groupKey(coupon: MyCoupon): String =
+        listOf(coupon.raceDate, coupon.city, coupon.pool, coupon.windowNumber).joinToString("|")
+
+    private fun withCount(body: String, count: Int): String =
+        if (count > 1) applicationContext.getString(R.string.notification_coupon_count, body, count) else body
 
     private fun label(coupon: MyCoupon): String {
         val window =
@@ -235,7 +260,7 @@ class CouponWatchWorker(
         const val KEY_WON = "won"
         const val REMINDER_BASE = 10_000
         const val WON_BASE = 20_000
-        const val ID_SPAN = 10_000L
+        const val ID_SPAN = 10_000
         val ISTANBUL: ZoneId = ZoneId.of("Europe/Istanbul")
     }
 }
