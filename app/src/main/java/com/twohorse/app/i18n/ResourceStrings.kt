@@ -1429,6 +1429,9 @@ object ResourceStrings : Strings {
     override val askAiLockedBody: String
         @Composable get() = stringResource(R.string.ask_ai_locked_body)
 
+    override val askAiLowDataNote: String
+        @Composable get() = stringResource(R.string.ask_ai_low_data_note)
+
     override val askAiUpgrade: String
         @Composable get() = stringResource(R.string.ask_ai_upgrade)
 

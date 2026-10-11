@@ -904,6 +904,8 @@ interface Strings {
     @get:Composable
     val askAiLockedBody: String
     @get:Composable
+    val askAiLowDataNote: String
+    @get:Composable
     val askAiUpgrade: String
     @get:Composable
     val askAiErrorBusy: String

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -214,7 +215,8 @@ fun AskAiSheet(
         isPremium = isPremium,
         repository = repository,
         onUpgradeClick = onUpgradeClick,
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        lowData = race.agfPending
     )
 }
 
@@ -232,7 +234,9 @@ fun AskAiSheet(
     repository: TwoHorseRepository,
     onUpgradeClick: () -> Unit,
     onDismiss: () -> Unit,
-    foreign: Boolean = false
+    foreign: Boolean = false,
+    /* Race has no AGF yet: say answers get better once morning data lands. */
+    lowData: Boolean = false
 ) {
     val strings = LocalStrings.current
 
@@ -285,6 +289,28 @@ fun AskAiSheet(
             Spacer(Modifier.height(8.dp))
 
             ToneDivider()
+
+            if (lowData) {
+                Row(
+                    modifier = Modifier.padding(top = 10.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = Muted,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Text(
+                        text = strings.askAiLowDataNote,
+                        color = Muted,
+                        fontSize = 12.sp
+                    )
+                }
+            }
 
             if (isPremium) {
                 AskAiChat(
