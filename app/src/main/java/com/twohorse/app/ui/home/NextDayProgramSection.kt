@@ -104,13 +104,15 @@ private fun nextDayRaceTime(
         ?: "--:--"
 
 /*
- * Header (date + note), city chips and one card per race of the
- * selected city. `selectedCity` null or unknown means the first city.
+ * Header (date + note), city chips, `afterHeader` (the coupon entry)
+ * and one card per race of the selected city. `selectedCity` null or
+ * unknown means the first city.
  */
 internal fun LazyListScope.nextDayProgramItems(
     program: NextDayProgram,
     selectedCity: String?,
-    onCitySelected: (String) -> Unit
+    onCitySelected: (String) -> Unit,
+    afterHeader: LazyListScope.() -> Unit = {}
 ) {
     val meeting =
         program.meetings.firstOrNull { it.city == selectedCity }
@@ -129,6 +131,8 @@ internal fun LazyListScope.nextDayProgramItems(
             )
         }
     }
+
+    afterHeader()
 
     items(
         items = meeting.races,
@@ -218,7 +222,9 @@ internal fun NextDayRaceCard(
     /*
      * Tomorrow has no AGF or model score until race morning, so the
      * favourite row of today's card is filled from the early expert
-     * consensus instead: the horse most experts already name.
+     * consensus instead: the horse most experts already name. It reads
+     * plain "Favori" with no expert count, since the app doesn't put the
+     * experts forward (user, 11 Oct).
      */
     val expertFavorite =
         race.horses
@@ -360,23 +366,6 @@ internal fun NextDayRaceCard(
                             fontWeight = FontWeight.Black,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    M3Surface(
-                        color = PaleGreen,
-                        shape = RoundedCornerShape(50)
-                    ) {
-                        Text(
-                            text = strings.homeNextDayExpertCount(horse.expertPickCount),
-                            modifier =
-                                Modifier.padding(
-                                    horizontal = 10.dp,
-                                    vertical = 5.dp
-                                ),
-                            color = Green,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Black
                         )
                     }
                 }

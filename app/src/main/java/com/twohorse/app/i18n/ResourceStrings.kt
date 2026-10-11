@@ -389,8 +389,6 @@ object ResourceStrings : Strings {
     override val couponLadderVariableDesc: String
         @Composable get() = stringResource(R.string.coupon_ladder_variable_desc)
 
-    override val couponLadderFooter: String
-        @Composable get() = stringResource(R.string.coupon_ladder_footer)
 
     @Composable
     override fun couponTierLabel(index: Int, total: Int): String =

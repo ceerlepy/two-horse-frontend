@@ -1876,15 +1876,6 @@ private fun CouponBudgetLadderInfo() {
                 background =
                     PaleRed
             )
-
-            Text(
-                text =
-                    strings.couponLadderFooter,
-                color =
-                    Muted,
-                fontSize =
-                    9.sp
-            )
         }
     }
 }
