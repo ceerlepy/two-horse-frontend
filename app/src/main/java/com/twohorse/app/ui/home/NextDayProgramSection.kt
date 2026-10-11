@@ -170,8 +170,8 @@ internal fun NextDayHeader(
                         language.code
                     )
                 ),
-            subtitle =
-                strings.homeNextDayNote,
+            /* The red note under the coupon button already says why scores move. */
+            subtitle = "",
             modifier =
                 Modifier.clip(
                     RoundedCornerShape(18.dp)

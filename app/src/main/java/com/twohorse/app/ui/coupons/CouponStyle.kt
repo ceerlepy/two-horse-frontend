@@ -78,12 +78,14 @@ internal fun CouponCardHeader(
                 fontWeight = FontWeight.ExtraBold
             )
 
-            Text(
-                text = subtitle,
-                color = CouponHeaderSubtle,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
-            )
+            if (subtitle.isNotBlank()) {
+                Text(
+                    text = subtitle,
+                    color = CouponHeaderSubtle,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
 
         trailing()
