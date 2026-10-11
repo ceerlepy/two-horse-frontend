@@ -532,4 +532,10 @@
     <string name="reset_invalid_code">Kod hatalı ya da süresi dolmuş.</string>
     <string name="reset_send_failed">Kod gönderilemedi, biraz sonra tekrar dene.</string>
     <string name="reset_cancel">Vazgeç</string>
+    <string name="notification_channel_coupons">Kupon bildirimleri</string>
+    <string name="notification_channel_coupons_desc">Kuponlarım\'daki kuponun başlamak üzereyken ve tuttuğunda haber verir.</string>
+    <string name="notification_coupon_soon_title">Kuponun birazdan başlıyor</string>
+    <string name="notification_coupon_soon_body">%1$s · ilk koşu %2$d dakika sonra</string>
+    <string name="notification_coupon_won_title">Kuponun tuttu! 🎉</string>
+    <string name="notification_coupon_won_body">%1$s · %2$d ayağın hepsi tuttu</string>
 </resources>

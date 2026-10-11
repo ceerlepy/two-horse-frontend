@@ -1,9 +1,12 @@
 package com.twohorse.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.mutableStateOf
 import com.twohorse.app.i18n.ProvideLanguage
+import com.twohorse.app.notifications.CouponNotifications
 import com.twohorse.app.ui.theme.TwoHorseTheme
 
 /*
@@ -15,6 +18,10 @@ import com.twohorse.app.ui.theme.TwoHorseTheme
 class MainActivity :
     AppCompatActivity() {
 
+    /* Set when a notification asks for a screen (e.g. Kuponlarım). */
+    private val openTarget =
+        mutableStateOf<String?>(null)
+
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
@@ -22,12 +29,30 @@ class MainActivity :
             savedInstanceState
         )
 
+        openTarget.value = intent?.getStringExtra(CouponNotifications.EXTRA_OPEN)
+        CouponNotifications.schedule(this)
+
         setContent {
             TwoHorseTheme {
                 ProvideLanguage {
-                    TwoHorseApp()
+                    TwoHorseApp(
+                        openTarget = openTarget.value,
+                        onOpenTargetHandled = {
+                            openTarget.value = null
+                            // Recreating the activity must not reopen the screen.
+                            intent?.removeExtra(CouponNotifications.EXTRA_OPEN)
+                        }
+                    )
                 }
             }
         }
+    }
+
+    override fun onNewIntent(
+        intent: Intent
+    ) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.getStringExtra(CouponNotifications.EXTRA_OPEN)?.let { openTarget.value = it }
     }
 }

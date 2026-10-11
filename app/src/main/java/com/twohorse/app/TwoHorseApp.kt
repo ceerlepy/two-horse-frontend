@@ -1,6 +1,10 @@
 package com.twohorse.app
 
+import android.Manifest
+import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -14,6 +18,7 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
+import com.twohorse.app.notifications.CouponNotifications
 import com.twohorse.app.ui.account.AccountScreen
 import com.twohorse.app.ui.account.MembershipPrompts
 import com.twohorse.app.ui.auth.LoginScreen
@@ -86,7 +91,10 @@ private sealed interface AppScreen {
 }
 
 @Composable
-fun TwoHorseApp() {
+fun TwoHorseApp(
+    openTarget: String? = null,
+    onOpenTargetHandled: () -> Unit = {}
+) {
     val context = LocalContext.current
 
     val repository =
@@ -171,6 +179,32 @@ fun TwoHorseApp() {
                 else ->
                     AppScreen.Home
             }
+    }
+
+    /* A tapped "coupon won" notification opens Kuponlarım once the member is signed in. */
+    LaunchedEffect(openTarget, screen is AppScreen.Home) {
+        if (openTarget == CouponNotifications.OPEN_MY_COUPONS && screen is AppScreen.Home) {
+            screen = AppScreen.MyCoupons(null)
+            onOpenTargetHandled()
+        }
+    }
+
+    /*
+     * Android 13+ asks once for permission to show coupon notifications,
+     * the first time a signed-in member reaches the home screen.
+     */
+    val notificationPermission =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { }
+
+    LaunchedEffect(screen is AppScreen.Home) {
+        if (screen !is AppScreen.Home) return@LaunchedEffect
+        if (!CouponNotifications.needsPermission(context)) return@LaunchedEffect
+        val prefs = context.getSharedPreferences("coupon_notifications", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("permission_asked", false)) return@LaunchedEffect
+        prefs.edit().putBoolean("permission_asked", true).apply()
+        notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     Surface(

@@ -397,6 +397,8 @@ data class MyCoupon(
     val legCount: Int,
     val hitLegs: Int?,
     val allLegsHit: Boolean?,
+    /* First leg's off (ISO, UTC); null for foreign meetings. */
+    val startsAt: String? = null,
     val legs: List<MyCouponLeg>
 )
 
