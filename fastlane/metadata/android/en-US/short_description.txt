@@ -1,1 +1,1 @@
-Real-time AI-powered horse racing analysis
+Our own advanced self-learning AI model for Turkish horse racing and coupons
