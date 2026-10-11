@@ -174,6 +174,15 @@ class CouponWatchWorker(
         val today = LocalDate.now(ISTANBUL)
 
         /*
+         * The "already announced" list lives on the phone, so a reinstall
+         * forgot it and announced this morning's win again (11 Oct). The
+         * first run after install only records the wins already there.
+         */
+        if (!prefs.getBoolean(KEY_SEEDED, false)) {
+            coupons.filter { it.allLegsHit == true }.forEach { won += it.id.toString() }
+        }
+
+        /*
          * Several saved coupons of the same altılı start together: one
          * notification per altılı, not one per coupon (11 Oct: six
          * identical "birazdan başlıyor" for six İstanbul 1. Altılı coupons).
@@ -233,6 +242,7 @@ class CouponWatchWorker(
         prefs.edit()
             .putStringSet(KEY_REMINDED, reminded.intersect(present))
             .putStringSet(KEY_WON, won.intersect(present))
+            .putBoolean(KEY_SEEDED, true)
             .apply()
 
         return Result.success()
@@ -258,6 +268,7 @@ class CouponWatchWorker(
         const val PREFS = "coupon_notifications"
         const val KEY_REMINDED = "reminded"
         const val KEY_WON = "won"
+        const val KEY_SEEDED = "seeded"
         const val REMINDER_BASE = 10_000
         const val WON_BASE = 20_000
         const val ID_SPAN = 10_000
