@@ -430,18 +430,6 @@ fun HomeScreen(
             )
         }
 
-        /*
-         * Overnight, before TJK opens AGF: one notice above all the cards,
-         * also over tomorrow's program once today is over.
-         */
-        if (
-            allRaces.any { it.agfPending } ||
-            nextDay?.meetings?.any { meeting -> meeting.races.any { it.agfPending } } == true
-        ) {
-            item {
-                AgfPendingNotice()
-            }
-        }
 
         // Keeps the trial's end in sight, so the switch to Free on
         // day 8 is never a surprise.
@@ -594,6 +582,21 @@ fun HomeScreen(
                 }
             }
 
+            /*
+             * Overnight, before the data is in: one notice right under the
+             * coupon button, also over tomorrow's program once today is over.
+             */
+            if (
+                allRaces.any { it.agfPending } ||
+                nextDay?.meetings?.any { meeting -> meeting.races.any { it.agfPending } } == true
+            ) {
+                item {
+                    Column {
+                        Spacer(Modifier.height(10.dp))
+                        AgfPendingNotice()
+                    }
+                }
+            }
         }
 
         if (
