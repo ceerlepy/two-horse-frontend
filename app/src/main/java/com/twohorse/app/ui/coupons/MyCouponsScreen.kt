@@ -306,7 +306,7 @@ private fun MyCouponLegRow(
 
     val (accent, pale) =
         when (hit) {
-            true -> Green to PaleGreen
+            true -> SignalGreen to PaleSignalGreen
             false -> Red to PaleRed
             null -> Muted to Bg
         }
@@ -350,14 +350,14 @@ private fun MyCouponLegRow(
                             Modifier
                                 .size(24.dp)
                                 .background(
-                                    if (isWinner) Green else PaleGreen,
+                                    if (isWinner) SignalGreen else PaleSignalGreen,
                                     CircleShape
                                 ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = number.toString(),
-                            color = if (isWinner) Color.White else Green,
+                            color = if (isWinner) Color.White else SignalGreen,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.ExtraBold
                         )

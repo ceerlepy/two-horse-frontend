@@ -19,9 +19,17 @@ val Surface = Color(0xFFFFFFFF)
 val Ink = Color(0xFF111815)
 val Muted = Color(0xFF69736E)
 
-val Green = Color(0xFF0E6B47)
-val Green2 = Color(0xFF17865A)
-val PaleGreen = Color(0xFFE5F4EC)
+/* Brand colour: buttons, tabs, headers, number circles; the dark tone of the logo blue. */
+val Green = Color(0xFF0A4FB8)
+val Green2 = Color(0xFF1A66D9)
+val PaleGreen = Color(0xFFE6EFFC)
+
+/*
+ * Green kept where green carries a meaning: score and expert bars, form
+ * positions, the low-uncertainty step, AGF pills and hit legs.
+ */
+val SignalGreen = Color(0xFF0E6B47)
+val PaleSignalGreen = Color(0xFFE5F4EC)
 
 val Gold = Color(0xFFD89B2B)
 val PaleGold = Color(0xFFFFF3D9)

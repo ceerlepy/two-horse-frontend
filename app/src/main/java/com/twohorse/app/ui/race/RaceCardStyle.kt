@@ -201,7 +201,7 @@ internal fun PositionDot(
     val (background, foreground) =
         when (position) {
             1 -> Gold to Color.White
-            2, 3 -> PaleGreen to Green
+            2, 3 -> PaleSignalGreen to SignalGreen
             null -> InsetTone to Muted
             else -> Color(0xFFE6E1D8) to Ink
         }
@@ -447,7 +447,7 @@ internal fun LevelMetric(
     val color =
         when (level) {
             0 -> Muted
-            1 -> Green
+            1 -> SignalGreen
             2 -> Gold
             3 -> Color(0xFFD9772B)
             else -> Red
