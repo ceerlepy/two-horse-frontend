@@ -909,6 +909,10 @@ interface Strings {
     fun askAiDailyLimit(n: Int): String
     @get:Composable
     val couponAgfPendingNote: String
+    @get:Composable
+    val couponLiveDataNote: String
+    @get:Composable
+    val homeLiveUpdateNote: String
     @Composable
     fun askAiLockedLimit(n: Int): String
     @get:Composable

@@ -322,8 +322,8 @@
     <string name="strategy_compact">NARROW COUPON</string>
     <string name="strategy_spread">WIDE COUPON</string>
     <string name="strategy_balanced">BALANCED COUPON</string>
-    <string name="strategy_one_candidate">1 strong single candidate</string>
-    <string name="strategy_candidates">%1$s strong candidates</string>
+    <string name="strategy_one_candidate">1 horse is enough</string>
+    <string name="strategy_candidates">%1$s horses suggested</string>
     <string name="strategy_backend_default">Coupon suggestion</string>
     <string name="strategy_line">%1$s · %2$s</string>
     <string name="component_agf">AGF</string>
@@ -411,6 +411,8 @@
     <string name="ask_ai_low_data_note">Some data for this race hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning.</string>
     <string name="ask_ai_low_data_note_all">Some data for these races hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning.</string>
     <string name="coupon_agf_pending_note">Some data is still missing. Build the coupon again in the morning as the data arrives for the best result.</string>
+    <string name="coupon_live_data_note">The coupon is built from the data available when you create it. As new data arrives during the day, build it again to see the latest version.</string>
+    <string name="home_live_update_note">Scores update automatically as new data arrives during the day.</string>
     <string name="ask_ai_daily_limit">You have %1$d questions a day.</string>
     <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data.</string>
     <string name="ask_ai_locked_limit">Premium members get %1$d questions a day.</string>

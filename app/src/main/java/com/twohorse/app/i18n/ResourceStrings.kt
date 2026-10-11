@@ -1446,6 +1446,12 @@ object ResourceStrings : Strings {
     override val couponAgfPendingNote: String
         @Composable get() = stringResource(R.string.coupon_agf_pending_note)
 
+    override val couponLiveDataNote: String
+        @Composable get() = stringResource(R.string.coupon_live_data_note)
+
+    override val homeLiveUpdateNote: String
+        @Composable get() = stringResource(R.string.home_live_update_note)
+
     override val askAiUpgrade: String
         @Composable get() = stringResource(R.string.ask_ai_upgrade)
 

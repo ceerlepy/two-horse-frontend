@@ -642,6 +642,17 @@ fun HomeScreen(
                         AgfPendingNotice()
                     }
                 }
+            } else {
+                /* Ganyan odds, AGF moves and expert picks keep landing after the morning. */
+                item {
+                    Text(
+                        text = strings.homeLiveUpdateNote,
+                        modifier = Modifier.padding(horizontal = 22.dp),
+                        color = Muted,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
             }
         }
 
