@@ -204,7 +204,7 @@
     <string name="region_tab_turkey">Türkiye</string>
     <string name="region_tab_foreign">Yurt dışı</string>
     <string name="coupon_show_generated">Oluşturulan kuponları göster</string>
-    <string name="coupon_next_day_notice">Bugünün yarışları bitti. Yarının (%1$s) kuponları yarış sabahı AGF açılınca hazırlanır; modelimiz AGF olmadan kupon kurmaz.</string>
+    <string name="coupon_next_day_notice">Yarının (%1$s) yarışları için henüz yeterli veri yok. Verilerin çoğu yarış sabahı geliyor; yapay zekamız kuponları o zaman, daha isabetli tahminlerle hazırlıyor.</string>
     <string name="ask_ai_pick_race">Hangi koşuyu soracaksın?</string>
     <string name="foreign_alt_coupon_expand">Göster</string>
     <string name="foreign_alt_coupon_collapse">Gizle</string>

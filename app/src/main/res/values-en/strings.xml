@@ -204,7 +204,7 @@
     <string name="region_tab_turkey">Turkey</string>
     <string name="region_tab_foreign">International</string>
     <string name="coupon_show_generated">Show generated coupons</string>
-    <string name="coupon_next_day_notice">Today\'s races are over. Tomorrow\'s (%1$s) coupons are built on race morning once AGF opens; our model does not build a coupon without AGF.</string>
+    <string name="coupon_next_day_notice">There isn\'t enough data yet for tomorrow\'s (%1$s) races. Most of it arrives on race morning; our AI prepares the coupons then, with more accurate predictions.</string>
     <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>
     <string name="foreign_alt_coupon_collapse">Hide</string>
