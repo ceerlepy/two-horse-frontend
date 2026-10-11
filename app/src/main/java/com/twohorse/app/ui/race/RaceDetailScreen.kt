@@ -269,18 +269,14 @@ fun RaceDetailScreen(
         }
 
         /*
-         * Finished races are not offered: the furthest back the shortcut goes
-         * is the race running now (the last one that has started).
+         * Only races the home screen still lists are offered: home drops a
+         * race a minute after its start, so the shortcut does the same.
          */
         val nowMillis = System.currentTimeMillis()
-        val earliestOpenNumber =
-            meetingRaces
-                .lastOrNull { (raceTimeMillis(it) ?: Long.MAX_VALUE) <= nowMillis }
-                ?.number
-                ?: 0
         val previousRace =
             meetingRaces.lastOrNull {
-                it.number < currentRace.number && it.number >= earliestOpenNumber
+                it.number < currentRace.number &&
+                    (raceTimeMillis(it)?.let { time -> time >= nowMillis - 60_000L } ?: true)
             }
         val nextRace = meetingRaces.firstOrNull { it.number > currentRace.number }
 
