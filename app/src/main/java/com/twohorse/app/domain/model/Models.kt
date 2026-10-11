@@ -113,6 +113,8 @@ data class Horse(
      * absent (today's runners, free tier, nothing published yet).
      */
     val expertPickCount: Int = 0,
+    /* Of those, sources calling it banko/favori/yıldız. */
+    val expertPrimaryCount: Int = 0,
     val expertSummary: String = ""
 )
 
@@ -132,7 +134,9 @@ data class Race(
     /* Value-model surprise: an outsider (not AGF top 3) AGF underrates. */
     val surpriseNumber: Int? = null,
     /* TJK has not opened AGF yet: no model score, advice or coupon. */
-    val agfPending: Boolean = false
+    val agfPending: Boolean = false,
+    /* Tomorrow's card: the no-AGF model favourite (paid tiers). */
+    val modelFavoriteNumber: Int? = null
 )
 
 data class Meeting(

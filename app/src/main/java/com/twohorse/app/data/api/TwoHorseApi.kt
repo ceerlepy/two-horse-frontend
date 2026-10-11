@@ -1974,6 +1974,11 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
                 json.optBoolean(
                     "agfPending",
                     false
+                ),
+
+            modelFavoriteNumber =
+                json.firstInt(
+                    "modelFavoriteNumber"
                 )
         )
     }
@@ -2369,6 +2374,12 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
             expertPickCount =
                 json.optInt(
                     "expertPickCount",
+                    0
+                ).coerceAtLeast(0),
+
+            expertPrimaryCount =
+                json.optInt(
+                    "expertPrimaryCount",
                     0
                 ).coerceAtLeast(0),
 

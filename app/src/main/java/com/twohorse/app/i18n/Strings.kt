@@ -432,8 +432,6 @@ interface Strings {
     @Composable
     fun askAiWholeMeeting(city: String): String
     @get:Composable
-    val homeNextDayExpertFavorite: String
-    @get:Composable
     val raceAgfPendingNote: String
     @get:Composable
     val raceTabRace: String

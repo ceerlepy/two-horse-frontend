@@ -660,9 +660,6 @@ object ResourceStrings : Strings {
     override fun askAiWholeMeeting(city: String): String =
         stringResource(R.string.ask_ai_whole_meeting, city)
 
-    override val homeNextDayExpertFavorite: String
-        @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
-
     override val raceAgfPendingNote: String
         @Composable get() = stringResource(R.string.race_agf_pending_note)
 

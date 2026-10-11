@@ -196,7 +196,6 @@
     <string name="foreign_coupon_button">Bu yarış için kupon oluştur</string>
     <string name="foreign_result_title">Sonuç</string>
     <string name="ask_ai_whole_meeting">%1$s · tüm koşular</string>
-    <string name="home_next_day_expert_favorite">FAVORİ</string>
     <string name="race_agf_pending_note">AGF ve bazı veriler genelde yarış sabahı gelir. Bu yüzden şu an gördüğün model puanları eksik veriyle hesaplandı ve tam doğru değil; sabah AGF açılınca güncellenir.</string>
     <string name="race_tab_race">Koşu</string>
     <string name="race_tab_training">İdman</string>
@@ -434,8 +433,8 @@
     <string name="home_next_day_title">Yarının programı · %1$s</string>
     <string name="home_next_day_note">Puanlar ve AGF yarış günü sabah gelir; erken uzman tahminleri geldikçe gösterilir</string>
     <plurals name="home_next_day_expert_count">
-        <item quantity="one">%1$d uzman</item>
-        <item quantity="other">%1$d uzman</item>
+        <item quantity="one">%1$d uzman favori</item>
+        <item quantity="other">%1$d uzman favori</item>
     </plurals>
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Son 6: %1$s</string>

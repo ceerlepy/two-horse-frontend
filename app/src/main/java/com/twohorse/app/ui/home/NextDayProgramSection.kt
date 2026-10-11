@@ -66,9 +66,9 @@ import java.util.Locale
  * Tomorrow's TJK card, shown in place of the "day over" card once
  * every race of today has started and the backend has tomorrow's
  * program (`nextDay` on /api/today). Read-only: schedule and runners,
- * no scores or AGF -- those arrive on race-day morning. Early expert
- * picks show as a count pill ("N uzman") when the backend has them
- * (paid tiers only); never which sources.
+ * no scores or AGF -- those arrive on race-day morning. Paid tiers
+ * see the no-AGF model favourite and, in the runner list, how many
+ * experts call a horse favourite; never which sources.
  */
 
 private val TurkeyZone: ZoneId = ZoneId.of("Europe/Istanbul")
@@ -220,19 +220,15 @@ internal fun NextDayRaceCard(
         rememberSaveable(race.city, race.number) { mutableStateOf(false) }
 
     /*
-     * Tomorrow has no AGF or model score until race morning, so the
-     * favourite row of today's card is filled from the early expert
-     * consensus instead: the horse most experts already name. It reads
-     * plain "Favori" with no expert count, since the app doesn't put the
-     * experts forward (user, 11 Oct).
+     * Tomorrow has no AGF until race morning, so the favourite row is
+     * the backend's no-AGF model pick (form, HP, weight, early expert
+     * picks; paid tiers only). No expert count beside it: the app
+     * doesn't put the experts forward (user, 11 Oct).
      */
-    val expertFavorite =
-        race.horses
-            .filter { it.expertPickCount > 0 }
-            .maxWithOrNull(
-                compareBy<Horse> { it.expertPickCount }
-                    .thenByDescending { it.number }
-            )
+    val modelFavorite =
+        race.modelFavoriteNumber?.let { number ->
+            race.horses.firstOrNull { it.number == number }
+        }
 
     Card(
         modifier =
@@ -332,7 +328,7 @@ internal fun NextDayRaceCard(
                 )
             }
 
-            expertFavorite?.let { horse ->
+            modelFavorite?.let { horse ->
                 Spacer(
                     Modifier.height(13.dp)
                 )
@@ -353,7 +349,7 @@ internal fun NextDayRaceCard(
                         Modifier.weight(1f)
                     ) {
                         Text(
-                            text = strings.homeNextDayExpertFavorite,
+                            text = strings.homeModelFavorite,
                             color = Muted,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
@@ -465,13 +461,19 @@ private fun NextDayRunnerRow(
             }
         }
 
-        if (horse.expertPickCount > 0) {
+        /*
+         * Only banko/favori/yıldız picks get a tag: on 957 races a
+         * horse one expert called favourite won ~20%, but rival picks
+         * (~10%) and surprise picks (~6%, below an unpicked horse) carry
+         * no edge, so a bare "1 uzman" read as more than it was.
+         */
+        if (horse.expertPrimaryCount > 0) {
             Spacer(
                 modifier = Modifier.width(8.dp)
             )
 
             AnalyticsChip(
-                text = strings.homeNextDayExpertCount(horse.expertPickCount),
+                text = strings.homeNextDayExpertCount(horse.expertPrimaryCount),
                 strong = true
             )
         }

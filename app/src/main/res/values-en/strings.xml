@@ -196,7 +196,6 @@
     <string name="foreign_coupon_button">Create a coupon for this meeting</string>
     <string name="foreign_result_title">Result</string>
     <string name="ask_ai_whole_meeting">%1$s · all races</string>
-    <string name="home_next_day_expert_favorite">FAVORITE</string>
     <string name="race_agf_pending_note">AGF and some other data usually arrive on race morning. The model scores you see now are built on missing data and are not fully accurate yet; they update once AGF opens in the morning.</string>
     <string name="race_tab_race">Race</string>
     <string name="race_tab_training">Training</string>
@@ -434,8 +433,8 @@
     <string name="home_next_day_title">Tomorrow\'s card · %1$s</string>
     <string name="home_next_day_note">Scores and AGF arrive on race-day morning; early expert picks are shown when available</string>
     <plurals name="home_next_day_expert_count">
-        <item quantity="one">%1$d expert</item>
-        <item quantity="other">%1$d experts</item>
+        <item quantity="one">Favourite of %1$d expert</item>
+        <item quantity="other">Favourite of %1$d experts</item>
     </plurals>
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Last 6: %1$s</string>
