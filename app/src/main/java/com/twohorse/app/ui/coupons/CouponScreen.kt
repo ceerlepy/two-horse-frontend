@@ -41,6 +41,7 @@ import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.SegmentTabs
 import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
@@ -812,6 +813,9 @@ fun CouponScreen(
 
     val generated = result
 
+    /* "Kuponlar | Risk sever" tab in the sheet; every new result opens on Kuponlar. */
+    var riskTabSelected by remember(generated) { mutableStateOf(false) }
+
     /* Generated coupons open in their own scrollable sheet, like AI'ya sor. */
     if (generated != null && showResults && !windowStarted) {
         ModalBottomSheet(
@@ -906,29 +910,6 @@ fun CouponScreen(
                             0.01
                     }
 
-            itemsIndexed(
-                visibleCoupons
-            ) { index, coupon ->
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 18.dp
-                        )
-                ) {
-                    CouponCard(
-                        coupon = coupon,
-                        tierIndex = index + 1,
-                        tierCount = visibleCoupons.size,
-                        onSave =
-                            if (canGenerateCoupons) {
-                                { repository.saveMyCoupon(couponResult, coupon) }
-                            } else {
-                                null
-                            }
-                    )
-                }
-            }
-
             val riskCoupons =
                 couponResult.riskLoverCoupons
                     .filter {
@@ -940,55 +921,55 @@ fun CouponScreen(
                             0.01
                     }
 
+            val showRisk = riskTabSelected && riskCoupons.isNotEmpty()
+
             if (riskCoupons.isNotEmpty()) {
                 item {
-                    Column(
-                        modifier =
-                            Modifier.padding(
-                                horizontal = 18.dp
-                            )
-                    ) {
-                        Text(
-                            text = strings.couponRiskSectionTitle,
-                            color = Ink,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(4.dp)
-                        )
-
-                        Text(
-                            text = strings.couponRiskSectionBody,
-                            color = Muted,
-                            fontSize = 12.sp
-                        )
-                    }
+                    SegmentTabs(
+                        labels = listOf(strings.couponTabMain, strings.couponTabRisk),
+                        selectedIndex = if (showRisk) 1 else 0,
+                        onSelect = { riskTabSelected = it == 1 }
+                    )
                 }
+            }
 
-                itemsIndexed(
-                    riskCoupons
-                ) { index, coupon ->
-                    Column(
+            if (showRisk) {
+                item {
+                    Text(
+                        text = strings.couponRiskSectionBody,
                         modifier =
                             Modifier.padding(
                                 horizontal = 18.dp
-                            )
-                    ) {
-                        CouponCard(
-                            coupon = coupon,
-                            tierIndex = index + 1,
-                            tierCount = riskCoupons.size,
-                            riskLover = true,
-                            onSave =
-                                if (canGenerateCoupons) {
-                                    { repository.saveMyCoupon(couponResult, coupon) }
-                                } else {
-                                    null
-                                }
+                            ),
+                        color = Muted,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            val shownCoupons = if (showRisk) riskCoupons else visibleCoupons
+
+            itemsIndexed(
+                shownCoupons
+            ) { index, coupon ->
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
                         )
-                    }
+                ) {
+                    CouponCard(
+                        coupon = coupon,
+                        tierIndex = index + 1,
+                        tierCount = shownCoupons.size,
+                        riskLover = showRisk,
+                        onSave =
+                            if (canGenerateCoupons) {
+                                { repository.saveMyCoupon(couponResult, coupon) }
+                            } else {
+                                null
+                            }
+                    )
                 }
             }
             }
