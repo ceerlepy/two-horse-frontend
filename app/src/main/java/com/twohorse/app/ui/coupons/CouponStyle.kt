@@ -40,7 +40,7 @@ internal val CouponWinBrush =
         )
     )
 
-/* Header for a "Risk sever" coupon (value model + surprises). */
+/* Header for a "Sürprizli" coupon (value model + surprises). */
 internal val CouponRiskBrush =
     Brush.linearGradient(
         listOf(

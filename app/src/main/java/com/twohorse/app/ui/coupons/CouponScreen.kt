@@ -814,7 +814,7 @@ fun CouponScreen(
 
     val generated = result
 
-    /* "Kuponlar | Risk sever" tab in the sheet; every new result opens on Kuponlar. */
+    /* "Kuponlar | Sürprizli" tab in the sheet; every new result opens on Kuponlar. */
     var riskTabSelected by remember(generated) { mutableStateOf(false) }
 
     /*
