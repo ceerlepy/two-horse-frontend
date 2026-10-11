@@ -159,16 +159,26 @@ fun RaceDetailScreen(
         repository
             .today()
             .onSuccess { today ->
+                /*
+                 * Tomorrow's race (opened from tomorrow's program once
+                 * today is over) lives in nextDay, not in today's list.
+                 */
+                val meetings =
+                    today.nextDay
+                        ?.takeIf { race.raceDate != null && it.date == race.raceDate }
+                        ?.meetings
+                        ?: today.meetings
+
                 meetingFetchedAt = System.currentTimeMillis()
                 meetingFetchKey = refreshKey
                 meetingRaces =
-                    today.meetings
+                    meetings
                         .flatMap { it.races }
                         .filter { it.city == race.city }
                         .sortedBy { it.number }
 
                 val fresh =
-                    today.meetings
+                    meetings
                         .asSequence()
                         .flatMap {
                             it.races.asSequence()
@@ -287,12 +297,6 @@ fun RaceDetailScreen(
                     next = nextRace,
                     onOpenRace = onOpenRace
                 )
-            }
-        }
-
-        if (currentRace.agfPending) {
-            item {
-                AgfPendingNotice()
             }
         }
 
@@ -1036,6 +1040,16 @@ private fun RaceRiskCard(
                 uncertainty == null &&
                 strategy == null
             ) {
+                Spacer(
+                    Modifier.height(8.dp)
+                )
+
+                Text(
+                    text = strings.noData,
+                    color = Muted,
+                    fontSize = 12.sp
+                )
+
                 return@Column
             }
 
@@ -1779,17 +1793,16 @@ private fun expertSummary(
     val secondary =
         e.secondaryCount ?: e.rivalCount
 
-    return buildString {
-        append(strings.raceExpertHeroFirst(primary, total))
-
-        if (strongOnly > 0) {
-            append(" · ${strings.raceExpertHeroStrong(strongOnly)}")
+    // "0/1 ilk tercih" says nothing; only name the roles experts gave.
+    val parts =
+        buildList {
+            if (primary > 0) add(strings.raceExpertHeroFirst(primary, total))
+            if (strongOnly > 0) add(strings.raceExpertHeroStrong(strongOnly))
+            if (secondary > 0) add(strings.raceExpertHeroSecond(secondary))
         }
 
-        if (secondary > 0) {
-            append(" · ${strings.raceExpertHeroSecond(secondary)}")
-        }
-    }
+    return parts.joinToString(" · ")
+        .ifEmpty { strings.raceExpertHeroFirst(0, total) }
 }
 
 @Composable
