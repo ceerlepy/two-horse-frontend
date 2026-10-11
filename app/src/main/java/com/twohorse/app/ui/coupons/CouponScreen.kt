@@ -39,6 +39,7 @@ import com.twohorse.app.domain.model.Coupon
 import com.twohorse.app.domain.model.CouponLeg
 import com.twohorse.app.domain.model.CouponResult
 import com.twohorse.app.domain.model.MembershipUser
+import com.twohorse.app.domain.model.MyCoupon
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.ui.components.SegmentTabs
@@ -816,6 +817,18 @@ fun CouponScreen(
     /* "Kuponlar | Risk sever" tab in the sheet; every new result opens on Kuponlar. */
     var riskTabSelected by remember(generated) { mutableStateOf(false) }
 
+    /*
+     * Coupons already in Kuponlarım: a rebuilt coupon with the same horses
+     * shows "Kaydedildi" instead of offering the save again.
+     */
+    var savedCoupons by remember { mutableStateOf<List<MyCoupon>>(emptyList()) }
+
+    LaunchedEffect(generated) {
+        if (generated != null && canGenerateCoupons) {
+            repository.myCoupons().onSuccess { savedCoupons = it }
+        }
+    }
+
     /* Generated coupons open in their own scrollable sheet, like AI'ya sor. */
     if (generated != null && showResults && !windowStarted) {
         ModalBottomSheet(
@@ -963,6 +976,7 @@ fun CouponScreen(
                         tierIndex = index + 1,
                         tierCount = shownCoupons.size,
                         riskLover = showRisk,
+                        alreadySaved = isAlreadySaved(couponResult, coupon, savedCoupons),
                         onSave =
                             if (canGenerateCoupons) {
                                 { repository.saveMyCoupon(couponResult, coupon) }
@@ -1318,20 +1332,38 @@ private fun ResultSummary(
 
 private enum class SaveState { Idle, Saving, Saved, Failed }
 
+/* Same day, meeting, pool, window and the same horses in every leg. */
+private fun isAlreadySaved(
+    result: CouponResult,
+    coupon: Coupon,
+    saved: List<MyCoupon>
+): Boolean {
+    val legs = coupon.legs.associate { leg -> leg.raceNumber to leg.horses.map { it.horseNumber }.toSet() }
+
+    return saved.any { entry ->
+        (result.date == null || entry.raceDate == result.date) &&
+            entry.city.equals(result.city, ignoreCase = true) &&
+            entry.pool == result.pool &&
+            entry.windowNumber == result.sixfold &&
+            entry.legs.associate { it.raceNumber to it.horseNumbers.toSet() } == legs
+    }
+}
+
 @Composable
 private fun CouponCard(
     coupon: Coupon,
     tierIndex: Int,
     tierCount: Int,
     riskLover: Boolean = false,
+    alreadySaved: Boolean = false,
     onSave: (suspend () -> Result<Long>)?
 ) {
     val strings = LocalStrings.current
     val scope = rememberCoroutineScope()
 
     var saveState by
-        remember(coupon) {
-            mutableStateOf(SaveState.Idle)
+        remember(coupon, alreadySaved) {
+            mutableStateOf(if (alreadySaved) SaveState.Saved else SaveState.Idle)
         }
 
     Card(

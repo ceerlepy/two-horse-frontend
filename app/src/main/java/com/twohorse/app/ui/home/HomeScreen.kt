@@ -358,6 +358,18 @@ fun HomeScreen(
             }
             .distinct()
 
+    /* The coupon screen lists cities by their next race, so the soonest is preselected. */
+    val couponCities =
+        allRaces
+            .mapNotNull { race ->
+                raceTimeMillis(race)
+                    ?.takeIf { it >= nowMillis - 60_000L }
+                    ?.let { race.city to it }
+            }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, times) -> times.min() }
+            .let { next -> upcomingCities.sortedBy { next[it] ?: Long.MAX_VALUE } }
+
     /* Tomorrow's card replaces the "day over" card once it is published. */
     val nextDay =
         data?.nextDay
@@ -641,7 +653,7 @@ fun HomeScreen(
                                 )
                             } else {
                                 onSixFoldClick(
-                                    upcomingCities.ifEmpty { cities },
+                                    couponCities.ifEmpty { cities },
                                     selectedCity,
                                     null
                                 )
