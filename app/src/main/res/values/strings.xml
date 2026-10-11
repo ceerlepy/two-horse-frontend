@@ -432,6 +432,18 @@
     <string name="home_day_over_button">Sonuçlara bak</string>
     <string name="home_next_day_title">Yarının programı · %1$s</string>
     <string name="home_next_day_note">Puanlar ve AGF yarış günü sabah gelir; erken uzman tahminleri geldikçe gösterilir</string>
+    <plurals name="home_next_day_expert_strong_count">
+        <item quantity="one">%1$d uzman güçlü aday</item>
+        <item quantity="other">%1$d uzman güçlü aday</item>
+    </plurals>
+    <plurals name="home_next_day_expert_second_count">
+        <item quantity="one">%1$d uzman ikinci tercih</item>
+        <item quantity="other">%1$d uzman ikinci tercih</item>
+    </plurals>
+    <plurals name="home_next_day_expert_surprise_count">
+        <item quantity="one">%1$d uzman sürpriz</item>
+        <item quantity="other">%1$d uzman sürpriz</item>
+    </plurals>
     <plurals name="home_next_day_expert_count">
         <item quantity="one">%1$d uzman favori</item>
         <item quantity="other">%1$d uzman favori</item>

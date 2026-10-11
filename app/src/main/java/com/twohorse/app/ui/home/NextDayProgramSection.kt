@@ -67,8 +67,8 @@ import java.util.Locale
  * every race of today has started and the backend has tomorrow's
  * program (`nextDay` on /api/today). Read-only: schedule and runners,
  * no scores or AGF -- those arrive on race-day morning. Paid tiers
- * see the no-AGF model favourite and, in the runner list, how many
- * experts call a horse favourite; never which sources.
+ * see the no-AGF model favourite and, in the runner list, what the
+ * experts said about a horse and how many; never which sources.
  */
 
 private val TurkeyZone: ZoneId = ZoneId.of("Europe/Istanbul")
@@ -462,18 +462,28 @@ private fun NextDayRunnerRow(
         }
 
         /*
-         * Only banko/favori/yıldız picks get a tag: on 957 races a
-         * horse one expert called favourite won ~20%, but rival picks
-         * (~10%) and surprise picks (~6%, below an unpicked horse) carry
-         * no edge, so a bare "1 uzman" read as more than it was.
+         * The tag names what the experts said ("1 uzman favori",
+         * "1 uzman sürpriz"), never a bare "1 uzman": on 957 races a
+         * horse one expert called favourite won ~20%, a lone surprise
+         * pick ~6%, below an unpicked horse. Older backends without a
+         * role fall back to the favourite count.
          */
-        if (horse.expertPrimaryCount > 0) {
+        val roleTag =
+            when {
+                horse.expertRole.isNotEmpty() && horse.expertRoleCount > 0 ->
+                    strings.homeNextDayExpertRole(horse.expertRole, horse.expertRoleCount)
+                horse.expertPrimaryCount > 0 ->
+                    strings.homeNextDayExpertCount(horse.expertPrimaryCount)
+                else -> null
+            }
+
+        if (roleTag != null) {
             Spacer(
                 modifier = Modifier.width(8.dp)
             )
 
             AnalyticsChip(
-                text = strings.homeNextDayExpertCount(horse.expertPrimaryCount),
+                text = roleTag,
                 strong = true
             )
         }

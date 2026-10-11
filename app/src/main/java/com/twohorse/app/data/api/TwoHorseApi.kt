@@ -2383,6 +2383,18 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
                     0
                 ).coerceAtLeast(0),
 
+            expertRole =
+                json.optString(
+                    "expertRole",
+                    ""
+                ).takeUnless { it == "null" }.orEmpty(),
+
+            expertRoleCount =
+                json.optInt(
+                    "expertRoleCount",
+                    0
+                ).coerceAtLeast(0),
+
             expertSummary =
                 json.optString(
                     "expertSummary",

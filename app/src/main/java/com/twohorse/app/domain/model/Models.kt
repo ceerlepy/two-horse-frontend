@@ -115,6 +115,10 @@ data class Horse(
     val expertPickCount: Int = 0,
     /* Of those, sources calling it banko/favori/yıldız. */
     val expertPrimaryCount: Int = 0,
+    /* Strongest role experts gave it ("favorite", "strong", "second",
+     * "surprise") and how many gave that role; "" / 0 when absent. */
+    val expertRole: String = "",
+    val expertRoleCount: Int = 0,
     val expertSummary: String = ""
 )
 

@@ -825,6 +825,8 @@ interface Strings {
     fun homeNextDayRunnerCount(n: Int): String
     @Composable
     fun homeNextDayExpertCount(n: Int): String
+    @Composable
+    fun homeNextDayExpertRole(role: String, n: Int): String
     @get:Composable
     val myCouponsButton: String
     @get:Composable
