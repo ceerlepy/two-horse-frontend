@@ -196,14 +196,14 @@
     <string name="foreign_coupon_button">Create a coupon for this meeting</string>
     <string name="foreign_result_title">Result</string>
     <string name="ask_ai_whole_meeting">%1$s · all races</string>
-    <string name="race_agf_pending_note">AGF and some other data usually arrive on race morning. The model scores you see now are built on missing data and are not fully accurate yet; they update as the data arrives.</string>
+    <string name="race_agf_pending_note">Some important data arrives on race morning. The current scores use the data we have; they update as the data arrives.</string>
     <string name="race_tab_race">Race</string>
     <string name="race_tab_training">Training</string>
     <string name="race_tab_form">Recent runs</string>
     <string name="region_tab_turkey">Turkey</string>
     <string name="region_tab_foreign">International</string>
     <string name="coupon_show_generated">Show generated coupons</string>
-    <string name="coupon_next_day_notice">There isn\'t enough data yet for tomorrow\'s (%1$s) races. Most of it arrives on race morning; our AI prepares the coupons then, with more accurate predictions.</string>
+    <string name="coupon_next_day_notice">Coupons open in the morning. Some important data arrives on race morning, so we build the coupons with it, for more accurate picks.</string>
     <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>
     <string name="foreign_alt_coupon_collapse">Hide</string>
@@ -408,7 +408,8 @@
     <string name="ask_ai_disclaimer">AI-generated answer; it can be wrong. Not betting advice.</string>
     <string name="ask_ai_you">You</string>
     <string name="ask_ai_locked_title">🤖 Ask the AI · Premium</string>
-    <string name="ask_ai_low_data_note">There isn\'t enough data for this race yet, so answers may not be very accurate. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
+    <string name="ask_ai_low_data_note">Some data for this race hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
+    <string name="ask_ai_low_data_note_all">Some data for these races hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
     <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data. Premium members get 20 questions a day.</string>
     <string name="ask_ai_upgrade">Go Premium</string>
     <string name="ask_ai_error_busy">Too busy right now, please try again shortly.</string>
@@ -432,7 +433,6 @@
     <string name="home_day_over_body">Results and our model\'s ranking for today are in Past Races. Tomorrow\'s card appears here once TJK publishes it.</string>
     <string name="home_day_over_button">See results</string>
     <string name="home_next_day_title">Tomorrow\'s card · %1$s</string>
-    <string name="home_next_day_note">Scores and AGF arrive on race-day morning; early expert picks are shown when available</string>
     <plurals name="home_next_day_expert_strong_count">
         <item quantity="one">Strong pick of %1$d expert</item>
         <item quantity="other">Strong pick of %1$d experts</item>
@@ -494,7 +494,7 @@
     <string name="strategy_short_balanced">Balanced</string>
     <string name="coupon_leg_race">Race %1$d</string>
     <string name="info_model_score_title">Model score</string>
-    <string name="info_model_score" formatted="false">This score comes from our own model: a learning model built on the AGF foundation. It runs 0–100 where 50 is the average chance in that race; a higher score means a stronger contender, not a sure winner.</string>
+    <string name="info_model_score" formatted="false">This score comes from our own model: a model that learns from past races and also uses the data that arrives on race morning. It runs 0–100 where 50 is the average chance in that race; a higher score means a stronger contender, not a sure winner.</string>
     <string name="error_title">Oops, something went wrong</string>
     <string name="error_timeout">The server is slow to respond right now. Please try again in a moment.</string>
     <string name="error_no_internet">It looks like you\'re offline. Check your connection and try again.</string>

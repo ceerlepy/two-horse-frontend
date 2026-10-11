@@ -1282,8 +1282,6 @@ object ResourceStrings : Strings {
     override fun homeNextDayTitle(date: String): String =
         stringResource(R.string.home_next_day_title, date)
 
-    override val homeNextDayNote: String
-        @Composable get() = stringResource(R.string.home_next_day_note)
 
     @Composable
     override fun homeNextDayRunnerWeight(weight: String): String =
@@ -1431,6 +1429,9 @@ object ResourceStrings : Strings {
 
     override val askAiLowDataNote: String
         @Composable get() = stringResource(R.string.ask_ai_low_data_note)
+
+    override val askAiLowDataNoteAll: String
+        @Composable get() = stringResource(R.string.ask_ai_low_data_note_all)
 
     override val askAiUpgrade: String
         @Composable get() = stringResource(R.string.ask_ai_upgrade)

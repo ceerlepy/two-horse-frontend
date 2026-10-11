@@ -305,7 +305,7 @@ fun AskAiSheet(
                     Spacer(Modifier.width(6.dp))
 
                     Text(
-                        text = strings.askAiLowDataNote,
+                        text = if (raceNumber == 0) strings.askAiLowDataNoteAll else strings.askAiLowDataNote,
                         color = Muted,
                         fontSize = 12.sp
                     )

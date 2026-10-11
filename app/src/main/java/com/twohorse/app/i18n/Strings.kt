@@ -815,8 +815,6 @@ interface Strings {
     val homeDayOverButton: String
     @Composable
     fun homeNextDayTitle(date: String): String
-    @get:Composable
-    val homeNextDayNote: String
     @Composable
     fun homeNextDayRunnerWeight(weight: String): String
     @Composable
@@ -905,6 +903,8 @@ interface Strings {
     val askAiLockedBody: String
     @get:Composable
     val askAiLowDataNote: String
+    @get:Composable
+    val askAiLowDataNoteAll: String
     @get:Composable
     val askAiUpgrade: String
     @get:Composable
