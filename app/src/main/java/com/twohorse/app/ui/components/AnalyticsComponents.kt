@@ -108,7 +108,7 @@ fun ScoreProgress(
                     if (score == null)
                         Muted
                     else
-                        Green,
+                        SignalGreen,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.ExtraBold
             )
@@ -138,7 +138,7 @@ fun ScoreProgress(
                 if (score == null)
                     Border
                 else
-                    Green,
+                    SignalGreen,
             trackColor =
                 Color(0xFFE3DED4)
         )

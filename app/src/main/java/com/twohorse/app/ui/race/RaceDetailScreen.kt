@@ -2297,7 +2297,7 @@ private fun ExpertConsensusSection(
             label = strings.raceExpertFirstChoice,
             detail = strings.raceCategoryCountOf(primary, total),
             percent = primary * 100.0 / total,
-            color = Green,
+            color = SignalGreen,
             info = strings.expertFirstChoiceInfo,
             chips = firstChoiceChips
         )
@@ -2306,7 +2306,7 @@ private fun ExpertConsensusSection(
             label = strings.expertRowStrong,
             detail = strings.raceCategoryCountOf(strongOnly, total),
             percent = strongOnly * 100.0 / total,
-            color = Green.copy(alpha = 0.7f)
+            color = SignalGreen.copy(alpha = 0.7f)
         )
 
         CategoryBar(

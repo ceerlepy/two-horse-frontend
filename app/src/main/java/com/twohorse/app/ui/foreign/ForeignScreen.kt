@@ -529,13 +529,13 @@ private fun ForeignRaceCard(
                     }
                     runner.agfPercent?.let {
                         Surface(
-                            color = if (leading) PaleGreen else Bg,
+                            color = if (leading) PaleSignalGreen else Bg,
                             shape = RoundedCornerShape(50)
                         ) {
                             Text(
                                 text = "%${"%.0f".format(it)}",
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                                color = if (leading) Green else Muted,
+                                color = if (leading) SignalGreen else Muted,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp
                             )
