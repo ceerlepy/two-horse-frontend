@@ -12,6 +12,7 @@ import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.domain.model.HorseVideo
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.MyCoupon
+import com.twohorse.app.notifications.CouponNotifications
 import com.twohorse.app.domain.model.RaceForm
 import com.twohorse.app.domain.model.RaceTraining
 import com.twohorse.app.domain.model.TodayData
@@ -19,6 +20,9 @@ import com.twohorse.app.domain.model.TodayData
 class TwoHorseRepository(
     context: Context
 ) {
+    private val appContext =
+        context.applicationContext
+
     private val sessionStore =
         SessionStore(
             context.applicationContext
@@ -202,6 +206,9 @@ class TwoHorseRepository(
     ): Result<Long> =
         runCatching {
             api.saveMyCoupon(result, coupon)
+        }.onSuccess {
+            // Its "starts soon" reminder may be due before the next periodic check.
+            CouponNotifications.checkNow(appContext)
         }
 
     suspend fun deleteMyCoupon(

@@ -821,6 +821,9 @@ class TwoHorseApi(
                             allLegsHit =
                                 if (item.isNull("allLegsHit")) null
                                 else item.optBoolean("allLegsHit"),
+                            startsAt =
+                                if (item.isNull("startsAt")) null
+                                else item.optString("startsAt").ifBlank { null },
                             legs =
                                 buildList {
                                     for (j in 0 until legsArray.length()) {

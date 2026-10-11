@@ -532,4 +532,10 @@
     <string name="reset_invalid_code">The code is wrong or has expired.</string>
     <string name="reset_send_failed">Could not send the code, please try again shortly.</string>
     <string name="reset_cancel">Cancel</string>
+    <string name="notification_channel_coupons">Coupon alerts</string>
+    <string name="notification_channel_coupons_desc">Tells you when a coupon in My coupons is about to start and when it wins.</string>
+    <string name="notification_coupon_soon_title">Your coupon starts soon</string>
+    <string name="notification_coupon_soon_body">%1$s · first race in %2$d minutes</string>
+    <string name="notification_coupon_won_title">Your coupon won! 🎉</string>
+    <string name="notification_coupon_won_body">%1$s · all %2$d legs hit</string>
 </resources>
