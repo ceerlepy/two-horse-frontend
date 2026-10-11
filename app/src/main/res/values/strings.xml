@@ -178,7 +178,7 @@
     <string name="foreign_title">Yurt Dışı Koşular</string>
     <string name="foreign_subtitle">TJK programı ve AGF sırası</string>
     <string name="foreign_empty">Şu an kalan yurt dışı koşu yok.</string>
-    <string name="foreign_load_failed">Yurt dışı koşular alınamadı.</string>
+    <string name="foreign_load_failed">Yurt dışı koşular yüklenemedi. Tekrar dener misin?</string>
     <string name="foreign_agf_note">Atlar AGF oranına göre sıralı. Mor kutucuklar alternatif bir tahmin içermektedir.</string>
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
     <string name="foreign_win_prob">Kazanma %%%1$s</string>
@@ -338,7 +338,7 @@
     <string name="market_down">Düşüş</string>
     <string name="market_strong_down">Güçlü düşüş</string>
     <string name="market_none">Yeterli piyasa hareketi yok</string>
-    <string name="history_fetch_failed">Geçmiş alınamadı</string>
+    <string name="history_fetch_failed">Geçmiş yüklenemedi. Tekrar dener misin?</string>
     <string name="history_loading">Geçmiş yarışlar yükleniyor</string>
     <string name="history_empty_title">Henüz tamamlanmış yarış yok</string>
     <string name="history_empty_body">Başlayan yarışlar burada görünür.</string>
@@ -424,7 +424,7 @@
     <string name="my_coupons_saved">Kuponlarıma kaydedildi</string>
     <string name="my_coupons_save_failed">Kaydedilemedi, tekrar dene</string>
     <string name="my_coupons_delete">Kuponu sil</string>
-    <string name="my_coupons_load_failed">Kuponların yüklenemedi. Biraz sonra tekrar dene.</string>
+    <string name="my_coupons_load_failed">Kuponların yüklenemedi. Tekrar dener misin?</string>
     <string name="my_coupons_winner">Kazanan: %1$d</string>
     <string name="home_day_over_title">Bugünün yarışları bitti</string>
     <string name="home_day_over_body">Sonuçlar ve modelimizin bugünkü sıralaması Geçmiş Yarışlar\'da. Yarının programı TJK\'da yayınlanınca burada görünecek.</string>

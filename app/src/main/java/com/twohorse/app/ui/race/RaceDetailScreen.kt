@@ -89,14 +89,30 @@ fun RaceDetailScreen(
             mutableStateOf<List<Race>>(emptyList())
         }
 
+    /*
+     * Keyed to the race: when the previous / next shortcut swaps races, the
+     * old race's cancelled refresh must not leave its "refreshing" flag or a
+     * stale "couldn't refresh" warning on the new one.
+     */
     var refreshing by
-        remember {
+        remember(race.city, race.number) {
             mutableStateOf(false)
         }
 
     var error by
-        remember {
+        remember(race.city, race.number) {
             mutableStateOf<RaceDetailError?>(null)
+        }
+
+    /* When the meeting list was last fetched, and for which refresh. */
+    var meetingFetchedAt by
+        remember(race.city) {
+            mutableLongStateOf(0L)
+        }
+
+    var meetingFetchKey by
+        remember(race.city) {
+            mutableIntStateOf(-1)
         }
 
     var refreshKey by
@@ -124,12 +140,27 @@ fun RaceDetailScreen(
             return@LaunchedEffect
         }
 
+        /*
+         * Moving to the next / previous race of the same meeting: the list
+         * fetched moments ago already holds it, so skip a second download.
+         */
+        if (
+            refreshKey == meetingFetchKey &&
+            System.currentTimeMillis() - meetingFetchedAt < MEETING_REUSE_MILLIS &&
+            meetingRaces.any { it.number == race.number }
+        ) {
+            currentRace = meetingRaces.first { it.number == race.number }
+            return@LaunchedEffect
+        }
+
         refreshing = true
         error = null
 
         repository
             .today()
             .onSuccess { today ->
+                meetingFetchedAt = System.currentTimeMillis()
+                meetingFetchKey = refreshKey
                 meetingRaces =
                     today.meetings
                         .flatMap { it.races }
@@ -157,6 +188,9 @@ fun RaceDetailScreen(
                 }
             }
             .onFailure {
+                /* Leaving the race cancels this refresh; that is not a failure. */
+                if (it is kotlinx.coroutines.CancellationException) throw it
+
                 error =
                     RaceDetailError.RefreshFailed
             }
@@ -234,7 +268,20 @@ fun RaceDetailScreen(
             )
         }
 
-        val previousRace = meetingRaces.lastOrNull { it.number < currentRace.number }
+        /*
+         * Finished races are not offered: the furthest back the shortcut goes
+         * is the race running now (the last one that has started).
+         */
+        val nowMillis = System.currentTimeMillis()
+        val earliestOpenNumber =
+            meetingRaces
+                .lastOrNull { (raceTimeMillis(it) ?: Long.MAX_VALUE) <= nowMillis }
+                ?.number
+                ?: 0
+        val previousRace =
+            meetingRaces.lastOrNull {
+                it.number < currentRace.number && it.number >= earliestOpenNumber
+            }
         val nextRace = meetingRaces.firstOrNull { it.number > currentRace.number }
 
         if (previousRace != null || nextRace != null) {
@@ -2880,3 +2927,5 @@ private fun RaceNavigationRow(
         }
     }
 }
+
+private const val MEETING_REUSE_MILLIS = 60_000L
