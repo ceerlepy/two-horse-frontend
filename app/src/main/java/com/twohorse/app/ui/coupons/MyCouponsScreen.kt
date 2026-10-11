@@ -27,13 +27,14 @@ import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.MyCoupon
 import com.twohorse.app.domain.model.MyCouponLeg
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.theme.*
 import kotlinx.coroutines.launch
 
 private sealed interface MyCouponsState {
     data object Loading : MyCouponsState
     data class Loaded(val coupons: List<MyCoupon>) : MyCouponsState
-    data object Failed : MyCouponsState
+    data class Failed(val error: Throwable) : MyCouponsState
     data object Locked : MyCouponsState
 }
 
@@ -62,7 +63,10 @@ fun MyCouponsScreen(
             mutableStateOf<MyCouponsState>(MyCouponsState.Loading)
         }
 
-    LaunchedEffect(Unit) {
+    var reloadKey by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(reloadKey) {
+        state = MyCouponsState.Loading
         state =
             repository.myCoupons()
                 .fold(
@@ -71,7 +75,7 @@ fun MyCouponsScreen(
                         if ((it as? ApiException)?.apiCode == "TIER_UPGRADE_REQUIRED")
                             MyCouponsState.Locked
                         else
-                            MyCouponsState.Failed
+                            MyCouponsState.Failed(it)
                     }
                 )
     }
@@ -163,13 +167,12 @@ fun MyCouponsScreen(
                         }
                     }
 
-                MyCouponsState.Failed ->
+                is MyCouponsState.Failed ->
                     item {
-                        Text(
-                            text = strings.myCouponsLoadFailed,
-                            modifier = Modifier.padding(horizontal = 18.dp),
-                            color = Red,
-                            fontSize = 13.sp
+                        AppErrorState(
+                            error = current.error,
+                            onRetry = { reloadKey++ },
+                            genericMessage = strings.myCouponsLoadFailed
                         )
                     }
 

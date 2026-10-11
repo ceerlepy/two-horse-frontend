@@ -21,12 +21,13 @@ import androidx.compose.ui.unit.sp
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.CouponHistoryEntry
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.theme.*
 
 private sealed interface CouponHistoryState {
     data object Loading : CouponHistoryState
     data class Loaded(val entries: List<CouponHistoryEntry>) : CouponHistoryState
-    data class Failed(val error: CouponError) : CouponHistoryState
+    data class Failed(val error: Throwable) : CouponHistoryState
 }
 
 /*
@@ -62,12 +63,15 @@ fun CouponHistoryScreen(
             mutableStateOf<Double?>(null)
         }
 
-    LaunchedEffect(Unit) {
+    var reloadKey by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(reloadKey) {
+        state = CouponHistoryState.Loading
         state =
             repository.couponHistory()
                 .fold(
                     onSuccess = { CouponHistoryState.Loaded(it) },
-                    onFailure = { CouponHistoryState.Failed(couponErrorFromThrowable(it)) }
+                    onFailure = { CouponHistoryState.Failed(it) }
                 )
     }
 
@@ -131,11 +135,11 @@ fun CouponHistoryScreen(
 
                 is CouponHistoryState.Failed ->
                     item {
-                        Text(
-                            text = couponErrorText(current.error, strings),
-                            modifier = Modifier.padding(horizontal = 18.dp),
-                            color = Red,
-                            fontSize = 13.sp
+                        AppErrorState(
+                            error = current.error,
+                            onRetry = { reloadKey++ },
+                            genericMessage =
+                                couponErrorText(couponErrorFromThrowable(current.error), strings)
                         )
                     }
 

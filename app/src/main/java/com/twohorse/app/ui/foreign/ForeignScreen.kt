@@ -33,6 +33,7 @@ import com.twohorse.app.domain.model.ForeignRace
 import com.twohorse.app.domain.model.ForeignRunner
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.RegionTabs
 import com.twohorse.app.ui.components.TwoHorseHeader
@@ -47,7 +48,7 @@ import com.twohorse.app.ui.theme.*
 private sealed interface ForeignLoadState {
     data object Loading : ForeignLoadState
     data class Loaded(val meetings: List<ForeignMeeting>) : ForeignLoadState
-    data object Failed : ForeignLoadState
+    data class Failed(val error: Throwable) : ForeignLoadState
 }
 
 @Composable
@@ -102,7 +103,7 @@ fun ForeignScreen(
                 .foreignMeetings()
                 .fold(
                     onSuccess = { ForeignLoadState.Loaded(it.withoutFinishedRaces()) },
-                    onFailure = { ForeignLoadState.Failed }
+                    onFailure = { ForeignLoadState.Failed(it) }
                 )
         refreshing = false
     }
@@ -154,9 +155,13 @@ fun ForeignScreen(
                     }
                 }
 
-            ForeignLoadState.Failed ->
+            is ForeignLoadState.Failed ->
                 item {
-                    ForeignNotice(strings.foreignLoadFailed)
+                    AppErrorState(
+                        error = current.error,
+                        onRetry = { if (!refreshing) refreshKey++ },
+                        genericMessage = strings.foreignLoadFailed
+                    )
                 }
 
             is ForeignLoadState.Loaded -> {

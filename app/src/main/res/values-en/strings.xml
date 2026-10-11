@@ -178,7 +178,7 @@
     <string name="foreign_title">International Races</string>
     <string name="foreign_subtitle">TJK card and AGF order</string>
     <string name="foreign_empty">No international races left right now.</string>
-    <string name="foreign_load_failed">International races could not be loaded.</string>
+    <string name="foreign_load_failed">International races couldn\'t be loaded. Please try again.</string>
     <string name="foreign_agf_note">Horses are ordered by AGF. Purple boxes contain an alternative prediction.</string>
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
     <string name="foreign_win_prob">Win %1$s%%</string>
@@ -338,7 +338,7 @@
     <string name="market_down">Fall</string>
     <string name="market_strong_down">Strong fall</string>
     <string name="market_none">Not enough market movement</string>
-    <string name="history_fetch_failed">Couldn\'t fetch history</string>
+    <string name="history_fetch_failed">Couldn\'t load history. Please try again.</string>
     <string name="history_loading">Loading past races</string>
     <string name="history_empty_title">No completed races yet</string>
     <string name="history_empty_body">Races that have started show up here.</string>
@@ -424,7 +424,7 @@
     <string name="my_coupons_saved">Saved to my coupons</string>
     <string name="my_coupons_save_failed">Couldn\'t save, try again</string>
     <string name="my_coupons_delete">Delete coupon</string>
-    <string name="my_coupons_load_failed">Couldn\'t load your coupons. Try again shortly.</string>
+    <string name="my_coupons_load_failed">Couldn\'t load your coupons. Please try again.</string>
     <string name="my_coupons_winner">Winner: %1$d</string>
     <string name="home_day_over_title">Today\'s races are over</string>
     <string name="home_day_over_body">Results and our model\'s ranking for today are in Past Races. Tomorrow\'s card appears here once TJK publishes it.</string>

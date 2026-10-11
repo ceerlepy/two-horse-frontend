@@ -1237,7 +1237,9 @@ private fun appErrorKind(error: Throwable): AppErrorKind {
 @Composable
 fun AppErrorState(
     error: Throwable?,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    /* What failed to load, shown when the cause is not the connection or server. */
+    genericMessage: String? = null
 ) {
     val strings = LocalStrings.current
 
@@ -1298,7 +1300,7 @@ fun AppErrorState(
                     AppErrorKind.NoInternet -> strings.errorNoInternet
                     AppErrorKind.Timeout -> strings.errorTimeout
                     AppErrorKind.Server -> strings.errorServer
-                    AppErrorKind.Generic -> strings.errorGeneric
+                    AppErrorKind.Generic -> genericMessage ?: strings.errorGeneric
                 },
             color = Muted,
             fontSize = 13.sp,

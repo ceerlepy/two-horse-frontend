@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,13 +44,12 @@ import com.twohorse.app.Config
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.HistoryRace
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.theme.Border
 import com.twohorse.app.ui.theme.Green
 import com.twohorse.app.ui.theme.Ink
 import com.twohorse.app.ui.theme.Muted
 import com.twohorse.app.ui.theme.PaleGreen
-import com.twohorse.app.ui.theme.PaleRed
-import com.twohorse.app.ui.theme.Red
 import com.twohorse.app.ui.theme.Surface
 
 @Composable
@@ -83,19 +83,26 @@ fun HistoryScreen(
 
     var error by
         remember {
-            mutableStateOf<String?>(
+            mutableStateOf<Throwable?>(
                 null
             )
         }
 
-    LaunchedEffect(Unit) {
+    var reloadKey by
+        remember {
+            mutableIntStateOf(0)
+        }
+
+    LaunchedEffect(reloadKey) {
+        loading = true
+        error = null
         repository
             .history()
             .onSuccess {
                 history = it
             }
             .onFailure {
-                error = it.message
+                error = it
             }
 
         loading = false
@@ -153,39 +160,11 @@ fun HistoryScreen(
 
             error != null -> {
                 item {
-                    Card(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal = 18.dp
-                                ),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor =
-                                    PaleRed
-                            ),
-                        shape =
-                            RoundedCornerShape(
-                                16.dp
-                            )
-                    ) {
-                        Text(
-                            text =
-                                error
-                                    ?: strings.historyFetchFailed,
-                            modifier =
-                                Modifier.padding(
-                                    14.dp
-                                ),
-                            color =
-                                Red,
-                            fontSize =
-                                12.sp,
-                            fontWeight =
-                                FontWeight.SemiBold
-                        )
-                    }
+                    AppErrorState(
+                        error = error,
+                        onRetry = { reloadKey++ },
+                        genericMessage = strings.historyFetchFailed
+                    )
                 }
             }
 
