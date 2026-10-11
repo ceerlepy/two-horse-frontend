@@ -112,7 +112,9 @@ internal fun LazyListScope.nextDayProgramItems(
     program: NextDayProgram,
     selectedCity: String?,
     onCitySelected: (String) -> Unit,
-    afterHeader: LazyListScope.() -> Unit = {}
+    afterHeader: LazyListScope.() -> Unit = {},
+    /* Today's full race card, when set, in place of the compact one. */
+    fullCard: (@Composable (Race) -> Unit)? = null
 ) {
     val meeting =
         program.meetings.firstOrNull { it.city == selectedCity }
@@ -142,7 +144,7 @@ internal fun LazyListScope.nextDayProgramItems(
             modifier =
                 Modifier.padding(horizontal = 18.dp)
         ) {
-            NextDayRaceCard(race)
+            if (fullCard != null) fullCard(race) else NextDayRaceCard(race)
         }
     }
 }

@@ -159,16 +159,26 @@ fun RaceDetailScreen(
         repository
             .today()
             .onSuccess { today ->
+                /*
+                 * Tomorrow's race (opened from tomorrow's program once
+                 * today is over) lives in nextDay, not in today's list.
+                 */
+                val meetings =
+                    today.nextDay
+                        ?.takeIf { race.raceDate != null && it.date == race.raceDate }
+                        ?.meetings
+                        ?: today.meetings
+
                 meetingFetchedAt = System.currentTimeMillis()
                 meetingFetchKey = refreshKey
                 meetingRaces =
-                    today.meetings
+                    meetings
                         .flatMap { it.races }
                         .filter { it.city == race.city }
                         .sortedBy { it.number }
 
                 val fresh =
-                    today.meetings
+                    meetings
                         .asSequence()
                         .flatMap {
                             it.races.asSequence()
@@ -287,12 +297,6 @@ fun RaceDetailScreen(
                     next = nextRace,
                     onOpenRace = onOpenRace
                 )
-            }
-        }
-
-        if (currentRace.agfPending) {
-            item {
-                AgfPendingNotice()
             }
         }
 

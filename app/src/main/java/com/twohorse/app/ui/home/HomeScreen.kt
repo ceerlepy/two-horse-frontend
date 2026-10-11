@@ -430,8 +430,14 @@ fun HomeScreen(
             )
         }
 
-        /* Overnight, before TJK opens AGF: one notice above all the cards. */
-        if (allRaces.any { it.agfPending }) {
+        /*
+         * Overnight, before TJK opens AGF: one notice above all the cards,
+         * also over tomorrow's program once today is over.
+         */
+        if (
+            allRaces.any { it.agfPending } ||
+            nextDay?.meetings?.any { meeting -> meeting.races.any { it.agfPending } } == true
+        ) {
             item {
                 AgfPendingNotice()
             }
@@ -523,6 +529,33 @@ fun HomeScreen(
          * city chips once today is over (11 Oct: it had dropped below
          * every one of tomorrow's race cards).
          */
+        /*
+         * Tomorrow's races on today's full card: the backend scores them
+         * without AGF, and a tap opens the same race screen.
+         */
+        val nextDayFullCard: @Composable (Race) -> Unit = { race ->
+            RaceCard(
+                race = race,
+                countdown =
+                    countdownText(
+                        race,
+                        nowMillis
+                    ),
+                time =
+                    displayRaceTime(
+                        race
+                    ),
+                onClick = {
+                    onRaceClick(
+                        race
+                    )
+                },
+                onAskAi = {
+                    askRace = race
+                }
+            )
+        }
+
         val sixFoldEntryItem: LazyListScope.() -> Unit = {
             item {
                 Column(
@@ -609,7 +642,8 @@ fun HomeScreen(
                     onCitySelected = {
                         nextDayCity = it
                     },
-                    afterHeader = sixFoldEntryItem
+                    afterHeader = sixFoldEntryItem,
+                    fullCard = nextDayFullCard
                 )
             } else {
                 item {
@@ -629,7 +663,8 @@ fun HomeScreen(
                     onCitySelected = {
                         nextDayCity = it
                     },
-                    afterHeader = sixFoldEntryItem
+                    afterHeader = sixFoldEntryItem,
+                    fullCard = nextDayFullCard
                 )
             } else if (
                 upcomingCities.isEmpty()
