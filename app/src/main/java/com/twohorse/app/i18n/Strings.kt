@@ -269,7 +269,6 @@ interface Strings {
     val couponLadderVariableTitle: String
     @get:Composable
     val couponLadderVariableDesc: String
-    @get:Composable
     @Composable
     fun couponTierLabel(index: Int, total: Int): String
     @Composable
