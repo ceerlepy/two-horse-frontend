@@ -2490,6 +2490,11 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
                     "combinations"
                 ),
 
+            bandMinTl =
+                json.optNullableDouble(
+                    "bandMinTl"
+                ),
+
             estimatedSurvivalProbability =
                 json.optNullableDouble(
                     "estimatedSurvivalProbability"

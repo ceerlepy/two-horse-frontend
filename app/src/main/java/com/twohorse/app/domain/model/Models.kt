@@ -173,7 +173,9 @@ data class Coupon(
     val totalTl: Double,
     val combinations: Long,
     val estimatedSurvivalProbability: Double?,
-    val legs: List<CouponLeg>
+    val legs: List<CouponLeg>,
+    /* Lower edge of the coupon's price band; budgetTl is the upper edge. */
+    val bandMinTl: Double? = null
 )
 
 data class CouponResult(
