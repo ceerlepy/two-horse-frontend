@@ -382,6 +382,13 @@ fun TwoHorseApp(
                         race =
                             current.race,
 
+                        onOpenRace = {
+                            screen =
+                                AppScreen.RaceDetail(
+                                    it
+                                )
+                        },
+
                         currentUser =
                             currentUser,
 

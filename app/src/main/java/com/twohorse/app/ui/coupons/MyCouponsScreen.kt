@@ -243,8 +243,8 @@ private fun MyCouponCard(
                     !coupon.evaluated ->
                         CouponPill(
                             text = strings.couponHistoryPending,
-                            background = Color.White.copy(alpha = 0.18f),
-                            content = Color.White
+                            background = PaleAmber,
+                            content = Amber
                         )
 
                     coupon.allLegsHit == true ->
@@ -308,7 +308,7 @@ private fun MyCouponLegRow(
         when (hit) {
             true -> SignalGreen to PaleSignalGreen
             false -> Red to PaleRed
-            null -> Muted to Bg
+            null -> Amber to PaleAmber
         }
 
     Row(

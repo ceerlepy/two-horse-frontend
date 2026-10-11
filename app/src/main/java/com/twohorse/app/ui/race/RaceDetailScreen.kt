@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -52,7 +54,9 @@ fun RaceDetailScreen(
     currentUser: MembershipUser?,
     onBack: () -> Unit,
     onOpenCoupons: (String) -> Unit,
-    onUpgradeClick: () -> Unit
+    onUpgradeClick: () -> Unit,
+    /* Previous / next race of the same meeting. */
+    onOpenRace: (Race) -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
 
@@ -77,6 +81,12 @@ fun RaceDetailScreen(
             race.number
         ) {
             mutableStateOf(race)
+        }
+
+    /* The meeting's races, for the previous / next shortcut. */
+    var meetingRaces by
+        remember(race.city) {
+            mutableStateOf<List<Race>>(emptyList())
         }
 
     var refreshing by
@@ -120,6 +130,12 @@ fun RaceDetailScreen(
         repository
             .today()
             .onSuccess { today ->
+                meetingRaces =
+                    today.meetings
+                        .flatMap { it.races }
+                        .filter { it.city == race.city }
+                        .sortedBy { it.number }
+
                 val fresh =
                     today.meetings
                         .asSequence()
@@ -216,6 +232,19 @@ fun RaceDetailScreen(
                 },
                 onBack = onBack
             )
+        }
+
+        val previousRace = meetingRaces.lastOrNull { it.number < currentRace.number }
+        val nextRace = meetingRaces.firstOrNull { it.number > currentRace.number }
+
+        if (previousRace != null || nextRace != null) {
+            item {
+                RaceNavigationRow(
+                    previous = previousRace,
+                    next = nextRace,
+                    onOpenRace = onOpenRace
+                )
+            }
         }
 
         if (currentRace.agfPending) {
@@ -2795,5 +2824,59 @@ private fun consensusSummary(
 
         else ->
             strings.raceConsensusNoDirection(value.sourceCount)
+    }
+}
+
+/* Small "‹ 1. Koşu   3. Koşu ›" links under the header for quick moves. */
+@Composable
+private fun RaceNavigationRow(
+    previous: Race?,
+    next: Race?,
+    onOpenRace: (Race) -> Unit
+) {
+    val strings = LocalStrings.current
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (previous != null) {
+            TextButton(onClick = { onOpenRace(previous) }) {
+                Icon(
+                    Icons.Default.KeyboardArrowLeft,
+                    contentDescription = strings.racePrevious,
+                    tint = Green,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = strings.couponLegRace(previous.number),
+                    color = Green,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (next != null) {
+            TextButton(onClick = { onOpenRace(next) }) {
+                Text(
+                    text = strings.couponLegRace(next.number),
+                    color = Green,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = strings.raceNext,
+                    tint = Green,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
     }
 }

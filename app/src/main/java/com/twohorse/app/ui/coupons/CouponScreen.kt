@@ -1595,7 +1595,7 @@ private fun CouponLegRow(
             modifier =
                 Modifier.width(62.dp),
             color =
-                PaleGreen,
+                PaleAmber,
             shape =
                 RoundedCornerShape(11.dp)
         ) {
@@ -1607,7 +1607,7 @@ private fun CouponLegRow(
                         vertical = 8.dp
                     ),
                 color =
-                    Green,
+                    Amber,
                 fontSize =
                     11.sp,
                 fontWeight =

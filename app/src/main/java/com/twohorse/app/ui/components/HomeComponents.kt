@@ -655,7 +655,7 @@ fun RaceCard(
                     Alignment.CenterVertically
             ) {
                 Surface(
-                    color = PaleGreen,
+                    color = PaleAmber,
                     shape =
                         RoundedCornerShape(9.dp)
                 ) {
@@ -667,7 +667,7 @@ fun RaceCard(
                                 horizontal = 9.dp,
                                 vertical = 6.dp
                             ),
-                        color = Green,
+                        color = Amber,
                         fontSize = 10.sp,
                         fontWeight =
                             FontWeight.ExtraBold
@@ -1091,7 +1091,7 @@ private fun ScoreBadge(
     horse: Horse
 ) {
     Surface(
-        color = PaleGreen,
+        color = PaleAmber,
         shape = CircleShape
     ) {
         Text(
@@ -1102,7 +1102,7 @@ private fun ScoreBadge(
                     ?: "—",
             modifier =
                 Modifier.padding(14.dp),
-            color = Green,
+            color = Amber,
             fontSize = 15.sp,
             fontWeight =
                 FontWeight.Black
