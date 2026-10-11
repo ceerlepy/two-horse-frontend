@@ -613,6 +613,16 @@ fun CouponScreen(
                     text = strings.couponAgfPendingNote
                 )
             }
+        } else {
+            item {
+                Text(
+                    text = strings.couponLiveDataNote,
+                    modifier = Modifier.padding(horizontal = 22.dp),
+                    color = Muted,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                )
+            }
         }
 
         item {
