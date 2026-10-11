@@ -408,6 +408,7 @@
     <string name="ask_ai_disclaimer">Yapay zeka cevabıdır, hata yapabilir. Bahis tavsiyesi değildir.</string>
     <string name="ask_ai_you">Sen</string>
     <string name="ask_ai_locked_title">🤖 AI\'ya sor · Premium</string>
+    <string name="ask_ai_low_data_note">Bu koşu için henüz yeterli veri yok, bu yüzden cevaplar çok isabetli olmayabilir. Sabah veriler geldikçe daha iyi cevap alırsın; günde 20 soru hakkın var.</string>
     <string name="ask_ai_locked_body">Bu koşu hakkında yapay zekaya soru sor, cevabını bizim verimizden alsın. Premium üyelere günde 20 soru.</string>
     <string name="ask_ai_upgrade">Premium\'a geç</string>
     <string name="ask_ai_error_busy">Şu an çok yoğun, biraz sonra tekrar dene.</string>
@@ -432,6 +433,18 @@
     <string name="home_day_over_button">Sonuçlara bak</string>
     <string name="home_next_day_title">Yarının programı · %1$s</string>
     <string name="home_next_day_note">Puanlar ve AGF yarış günü sabah gelir; erken uzman tahminleri geldikçe gösterilir</string>
+    <plurals name="home_next_day_expert_strong_count">
+        <item quantity="one">%1$d uzman güçlü aday</item>
+        <item quantity="other">%1$d uzman güçlü aday</item>
+    </plurals>
+    <plurals name="home_next_day_expert_second_count">
+        <item quantity="one">%1$d uzman ikinci tercih</item>
+        <item quantity="other">%1$d uzman ikinci tercih</item>
+    </plurals>
+    <plurals name="home_next_day_expert_surprise_count">
+        <item quantity="one">%1$d uzman sürpriz</item>
+        <item quantity="other">%1$d uzman sürpriz</item>
+    </plurals>
     <plurals name="home_next_day_expert_count">
         <item quantity="one">%1$d uzman favori</item>
         <item quantity="other">%1$d uzman favori</item>

@@ -408,6 +408,7 @@
     <string name="ask_ai_disclaimer">AI-generated answer; it can be wrong. Not betting advice.</string>
     <string name="ask_ai_you">You</string>
     <string name="ask_ai_locked_title">🤖 Ask the AI · Premium</string>
+    <string name="ask_ai_low_data_note">There isn\'t enough data for this race yet, so answers may not be very accurate. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
     <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data. Premium members get 20 questions a day.</string>
     <string name="ask_ai_upgrade">Go Premium</string>
     <string name="ask_ai_error_busy">Too busy right now, please try again shortly.</string>
@@ -432,6 +433,18 @@
     <string name="home_day_over_button">See results</string>
     <string name="home_next_day_title">Tomorrow\'s card · %1$s</string>
     <string name="home_next_day_note">Scores and AGF arrive on race-day morning; early expert picks are shown when available</string>
+    <plurals name="home_next_day_expert_strong_count">
+        <item quantity="one">Strong pick of %1$d expert</item>
+        <item quantity="other">Strong pick of %1$d experts</item>
+    </plurals>
+    <plurals name="home_next_day_expert_second_count">
+        <item quantity="one">Second choice of %1$d expert</item>
+        <item quantity="other">Second choice of %1$d experts</item>
+    </plurals>
+    <plurals name="home_next_day_expert_surprise_count">
+        <item quantity="one">Surprise of %1$d expert</item>
+        <item quantity="other">Surprise of %1$d experts</item>
+    </plurals>
     <plurals name="home_next_day_expert_count">
         <item quantity="one">Favourite of %1$d expert</item>
         <item quantity="other">Favourite of %1$d experts</item>
