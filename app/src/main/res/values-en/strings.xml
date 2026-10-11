@@ -21,7 +21,7 @@
     <string name="account_subscription_renews_at">Subscription renews on %1$s</string>
     <string name="account_unlimited">Unlimited</string>
     <string name="account_gold_description">All model signals and expert consensus · 10 coupons a day, up to 1,500 TL · My coupons</string>
-    <string name="account_premium_description">Everything in Gold + \"Underrated by AGF\" label + Ask the AI (20 questions a day) + unlimited coupons + My coupons</string>
+    <string name="account_premium_description">Everything in Gold + \"Underrated by AGF\" label + Ask the AI (%1$d questions a day) + unlimited coupons + My coupons</string>
     <string name="account_upgrade_to">Upgrade to %1$s</string>
     <string name="account_loading_ellipsis">Loading…</string>
     <string name="account_already_premium">You\'re already Premium — everything is unlocked.</string>
@@ -394,7 +394,7 @@
     <string name="coupon_history_window_sixfold">Six-fold #%1$d</string>
     <string name="coupon_history_window_fivefold">Five-fold #%1$d</string>
     <string name="account_feature_ask_ai">Ask the AI</string>
-    <string name="account_ask_ai_premium">20/day</string>
+    <string name="account_ask_ai_premium">%1$d/day</string>
     <string name="account_feature_my_coupons">My coupons</string>
 
     <!-- AI'ya sor -->
@@ -408,9 +408,12 @@
     <string name="ask_ai_disclaimer">AI-generated answer; it can be wrong. Not betting advice.</string>
     <string name="ask_ai_you">You</string>
     <string name="ask_ai_locked_title">🤖 Ask the AI · Premium</string>
-    <string name="ask_ai_low_data_note">Some data for this race hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
-    <string name="ask_ai_low_data_note_all">Some data for these races hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning; you have 20 questions a day.</string>
-    <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data. Premium members get 20 questions a day.</string>
+    <string name="ask_ai_low_data_note">Some data for this race hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning.</string>
+    <string name="ask_ai_low_data_note_all">Some data for these races hasn\'t arrived yet, so answers may be less accurate than in the morning. You\'ll get better answers as the data arrives in the morning.</string>
+    <string name="coupon_agf_pending_note">Some data is still missing. Build the coupon again in the morning as the data arrives for the best result.</string>
+    <string name="ask_ai_daily_limit">You have %1$d questions a day.</string>
+    <string name="ask_ai_locked_body">Ask the AI about this race and get an answer built from our data.</string>
+    <string name="ask_ai_locked_limit">Premium members get %1$d questions a day.</string>
     <string name="ask_ai_upgrade">Go Premium</string>
     <string name="ask_ai_error_busy">Too busy right now, please try again shortly.</string>
     <string name="ask_ai_error_failed">Couldn\'t get an answer, please try again.</string>

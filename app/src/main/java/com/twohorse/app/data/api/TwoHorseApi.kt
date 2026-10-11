@@ -1673,7 +1673,15 @@ private fun JSONObject.doubleOrNull(key: String): Double? =
             subscriptionPendingTier =
                 json.firstString(
                     "subscriptionPendingTier"
-                )
+                ),
+
+            askAiPerDay =
+                json.optInt("askAiPerDay", -1)
+                    .takeIf { it >= 0 },
+
+            premiumAskAiPerDay =
+                json.optInt("premiumAskAiPerDay", -1)
+                    .takeIf { it > 0 }
         )
 
     private fun getJson(

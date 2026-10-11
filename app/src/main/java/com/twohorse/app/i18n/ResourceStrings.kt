@@ -125,8 +125,9 @@ object ResourceStrings : Strings {
     override val accountGoldDescription: String
         @Composable get() = stringResource(R.string.account_gold_description)
 
-    override val accountPremiumDescription: String
-        @Composable get() = stringResource(R.string.account_premium_description)
+    @Composable
+    override fun accountPremiumDescription(askAiPerDay: Int): String =
+        stringResource(R.string.account_premium_description, askAiPerDay)
 
     @Composable
     override fun accountUpgradeTo(tierTitle: String): String =
@@ -1388,8 +1389,9 @@ object ResourceStrings : Strings {
     override val accountFeatureAskAi: String
         @Composable get() = stringResource(R.string.account_feature_ask_ai)
 
-    override val accountAskAiPremium: String
-        @Composable get() = stringResource(R.string.account_ask_ai_premium)
+    @Composable
+    override fun accountAskAiPremium(n: Int): String =
+        stringResource(R.string.account_ask_ai_premium, n)
 
     override val accountFeatureMyCoupons: String
         @Composable get() = stringResource(R.string.account_feature_my_coupons)
@@ -1432,6 +1434,17 @@ object ResourceStrings : Strings {
 
     override val askAiLowDataNoteAll: String
         @Composable get() = stringResource(R.string.ask_ai_low_data_note_all)
+
+    @Composable
+    override fun askAiDailyLimit(n: Int): String =
+        stringResource(R.string.ask_ai_daily_limit, n)
+
+    @Composable
+    override fun askAiLockedLimit(n: Int): String =
+        stringResource(R.string.ask_ai_locked_limit, n)
+
+    override val couponAgfPendingNote: String
+        @Composable get() = stringResource(R.string.coupon_agf_pending_note)
 
     override val askAiUpgrade: String
         @Composable get() = stringResource(R.string.ask_ai_upgrade)

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.data.repository.TwoHorseRepository
 import com.twohorse.app.domain.model.Race
@@ -206,7 +207,8 @@ fun AskAiSheet(
     isPremium: Boolean,
     repository: TwoHorseRepository,
     onUpgradeClick: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    user: MembershipUser? = null
 ) {
     AskAiSheet(
         city = race.city,
@@ -216,7 +218,8 @@ fun AskAiSheet(
         repository = repository,
         onUpgradeClick = onUpgradeClick,
         onDismiss = onDismiss,
-        lowData = race.agfPending
+        lowData = race.agfPending,
+        user = user
     )
 }
 
@@ -236,7 +239,9 @@ fun AskAiSheet(
     onDismiss: () -> Unit,
     foreign: Boolean = false,
     /* Race has no AGF yet: say answers get better once morning data lands. */
-    lowData: Boolean = false
+    lowData: Boolean = false,
+    /* Daily question counts come from the server, never from the app. */
+    user: MembershipUser? = null
 ) {
     val strings = LocalStrings.current
 
@@ -304,8 +309,16 @@ fun AskAiSheet(
 
                     Spacer(Modifier.width(6.dp))
 
+                    val note =
+                        if (raceNumber == WHOLE_MEETING) strings.askAiLowDataNoteAll else strings.askAiLowDataNote
+
+                    val dailyLimit =
+                        user?.askAiPerDay?.takeIf { isPremium && it > 0 }
+
                     Text(
-                        text = if (raceNumber == 0) strings.askAiLowDataNoteAll else strings.askAiLowDataNote,
+                        text =
+                            if (dailyLimit != null) "$note ${strings.askAiDailyLimit(dailyLimit)}"
+                            else note,
                         color = Muted,
                         fontSize = 12.sp
                     )
@@ -332,8 +345,13 @@ fun AskAiSheet(
                         fontWeight = FontWeight.Black
                     )
 
+                    val premiumLimit =
+                        user?.premiumAskAiPerDay
+
                     Text(
-                        text = strings.askAiLockedBody,
+                        text =
+                            if (premiumLimit != null) "${strings.askAiLockedBody} ${strings.askAiLockedLimit(premiumLimit)}"
+                            else strings.askAiLockedBody,
                         color = Muted,
                         fontSize = 13.sp
                     )
