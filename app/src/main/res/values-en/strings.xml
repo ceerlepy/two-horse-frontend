@@ -100,8 +100,8 @@
     <string name="coupon_window_started">This %1$s window\'s first leg has started, so the prediction is no longer shown.</string>
     <string name="coupon_generated_summary">%3$s #%2$s coupon for %1$s generated with a %4$s TL budget.</string>
     <string name="coupon_none_generated">No suitable coupon could be generated for this selection. Try increasing the budget or choosing another window.</string>
-    <string name="coupon_intro_title">Optimize with a budget ladder</string>
-    <string name="coupon_intro_subtitle">Optimizes all legs together using model probabilities, generating increasing coupons from 500 TL up to your chosen max budget.</string>
+    <string name="coupon_intro_title">One coupon for each price range</string>
+    <string name="coupon_intro_subtitle">Our AI weighs all legs together and, up to the top budget you choose, prepares the coupon most likely to hit in each price range.</string>
     <string name="coupon_race_range">Race %1$s → Race %2$s</string>
     <string name="coupon_max_budget_and_count">Max budget %1$s TL · %2$s coupons</string>
     <string name="coupon_unit_price_and_multiplier">Unit price %1$s TL · Multiplier %2$s</string>
@@ -113,7 +113,6 @@
     <string name="coupon_ladder_fixed2_desc">Slightly wider coverage</string>
     <string name="coupon_ladder_variable_title">From 1000 TL to your ceiling</string>
     <string name="coupon_ladder_variable_desc">One more coupon for every 500 TL range, with wider coverage</string>
-    <string name="coupon_ladder_footer">Up to 1500 TL, each coupon also contains the horses of the one before.</string>
     <string name="coupon_tier_label">Tier %1$s / %2$s</string>
     <string name="coupon_amount_label">%1$s TL Coupon</string>
     <string name="coupon_risk_title">With surprises · %1$s TL</string>
@@ -197,7 +196,6 @@
     <string name="foreign_coupon_button">Create a coupon for this meeting</string>
     <string name="foreign_result_title">Result</string>
     <string name="ask_ai_whole_meeting">%1$s · all races</string>
-    <string name="home_next_day_expert_favorite">EXPERT FAVORITE</string>
     <string name="race_agf_pending_note">AGF and some other data usually arrive on race morning. The model scores you see now are built on missing data and are not fully accurate yet; they update once AGF opens in the morning.</string>
     <string name="race_tab_race">Race</string>
     <string name="race_tab_training">Training</string>
@@ -205,7 +203,7 @@
     <string name="region_tab_turkey">Turkey</string>
     <string name="region_tab_foreign">International</string>
     <string name="coupon_show_generated">Show generated coupons</string>
-    <string name="coupon_next_day_notice">Today\'s races are over. Tomorrow\'s (%1$s) coupons are built on race morning once AGF opens; our model does not build a coupon without AGF.</string>
+    <string name="coupon_next_day_notice">There isn\'t enough data yet for tomorrow\'s (%1$s) races. Most of it arrives on race morning; our AI prepares the coupons then, with more accurate predictions.</string>
     <string name="ask_ai_pick_race">Which race do you want to ask about?</string>
     <string name="foreign_alt_coupon_expand">Show</string>
     <string name="foreign_alt_coupon_collapse">Hide</string>
@@ -435,8 +433,8 @@
     <string name="home_next_day_title">Tomorrow\'s card · %1$s</string>
     <string name="home_next_day_note">Scores and AGF arrive on race-day morning; early expert picks are shown when available</string>
     <plurals name="home_next_day_expert_count">
-        <item quantity="one">%1$d expert</item>
-        <item quantity="other">%1$d experts</item>
+        <item quantity="one">Favourite of %1$d expert</item>
+        <item quantity="other">Favourite of %1$d experts</item>
     </plurals>
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Last 6: %1$s</string>

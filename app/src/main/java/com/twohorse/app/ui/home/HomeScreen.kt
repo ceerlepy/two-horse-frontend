@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -516,6 +517,52 @@ fun HomeScreen(
             }
         }
 
+        /*
+         * The Altılı / Beşli entry sits right under the day's header:
+         * below the next-race hero today, and under tomorrow's title and
+         * city chips once today is over (11 Oct: it had dropped below
+         * every one of tomorrow's race cards).
+         */
+        val sixFoldEntryItem: LazyListScope.() -> Unit = {
+            item {
+                Column(
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        )
+                ) {
+                    /*
+                     * The coupon screen lists exactly the cities home is
+                     * showing: today's still-running meetings, or
+                     * tomorrow's once today is over (9 Oct: home showed
+                     * Ankara while the coupon screen offered finished
+                     * Bursa and İstanbul).
+                     */
+                    SixFoldEntryCard(
+                        onClick = {
+                            if (nextDay != null) {
+                                onSixFoldClick(
+                                    nextDay.meetings.map { it.city },
+                                    nextDayCity,
+                                    nextDayDateLabel(
+                                        nextDay.date,
+                                        currentLanguage().code
+                                    )
+                                )
+                            } else {
+                                onSixFoldClick(
+                                    couponCities.ifEmpty { cities },
+                                    selectedCity,
+                                    null
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+
+        }
+
         if (
             loading
         ) {
@@ -561,7 +608,8 @@ fun HomeScreen(
                     selectedCity = nextDayCity,
                     onCitySelected = {
                         nextDayCity = it
-                    }
+                    },
+                    afterHeader = sixFoldEntryItem
                 )
             } else {
                 item {
@@ -580,7 +628,8 @@ fun HomeScreen(
                     selectedCity = nextDayCity,
                     onCitySelected = {
                         nextDayCity = it
-                    }
+                    },
+                    afterHeader = sixFoldEntryItem
                 )
             } else if (
                 upcomingCities.isEmpty()
@@ -626,41 +675,10 @@ fun HomeScreen(
                 }
             }
 
-            item {
-                Column(
-                    modifier =
-                        Modifier.padding(
-                            horizontal = 18.dp
-                        )
-                ) {
-                    /*
-                     * The coupon screen lists exactly the cities home is
-                     * showing: today's still-running meetings, or
-                     * tomorrow's once today is over (9 Oct: home showed
-                     * Ankara while the coupon screen offered finished
-                     * Bursa and İstanbul).
-                     */
-                    SixFoldEntryCard(
-                        onClick = {
-                            if (nextDay != null) {
-                                onSixFoldClick(
-                                    nextDay.meetings.map { it.city },
-                                    nextDayCity,
-                                    nextDayDateLabel(
-                                        nextDay.date,
-                                        currentLanguage().code
-                                    )
-                                )
-                            } else {
-                                onSixFoldClick(
-                                    couponCities.ifEmpty { cities },
-                                    selectedCity,
-                                    null
-                                )
-                            }
-                        }
-                    )
-                }
+            if (
+                nextDay == null
+            ) {
+                sixFoldEntryItem()
             }
 
             val remaining =

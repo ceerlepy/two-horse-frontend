@@ -100,8 +100,8 @@
     <string name="coupon_window_started">Bu %1$s penceresinin ilk ayağı başladı, tahmin artık gösterilmiyor.</string>
     <string name="coupon_generated_summary">%1$s için %2$s. %3$s kuponu %4$s TL bütçeyle oluşturuldu.</string>
     <string name="coupon_none_generated">Bu seçim için uygun kupon üretilemedi. Bütçeyi artırmayı veya diğer pencereyi seçmeyi dene.</string>
-    <string name="coupon_intro_title">Kademeli bütçeye göre optimize et</string>
-    <string name="coupon_intro_subtitle">Model olasılıklarını kullanarak tüm ayakları birlikte optimize eder ve 500 TL\'den seçtiğin üst bütçeye kadar artan kuponlar üretir.</string>
+    <string name="coupon_intro_title">Her fiyat aralığına bir kupon</string>
+    <string name="coupon_intro_subtitle">Yapay zekamız tüm ayakları birlikte değerlendirir ve seçtiğin üst bütçeye kadar her fiyat aralığı için tutma ihtimali en yüksek kuponu hazırlar.</string>
     <string name="coupon_race_range">%1$s. koşu → %2$s. koşu</string>
     <string name="coupon_max_budget_and_count">Üst bütçe %1$s TL · %2$s kupon</string>
     <string name="coupon_unit_price_and_multiplier">Birim fiyat %1$s TL · Çarpan %2$s</string>
@@ -113,7 +113,6 @@
     <string name="coupon_ladder_fixed2_desc">Biraz daha geniş kapsam</string>
     <string name="coupon_ladder_variable_title">1000 TL\'den üst bütçene</string>
     <string name="coupon_ladder_variable_desc">Her 500 TL\'lik aralıkta bir kupon daha, artan kapsamla</string>
-    <string name="coupon_ladder_footer">1500 TL\'ye kadar her kupon bir öncekinin atlarını da içerir.</string>
     <string name="coupon_tier_label">Kademe %1$s / %2$s</string>
     <string name="coupon_amount_label">%1$s TL Kupon</string>
     <string name="coupon_risk_title">Sürprizli · %1$s TL</string>
@@ -197,7 +196,6 @@
     <string name="foreign_coupon_button">Bu yarış için kupon oluştur</string>
     <string name="foreign_result_title">Sonuç</string>
     <string name="ask_ai_whole_meeting">%1$s · tüm koşular</string>
-    <string name="home_next_day_expert_favorite">UZMAN FAVORİSİ</string>
     <string name="race_agf_pending_note">AGF ve bazı veriler genelde yarış sabahı gelir. Bu yüzden şu an gördüğün model puanları eksik veriyle hesaplandı ve tam doğru değil; sabah AGF açılınca güncellenir.</string>
     <string name="race_tab_race">Koşu</string>
     <string name="race_tab_training">İdman</string>
@@ -205,7 +203,7 @@
     <string name="region_tab_turkey">Türkiye</string>
     <string name="region_tab_foreign">Yurt dışı</string>
     <string name="coupon_show_generated">Oluşturulan kuponları göster</string>
-    <string name="coupon_next_day_notice">Bugünün yarışları bitti. Yarının (%1$s) kuponları yarış sabahı AGF açılınca hazırlanır; modelimiz AGF olmadan kupon kurmaz.</string>
+    <string name="coupon_next_day_notice">Yarının (%1$s) yarışları için henüz yeterli veri yok. Verilerin çoğu yarış sabahı geliyor; yapay zekamız kuponları o zaman, daha isabetli tahminlerle hazırlıyor.</string>
     <string name="ask_ai_pick_race">Hangi koşuyu soracaksın?</string>
     <string name="foreign_alt_coupon_expand">Göster</string>
     <string name="foreign_alt_coupon_collapse">Gizle</string>
@@ -435,8 +433,8 @@
     <string name="home_next_day_title">Yarının programı · %1$s</string>
     <string name="home_next_day_note">Puanlar ve AGF yarış günü sabah gelir; erken uzman tahminleri geldikçe gösterilir</string>
     <plurals name="home_next_day_expert_count">
-        <item quantity="one">%1$d uzman</item>
-        <item quantity="other">%1$d uzman</item>
+        <item quantity="one">%1$d uzman favori</item>
+        <item quantity="other">%1$d uzman favori</item>
     </plurals>
     <string name="home_next_day_runner_weight">%1$s kg</string>
     <string name="home_next_day_runner_form">Son 6: %1$s</string>

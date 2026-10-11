@@ -389,9 +389,6 @@ object ResourceStrings : Strings {
     override val couponLadderVariableDesc: String
         @Composable get() = stringResource(R.string.coupon_ladder_variable_desc)
 
-    override val couponLadderFooter: String
-        @Composable get() = stringResource(R.string.coupon_ladder_footer)
-
     @Composable
     override fun couponTierLabel(index: Int, total: Int): String =
         stringResource(R.string.coupon_tier_label, index, total)
@@ -662,9 +659,6 @@ object ResourceStrings : Strings {
     @Composable
     override fun askAiWholeMeeting(city: String): String =
         stringResource(R.string.ask_ai_whole_meeting, city)
-
-    override val homeNextDayExpertFavorite: String
-        @Composable get() = stringResource(R.string.home_next_day_expert_favorite)
 
     override val raceAgfPendingNote: String
         @Composable get() = stringResource(R.string.race_agf_pending_note)

@@ -269,8 +269,6 @@ interface Strings {
     val couponLadderVariableTitle: String
     @get:Composable
     val couponLadderVariableDesc: String
-    @get:Composable
-    val couponLadderFooter: String
     @Composable
     fun couponTierLabel(index: Int, total: Int): String
     @Composable
@@ -433,8 +431,6 @@ interface Strings {
     val askAiPickRace: String
     @Composable
     fun askAiWholeMeeting(city: String): String
-    @get:Composable
-    val homeNextDayExpertFavorite: String
     @get:Composable
     val raceAgfPendingNote: String
     @get:Composable
