@@ -821,11 +821,11 @@ fun CouponScreen(
      * Coupons already in Kuponlarım: a rebuilt coupon with the same horses
      * shows "Kaydedildi" instead of offering the save again.
      */
-    var savedCoupons by remember { mutableStateOf<List<MyCoupon>>(emptyList()) }
+    var savedKeys by remember { mutableStateOf<Set<String>>(emptySet()) }
 
     LaunchedEffect(generated) {
         if (generated != null && canGenerateCoupons) {
-            repository.myCoupons().onSuccess { savedCoupons = it }
+            repository.myCoupons().onSuccess { saved -> savedKeys = saved.map(::couponKey).toSet() }
         }
     }
 
@@ -976,7 +976,7 @@ fun CouponScreen(
                         tierIndex = index + 1,
                         tierCount = shownCoupons.size,
                         riskLover = showRisk,
-                        alreadySaved = isAlreadySaved(couponResult, coupon, savedCoupons),
+                        alreadySaved = couponKey(couponResult, coupon) in savedKeys,
                         onSave =
                             if (canGenerateCoupons) {
                                 { repository.saveMyCoupon(couponResult, coupon) }
@@ -1332,22 +1332,37 @@ private fun ResultSummary(
 
 private enum class SaveState { Idle, Saving, Saved, Failed }
 
-/* Same day, meeting, pool, window and the same horses in every leg. */
-private fun isAlreadySaved(
-    result: CouponResult,
-    coupon: Coupon,
-    saved: List<MyCoupon>
-): Boolean {
-    val legs = coupon.legs.associate { leg -> leg.raceNumber to leg.horses.map { it.horseNumber }.toSet() }
+/*
+ * One key per coupon: day, meeting, pool, window and the sorted horses of
+ * every leg. Equal keys mean the same coupon, so a lookup in the saved set
+ * replaces comparing leg by leg.
+ */
+private fun couponKey(
+    raceDate: String?,
+    city: String,
+    pool: String,
+    window: Int,
+    legs: Map<Int, List<Int>>
+): String =
+    listOf(
+        raceDate.orEmpty(),
+        city.lowercase(),
+        pool,
+        window.toString(),
+        legs.toSortedMap().entries.joinToString(";") { (race, horses) -> "$race:" + horses.sorted().joinToString(",") }
+    ).joinToString("|")
 
-    return saved.any { entry ->
-        (result.date == null || entry.raceDate == result.date) &&
-            entry.city.equals(result.city, ignoreCase = true) &&
-            entry.pool == result.pool &&
-            entry.windowNumber == result.sixfold &&
-            entry.legs.associate { it.raceNumber to it.horseNumbers.toSet() } == legs
-    }
-}
+private fun couponKey(saved: MyCoupon): String =
+    couponKey(saved.raceDate, saved.city, saved.pool, saved.windowNumber, saved.legs.associate { it.raceNumber to it.horseNumbers })
+
+private fun couponKey(result: CouponResult, coupon: Coupon): String =
+    couponKey(
+        result.date,
+        result.city,
+        result.pool,
+        result.sixfold,
+        coupon.legs.associate { leg -> leg.raceNumber to leg.horses.map { it.horseNumber } }
+    )
 
 @Composable
 private fun CouponCard(
