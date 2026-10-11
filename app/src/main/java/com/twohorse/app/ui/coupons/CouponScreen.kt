@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,7 +72,7 @@ private fun poolLabel(pool: String): String {
     return if (pool == "fivefold") strings.poolLabelFivefold else strings.poolLabelSixfold
 }
 
-private const val GOLD_MAX_COUPON_BUDGET_TL = 1000.0
+private const val GOLD_MAX_COUPON_BUDGET_TL = 1500.0
 
 @Composable
 fun CouponScreen(
@@ -100,8 +101,6 @@ fun CouponScreen(
 
     val tier = currentUser?.tier ?: "free"
     val canGenerateCoupons = tier != "free"
-    val maxBudgetTl =
-        if (tier == "gold") GOLD_MAX_COUPON_BUDGET_TL else Double.MAX_VALUE
 
     val repository =
         remember {
@@ -734,13 +733,16 @@ fun CouponScreen(
                         Arrangement.spacedBy(8.dp)
                 ) {
                     items(
-                        listOf(
-                            1000.0,
-                            2000.0,
-                            3000.0,
-                            4000.0,
-                            5000.0
-                        ).filter { it <= maxBudgetTl }
+                        if (tier == "gold")
+                            listOf(GOLD_MAX_COUPON_BUDGET_TL)
+                        else
+                            listOf(
+                                1000.0,
+                                2000.0,
+                                3000.0,
+                                4000.0,
+                                5000.0
+                            )
                     ) { value ->
                         SelectChip(
                             text =
@@ -947,15 +949,29 @@ fun CouponScreen(
 
             /* What the coupons are, in a sentence; the Sürprizli tab has its own. */
             item {
-                Text(
-                    text = if (showRisk) strings.couponRiskSectionBody else strings.couponMainSectionBody,
+                Row(
                     modifier =
                         Modifier.padding(
                             horizontal = 18.dp
                         ),
-                    color = Muted,
-                    fontSize = 12.sp
-                )
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = Muted,
+                        modifier = Modifier.padding(top = 1.dp).size(15.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = if (showRisk) strings.couponRiskSectionBody else strings.couponMainSectionBody,
+                        color = Muted,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
             }
 
             val shownCoupons = if (showRisk) riskCoupons else visibleCoupons
