@@ -281,6 +281,7 @@ fun ForeignScreen(
             raceNumber = askRace,
             raceDate = askMeeting.raceDate,
             isPremium = currentUser?.tier == "premium",
+            user = currentUser,
             repository = repository,
             onUpgradeClick = {
                 askRaceNumber = null

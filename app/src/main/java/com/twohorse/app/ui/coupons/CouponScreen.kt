@@ -43,6 +43,7 @@ import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.domain.model.MyCoupon
 import com.twohorse.app.domain.model.Race
 import com.twohorse.app.i18n.LocalStrings
+import com.twohorse.app.ui.components.AgfPendingNotice
 import com.twohorse.app.ui.components.SegmentTabs
 import com.twohorse.app.ui.race.InfoButton
 import com.twohorse.app.ui.theme.*
@@ -604,6 +605,15 @@ fun CouponScreen(
                 }
             }
         } else {
+
+        /* Built before the morning data: say a rebuild then will be better. Gone once AGF lands. */
+        if (!foreign && todayRaces.any { it.agfPending }) {
+            item {
+                AgfPendingNotice(
+                    text = strings.couponAgfPendingNote
+                )
+            }
+        }
 
         item {
             Column(

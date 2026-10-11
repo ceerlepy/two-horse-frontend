@@ -98,8 +98,8 @@ interface Strings {
     val accountUnlimited: String
     @get:Composable
     val accountGoldDescription: String
-    @get:Composable
-    val accountPremiumDescription: String
+    @Composable
+    fun accountPremiumDescription(askAiPerDay: Int): String
     @Composable
     fun accountUpgradeTo(tierTitle: String): String
     @get:Composable
@@ -873,8 +873,8 @@ interface Strings {
     fun couponHistoryWindow(pool: String, windowNumber: Int): String
     @get:Composable
     val accountFeatureAskAi: String
-    @get:Composable
-    val accountAskAiPremium: String
+    @Composable
+    fun accountAskAiPremium(n: Int): String
     @get:Composable
     val accountFeatureMyCoupons: String
 
@@ -905,6 +905,12 @@ interface Strings {
     val askAiLowDataNote: String
     @get:Composable
     val askAiLowDataNoteAll: String
+    @Composable
+    fun askAiDailyLimit(n: Int): String
+    @get:Composable
+    val couponAgfPendingNote: String
+    @Composable
+    fun askAiLockedLimit(n: Int): String
     @get:Composable
     val askAiUpgrade: String
     @get:Composable

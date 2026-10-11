@@ -21,7 +21,7 @@
     <string name="account_subscription_renews_at">Abonelik %1$s tarihinde yenilenir</string>
     <string name="account_unlimited">Süresiz</string>
     <string name="account_gold_description">Tüm model sinyalleri ve uzman konsensusu · günde 10 kupon, 1.500 TL\'ye kadar · Kuponlarım</string>
-    <string name="account_premium_description">Gold\'un hepsi + \"AGF\'nin hafife aldığı at\" etiketi + AI\'ya sor (günde 20 soru) + sınırsız kupon + Kuponlarım</string>
+    <string name="account_premium_description">Gold\'un hepsi + \"AGF\'nin hafife aldığı at\" etiketi + AI\'ya sor (günde %1$d soru) + sınırsız kupon + Kuponlarım</string>
     <string name="account_upgrade_to">%1$s\'a Yükselt</string>
     <string name="account_loading_ellipsis">Yükleniyor…</string>
     <string name="account_already_premium">Zaten Premium\'sun, her şey açık.</string>
@@ -394,7 +394,7 @@
     <string name="coupon_history_window_sixfold">%1$d. Altılı</string>
     <string name="coupon_history_window_fivefold">%1$d. Beşli</string>
     <string name="account_feature_ask_ai">AI\'ya sor</string>
-    <string name="account_ask_ai_premium">20/gün</string>
+    <string name="account_ask_ai_premium">%1$d/gün</string>
     <string name="account_feature_my_coupons">Kuponlarım</string>
 
     <!-- AI'ya sor -->
@@ -408,9 +408,12 @@
     <string name="ask_ai_disclaimer">Yapay zeka cevabıdır, hata yapabilir. Bahis tavsiyesi değildir.</string>
     <string name="ask_ai_you">Sen</string>
     <string name="ask_ai_locked_title">🤖 AI\'ya sor · Premium</string>
-    <string name="ask_ai_low_data_note">Bu koşu için bazı veriler henüz gelmedi, cevaplar sabahki kadar isabetli olmayabilir. Sabah veriler geldikçe daha iyi cevap alırsın; günde 20 soru hakkın var.</string>
-    <string name="ask_ai_low_data_note_all">Koşular için bazı veriler henüz gelmedi, cevaplar sabahki kadar isabetli olmayabilir. Sabah veriler geldikçe daha iyi cevap alırsın; günde 20 soru hakkın var.</string>
-    <string name="ask_ai_locked_body">Bu koşu hakkında yapay zekaya soru sor, cevabını bizim verimizden alsın. Premium üyelere günde 20 soru.</string>
+    <string name="ask_ai_low_data_note">Bu koşu için bazı veriler henüz gelmedi, cevaplar sabahki kadar isabetli olmayabilir. Sabah veriler geldikçe daha iyi cevap alırsın.</string>
+    <string name="ask_ai_low_data_note_all">Koşular için bazı veriler henüz gelmedi, cevaplar sabahki kadar isabetli olmayabilir. Sabah veriler geldikçe daha iyi cevap alırsın.</string>
+    <string name="coupon_agf_pending_note">Şu an bazı veriler eksik. Sabah veriler geldikçe kuponu yeniden oluşturursan en iyi sonucu o zaman görürsün.</string>
+    <string name="ask_ai_daily_limit">Günde %1$d soru hakkın var.</string>
+    <string name="ask_ai_locked_body">Bu koşu hakkında yapay zekaya soru sor, cevabını bizim verimizden alsın.</string>
+    <string name="ask_ai_locked_limit">Premium üyelere günde %1$d soru.</string>
     <string name="ask_ai_upgrade">Premium\'a geç</string>
     <string name="ask_ai_error_busy">Şu an çok yoğun, biraz sonra tekrar dene.</string>
     <string name="ask_ai_error_failed">Cevap alınamadı, tekrar dene.</string>

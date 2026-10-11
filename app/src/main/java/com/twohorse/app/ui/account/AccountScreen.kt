@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.twohorse.app.domain.model.premiumAskAiLimit
 import com.twohorse.app.data.api.ApiException
 import com.twohorse.app.Config
 import com.twohorse.app.billing.BASE_PLAN_MONTHLY
@@ -490,7 +491,8 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     PlanComparisonTable(
-                        currentTier = activeUser?.tier ?: "free"
+                        currentTier = activeUser?.tier ?: "free",
+                        premiumAskAiPerDay = activeUser.premiumAskAiLimit
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -551,7 +553,7 @@ fun AccountScreen(
                 if (paidTier != "premium") {
                     PlanCard(
                         title = strings.accountTierTitle("premium"),
-                        description = strings.accountPremiumDescription,
+                        description = strings.accountPremiumDescription(user.premiumAskAiLimit),
                         price = premiumProduct.priceFor(billingPeriod),
                         yearly = billingPeriod == BASE_PLAN_YEARLY,
                         highlighted = false,
@@ -1213,7 +1215,8 @@ private sealed interface PlanCell {
 
 @Composable
 internal fun PlanComparisonTable(
-    currentTier: String
+    currentTier: String,
+    premiumAskAiPerDay: Int
 ) {
     val strings = LocalStrings.current
 
@@ -1245,7 +1248,7 @@ internal fun PlanComparisonTable(
                 listOf(
                     PlanCell.No,
                     PlanCell.No,
-                    PlanCell.Label(strings.accountAskAiPremium)
+                    PlanCell.Label(strings.accountAskAiPremium(premiumAskAiPerDay))
                 ),
             strings.accountFeatureVideos to
                 listOf(PlanCell.Yes, PlanCell.Yes, PlanCell.Yes)

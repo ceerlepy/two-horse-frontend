@@ -347,6 +347,10 @@ data class ForeignMeeting(
     val raceDate: String? = null
 )
 
+/* Premium's daily "AI'ya sor" questions as the server reports them; 20 only before it answers. */
+val MembershipUser?.premiumAskAiLimit: Int
+    get() = this?.premiumAskAiPerDay ?: 20
+
 data class MembershipUser(
     val id: String,
     val email: String,
@@ -358,7 +362,10 @@ data class MembershipUser(
     /* false once the member cancelled in Google Play (runs to expiry). */
     val subscriptionAutoRenew: Boolean? = null,
     /* Plan a scheduled switch moves to at the next renewal. */
-    val subscriptionPendingTier: String? = null
+    val subscriptionPendingTier: String? = null,
+    /* "AI'ya sor" questions a day, from the server (null on an old server). */
+    val askAiPerDay: Int? = null,
+    val premiumAskAiPerDay: Int? = null
 ) {
     val isFree: Boolean get() = tier == "free"
     val isGold: Boolean get() = tier == "gold"

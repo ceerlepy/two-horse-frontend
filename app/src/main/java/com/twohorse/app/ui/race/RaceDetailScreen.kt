@@ -546,6 +546,7 @@ fun RaceDetailScreen(
         AskAiSheet(
             race = currentRace,
             isPremium = currentUser?.tier == "premium",
+            user = currentUser,
             repository = repository,
             onUpgradeClick = {
                 askOpen = false

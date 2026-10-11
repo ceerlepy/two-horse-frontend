@@ -1401,7 +1401,9 @@ fun SegmentTabs(
  * until race morning): the scores below are built on missing data.
  */
 @Composable
-fun AgfPendingNotice() {
+fun AgfPendingNotice(
+    text: String? = null
+) {
     val strings = LocalStrings.current
 
     Surface(
@@ -1427,7 +1429,7 @@ fun AgfPendingNotice() {
             Spacer(Modifier.width(10.dp))
 
             Text(
-                text = strings.raceAgfPendingNote,
+                text = text ?: strings.raceAgfPendingNote,
                 color = Red,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,

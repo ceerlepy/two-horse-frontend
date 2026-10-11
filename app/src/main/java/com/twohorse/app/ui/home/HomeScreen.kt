@@ -48,6 +48,7 @@ import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.i18n.currentLanguage
 import com.twohorse.app.ui.components.AppErrorState
 import com.twohorse.app.ui.components.AutoRefreshEffect
+import com.twohorse.app.ui.components.autoRefreshIntervalMillis
 import com.twohorse.app.ui.components.CityChip
 import com.twohorse.app.ui.components.EmptyRaceState
 import com.twohorse.app.ui.components.AgfPendingNotice
@@ -102,9 +103,17 @@ fun HomeScreen(
     val lifecycleOwner =
         LocalLifecycleOwner.current
 
+    val cacheKey =
+        "${user?.id}|${user?.tier}"
+
+    val cached =
+        remember(cacheKey) {
+            HomeTodayCache.snapshot(cacheKey)
+        }
+
     var loading by
         remember {
-            mutableStateOf(true)
+            mutableStateOf(cached?.data == null)
         }
 
     var refreshing by
@@ -124,8 +133,8 @@ fun HomeScreen(
 
     var data by
         remember {
-            mutableStateOf<TodayData?>(
-                null
+            mutableStateOf(
+                cached?.data
             )
         }
 
@@ -145,10 +154,16 @@ fun HomeScreen(
 
     var selectedCity by
         remember {
-            mutableStateOf<String?>(
-                null
+            mutableStateOf(
+                cached?.selectedCity
             )
         }
+
+    LaunchedEffect(selectedCity) {
+        if (HomeTodayCache.key == cacheKey) {
+            HomeTodayCache.selectedCity = selectedCity
+        }
+    }
 
     var remainingExpanded by
         remember {
@@ -227,6 +242,33 @@ fun HomeScreen(
             return@LaunchedEffect
         }
 
+        /*
+         * Coming back from Account or Coupons rebuilds this screen. The
+         * data fetched a moment ago is still on screen from the cache, so
+         * only fetch again once the auto-refresh interval has passed.
+         */
+        val now =
+            System.currentTimeMillis()
+
+        val cachedData =
+            cached?.data
+
+        if (
+            refreshKey == 0L &&
+            cachedData != null &&
+            now - cached.fetchedAt <
+                autoRefreshIntervalMillis(
+                    cachedData.meetings
+                        .flatMap { it.races }
+                        .mapNotNull { raceTimeMillis(it) }
+                        .filter { it >= now }
+                        .minOrNull(),
+                    now
+                )
+        ) {
+            return@LaunchedEffect
+        }
+
         requestInFlight =
             true
 
@@ -248,6 +290,10 @@ fun HomeScreen(
             .onSuccess {
                 data =
                     it
+
+                HomeTodayCache.key = cacheKey
+                HomeTodayCache.data = it
+                HomeTodayCache.fetchedAt = System.currentTimeMillis()
 
                 showingStaleData =
                     false
@@ -876,6 +922,7 @@ fun HomeScreen(
         AskAiSheet(
             race = race,
             isPremium = user?.tier == "premium",
+            user = user,
             repository = repository,
             onUpgradeClick = {
                 askRace = null
@@ -1154,4 +1201,29 @@ private fun TrialStrip(
             tint = Green
         )
     }
+}
+
+/*
+ * Today's data outlives the home screen, so returning from Account or
+ * Coupons shows it at once instead of the loading skeleton. Keyed by
+ * member and plan, because what the server sends depends on the plan.
+ */
+private object HomeTodayCache {
+    var key: String? = null
+    var data: TodayData? = null
+    var fetchedAt: Long = 0L
+    var selectedCity: String? = null
+
+    fun snapshot(forKey: String): Snapshot? =
+        if (key == forKey && data != null) {
+            Snapshot(data, fetchedAt, selectedCity)
+        } else {
+            null
+        }
+
+    class Snapshot(
+        val data: TodayData?,
+        val fetchedAt: Long,
+        val selectedCity: String?
+    )
 }

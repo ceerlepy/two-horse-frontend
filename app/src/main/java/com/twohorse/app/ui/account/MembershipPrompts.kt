@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.twohorse.app.domain.model.premiumAskAiLimit
 import com.twohorse.app.domain.model.MembershipUser
 import com.twohorse.app.i18n.LocalStrings
 import com.twohorse.app.i18n.currentLanguage
@@ -93,6 +94,7 @@ fun MembershipPrompts(
 
         isTrialEnded(activeUser) && !context.promptSeen(endedKey) ->
             TrialEndedDialog(
+                premiumAskAiPerDay = activeUser.premiumAskAiLimit,
                 onCompare = { close(endedKey, openPlans = true) },
                 onContinueFree = { close(endedKey, openPlans = false) }
             )
@@ -209,12 +211,13 @@ private fun WelcomeDialog(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        PlanComparisonTable(currentTier = user.tier)
+        PlanComparisonTable(currentTier = user.tier, premiumAskAiPerDay = user.premiumAskAiLimit)
     }
 }
 
 @Composable
 private fun TrialEndedDialog(
+    premiumAskAiPerDay: Int,
     onCompare: () -> Unit,
     onContinueFree: () -> Unit
 ) {
@@ -279,7 +282,7 @@ private fun TrialEndedDialog(
 
         ShortPlan(
             title = strings.accountTierTitle("premium"),
-            description = strings.accountPremiumDescription,
+            description = strings.accountPremiumDescription(premiumAskAiPerDay),
             accent = Green
         )
     }
