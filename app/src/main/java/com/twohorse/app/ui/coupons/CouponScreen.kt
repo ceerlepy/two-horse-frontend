@@ -71,7 +71,7 @@ private fun poolLabel(pool: String): String {
     return if (pool == "fivefold") strings.poolLabelFivefold else strings.poolLabelSixfold
 }
 
-private const val GOLD_MAX_COUPON_BUDGET_TL = 1500.0
+private const val GOLD_MAX_COUPON_BUDGET_TL = 1000.0
 
 @Composable
 fun CouponScreen(
@@ -154,7 +154,7 @@ fun CouponScreen(
                 if (tier == "gold")
                     GOLD_MAX_COUPON_BUDGET_TL
                 else
-                    3000.0
+                    2000.0
             )
         }
 
@@ -735,12 +735,11 @@ fun CouponScreen(
                 ) {
                     items(
                         listOf(
-                            500.0,
-                            750.0,
-                            1500.0,
+                            1000.0,
+                            2000.0,
                             3000.0,
-                            5000.0,
-                            10000.0
+                            4000.0,
+                            5000.0
                         ).filter { it <= maxBudgetTl }
                     ) { value ->
                         SelectChip(
@@ -946,18 +945,17 @@ fun CouponScreen(
                 }
             }
 
-            if (showRisk) {
-                item {
-                    Text(
-                        text = strings.couponRiskSectionBody,
-                        modifier =
-                            Modifier.padding(
-                                horizontal = 18.dp
-                            ),
-                        color = Muted,
-                        fontSize = 12.sp
-                    )
-                }
+            /* What the coupons are, in a sentence; the Sürprizli tab has its own. */
+            item {
+                Text(
+                    text = if (showRisk) strings.couponRiskSectionBody else strings.couponMainSectionBody,
+                    modifier =
+                        Modifier.padding(
+                            horizontal = 18.dp
+                        ),
+                    color = Muted,
+                    fontSize = 12.sp
+                )
             }
 
             val shownCoupons = if (showRisk) riskCoupons else visibleCoupons
@@ -1398,10 +1396,15 @@ private fun CouponCard(
     ) {
         CouponCardHeader(
             title =
-                if (riskLover) {
-                    strings.couponRiskTitle(coupon.budgetTl.toInt())
-                } else {
-                    strings.couponAmountLabel(coupon.budgetTl.toInt())
+                when {
+                    coupon.bandMinTl == null && riskLover ->
+                        strings.couponRiskTitle(coupon.budgetTl.toInt())
+                    coupon.bandMinTl == null ->
+                        strings.couponAmountLabel(coupon.budgetTl.toInt())
+                    riskLover ->
+                        strings.couponRiskBandTitle(coupon.bandMinTl.toInt(), coupon.budgetTl.toInt())
+                    else ->
+                        strings.couponBandLabel(coupon.bandMinTl.toInt(), coupon.budgetTl.toInt())
                 },
             subtitle =
                 strings.couponTierLabel(tierIndex, tierCount),
@@ -1847,7 +1850,7 @@ private fun CouponBudgetLadderInfo() {
 
             LadderLegendRow(
                 symbol =
-                    "3-6",
+                    "3+",
                 title =
                     strings.couponLadderVariableTitle,
                 description =
