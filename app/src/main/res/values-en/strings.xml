@@ -125,6 +125,7 @@
     <string name="coupon_tab_main">Coupons</string>
     <string name="coupon_tab_risk">With surprises</string>
     <string name="coupon_risk_section_body">Our AI prepares coupons with surprises only in the price ranges it finds suitable, adding the strongest surprise candidates next to the favourites.</string>
+    <string name="coupon_no_surprise_note">Our model found no surprise horse in these legs, so there is no coupon with surprises.</string>
     <string name="coupon_metric_combinations">Combinations</string>
     <string name="coupon_metric_coverage">Coverage</string>
     <string name="coupon_coverage_info_title">Coverage</string>
@@ -185,7 +186,7 @@
     <string name="foreign_win_prob_note">Win chance: AGF adjusted for country and field size</string>
     <string name="foreign_win_prob">Win %1$s%%</string>
     <string name="foreign_win_prob_info_title">AGF and win chance</string>
-    <string name="foreign_win_prob_info">The green AGF tag is the share of money bet on that horse. The yellow \"Win %\" tag is our own model\'s estimate of its chance to win; it does not mean the horse will win. International races have no value label.</string>
+    <string name="foreign_win_prob_info">The green AGF tag is the share of money bet on that horse. The yellow \"Win %\" tag is our own model\'s estimate of its chance to win; it does not mean the horse will win. International races have no gap-to-AGF label.</string>
     <string name="foreign_race_title">Race %1$s</string>
     <string name="foreign_back">Back</string>
     <string name="foreign_ai_top">Alternative favourite: %1$s</string>

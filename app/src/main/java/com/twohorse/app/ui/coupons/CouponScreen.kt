@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -66,6 +67,9 @@ private fun couponRaceStartMillis(
         OffsetDateTime.parse(value).toInstant().toEpochMilli()
     }.getOrNull()
 }
+
+/* Lowest coupon budget for which the backend offers Sürprizli coupons (750-1000 TL band). */
+private const val NO_SURPRISE_NOTE_MIN_BUDGET_TL = 750.0
 
 @Composable
 private fun poolLabel(pool: String): String {
@@ -964,6 +968,46 @@ fun CouponScreen(
                         selectedIndex = if (showRisk) 1 else 0,
                         onSelect = { riskTabSelected = it == 1 }
                     )
+                }
+            }
+
+            /*
+             * The Sürprizli tab only appears when the model found a surprise
+             * horse; in a price range where it would be offered (750 TL and
+             * up), say so instead of leaving the tab out silently. Foreign
+             * coupons have no Sürprizli version.
+             */
+            val noSurpriseNote =
+                !foreign &&
+                    visibleCoupons.isNotEmpty() &&
+                    riskCoupons.isEmpty() &&
+                    couponResult.budgetTl >= NO_SURPRISE_NOTE_MIN_BUDGET_TL
+
+            if (noSurpriseNote) {
+                item {
+                    Row(
+                        modifier =
+                            Modifier.padding(
+                                horizontal = 18.dp
+                            ),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ErrorOutline,
+                            contentDescription = null,
+                            tint = Amber,
+                            modifier = Modifier.padding(top = 1.dp).size(15.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = strings.couponNoSurpriseNote,
+                            color = Amber,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
                 }
             }
 
