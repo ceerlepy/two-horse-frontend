@@ -290,6 +290,8 @@ interface Strings {
     @get:Composable
     val couponRiskSectionBody: String
     @get:Composable
+    val couponNoSurpriseNote: String
+    @get:Composable
     val couponMetricCombinations: String
     @get:Composable
     val couponMetricCoverage: String

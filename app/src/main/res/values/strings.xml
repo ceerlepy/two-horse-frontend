@@ -125,6 +125,7 @@
     <string name="coupon_tab_main">Kuponlar</string>
     <string name="coupon_tab_risk">Sürprizli</string>
     <string name="coupon_risk_section_body">Yapay zekamız sürprizli kuponu yalnızca uygun gördüğü fiyat aralıklarında hazırlar ve en güçlü sürpriz adaylarını favorilerin yanına ekler.</string>
+    <string name="coupon_no_surprise_note">Bu ayaklarda modelimizin belirlediği bir sürpriz at yok, bu yüzden sürprizli kupon hazırlanmadı.</string>
     <string name="coupon_metric_combinations">Kombinasyon</string>
     <string name="coupon_metric_coverage">Kapsama</string>
     <string name="coupon_coverage_info_title">Kapsama</string>
@@ -185,7 +186,7 @@
     <string name="foreign_win_prob_note">Kazanma ihtimali: AGF\'nin ülke ve alan büyüklüğüne göre düzeltilmiş hali</string>
     <string name="foreign_win_prob">Kazanma %%%1$s</string>
     <string name="foreign_win_prob_info_title">AGF ve kazanma tahmini</string>
-    <string name="foreign_win_prob_info">Yeşil etiketteki AGF, oyuncuların o ata yatırdığı paranın payıdır. Sarı \"Kazanma %\" etiketi ise kendi modelimizin o atın kazanma ihtimali için tahminidir; kesin kazanır anlamına gelmez. Yurt dışı koşularda değer etiketi yoktur.</string>
+    <string name="foreign_win_prob_info">Yeşil etiketteki AGF, oyuncuların o ata yatırdığı paranın payıdır. Sarı \"Kazanma %\" etiketi ise kendi modelimizin o atın kazanma ihtimali için tahminidir; kesin kazanır anlamına gelmez. Yurt dışı koşularda AGF farkı etiketi yoktur.</string>
     <string name="foreign_race_title">%1$s. Koşu</string>
     <string name="foreign_back">Geri</string>
     <string name="foreign_ai_top">Alternatif favori: %1$s</string>

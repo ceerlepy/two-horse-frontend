@@ -431,6 +431,9 @@ object ResourceStrings : Strings {
     override val couponRiskSectionBody: String
         @Composable get() = stringResource(R.string.coupon_risk_section_body)
 
+    override val couponNoSurpriseNote: String
+        @Composable get() = stringResource(R.string.coupon_no_surprise_note)
+
     override val couponMetricCombinations: String
         @Composable get() = stringResource(R.string.coupon_metric_combinations)
 
